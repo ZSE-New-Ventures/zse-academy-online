@@ -47,13 +47,25 @@ export const formatDate = (dateString: string): string => {
 };
 
 export const transformBlogPost = (post: any): any => {
+  let cleanContent = post.content || '';
+  // Fix escaped forward slashes which might break HTML rendering or URLs
+  if (typeof cleanContent === 'string') {
+    cleanContent = cleanContent.replace(/\\\//g, '/');
+  }
+
+  let cleanImage = post.image || '';
+  if (typeof cleanImage === 'string') {
+    cleanImage = cleanImage.replace(/\\\//g, '/');
+  }
+
   return {
     ...post,
+    content: cleanContent,
     author: post.user ? { name: post.user.name, email: post.user.email } : { name: "Anonymous Author", email: "" },
-    image: post.image || getFallbackImage(post.id),
-    excerpt: generateExcerpt(post.content),
+    image: cleanImage || getFallbackImage(post.id),
+    excerpt: generateExcerpt(cleanContent),
     category: post.category || getRandomCategory(),
-    read_time: calculateReadTime(post.content),
+    read_time: calculateReadTime(cleanContent),
     tags: generateTags(post.title),
   };
 };

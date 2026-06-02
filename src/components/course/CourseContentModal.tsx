@@ -6,6 +6,8 @@ import {
   faForward,
   faBackward,
   faCheck,
+  faExpand,
+  faCompress,
 } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
@@ -63,6 +65,7 @@ export const CourseContentModal = ({
   const [slideDirection, setSlideDirection] = useState<"left" | "right">("right");
   const [loadingFinish, setLoadingFinish] = useState(false);
   const [isModuleCompleted, setIsModuleCompleted] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const token = localStorage.getItem("zse_training_token");
 
@@ -143,14 +146,22 @@ export const CourseContentModal = ({
     slideDirection === "right" ? "animate-slide-in-right" : "animate-slide-in-left";
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
-      <div className="bg-background rounded-lg w-full max-w-6xl aspect-video relative flex flex-col overflow-hidden">
+    <div className={`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 ${isFullscreen ? 'p-0' : 'p-4'}`}>
+      <div className={`bg-background relative flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen ? 'w-full h-full rounded-none' : 'w-full max-w-6xl aspect-video rounded-lg'}`}>
         {/* HEADER */}
         <div className="flex justify-between items-center p-4 border-b bg-background">
           <div className="flex items-center space-x-4">
             <button
+              onClick={() => setIsFullscreen(!isFullscreen)}
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+            >
+              <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} className="h-5 w-5" />
+            </button>
+            <button
               onClick={onClose}
               className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+              title="Close"
             >
               <FontAwesomeIcon icon={faXmark} className="h-5 w-5" />
             </button>

@@ -228,13 +228,7 @@ const Courses = () => {
               Learn from the best courses
             </h1>
             <p className="text-lg md:text-xl text-purple-100 transition-all duration-300">
-              {showFullDesc ? heroDescription : `${heroDescription.substring(0, 25)}...`}
-              <button
-                onClick={() => setShowFullDesc(!showFullDesc)}
-                className="ml-2 underline font-bold hover:text-white text-purple-200 transition-colors text-sm"
-              >
-                {showFullDesc ? "Read Less" : "Read More"}
-              </button>
+              {heroDescription}
             </p>
           </div>
         </div>
@@ -339,22 +333,7 @@ const Courses = () => {
 
                     <p className="text-xs text-gray-600 mb-2">{course.instructor}</p>
 
-                    <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-                      {course.description ? (
-                        course.description.length > 50 ? (
-                          <>
-                            {course.description.substring(0, 50)}...
-                            <Link to={`/courses/${course.id}`} className="text-purple-600 hover:text-purple-800 font-semibold ml-1">
-                              Read More
-                            </Link>
-                          </>
-                        ) : (
-                          course.description
-                        )
-                      ) : (
-                        "No description available."
-                      )}
-                    </p>
+                    {/* Description Removed */}
 
                     {/* Rating - Only shows if rating data exists */}
                     {renderRating(course)}

@@ -10,16 +10,25 @@ interface CourseInstructorTabProps {
     email?: string;
     phone?: string;
     bio?: string;
+    profile_photo_url?: string;
+    profile_picture_url?: string;
+    avatar?: string;
+    image?: string;
   };
 }
 
 export const CourseInstructorTab = ({ instructor }: CourseInstructorTabProps) => {
+  const getInstructorImage = () => {
+    if (!instructor) return "/placeholder.svg";
+    return instructor.profile_photo_url || instructor.profile_picture_url || instructor.avatar || instructor.image || "/placeholder.svg";
+  };
+
   return (
     <Card className="rounded-none border border-gray-200 bg-white">
       <CardContent className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row items-start gap-6">
           <Avatar className="h-20 w-20 rounded-full border border-gray-100 shrink-0">
-            <AvatarImage src="/placeholder.svg" alt={instructor?.name || "Instructor"} />
+            <AvatarImage src={getInstructorImage()} alt={instructor?.name || "Instructor"} />
             <AvatarFallback className="bg-gray-100 text-gray-800 font-bold text-xl uppercase">
               {instructor?.name
                 ?.split(" ")

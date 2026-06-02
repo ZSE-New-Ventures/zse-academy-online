@@ -216,6 +216,16 @@ const BlogPostPage = () => {
               .blog-content-view a:hover {
                 color: #008cc0 !important;
               }
+              .blog-content-view img {
+                width: 100% !important;
+                max-height: 400px !important;
+                object-fit: cover !important;
+                border-radius: 0.375rem !important;
+                margin-top: 1rem !important;
+                margin-bottom: 1rem !important;
+                border: 1px solid #f3f4f6 !important;
+                display: block !important;
+              }
             `}</style>
             <div
               className="blog-content-view whitespace-pre-wrap font-sans text-base md:text-lg text-gray-800 leading-relaxed"
@@ -223,44 +233,9 @@ const BlogPostPage = () => {
             />
           </div>
 
-          {/* Tags directly below content */}
-          {post.tags && post.tags.length > 0 && (
-            <div className="mt-8 pt-6 border-t border-gray-150">
-              <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wider">Related Topics:</h3>
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag, index) => (
-                  <span key={index} className="px-3 py-1 border border-gray-300 text-gray-700 text-xs font-semibold bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Tags section removed per user request */}
 
-          {/* Instructor / Author Block */}
-          <div className="mt-14 pt-8 border-t border-gray-150">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6 tracking-tight">About the Author</h2>
-            <div className="flex flex-col sm:flex-row items-start gap-6">
-              <img 
-                src={getFallbackImage("author")} 
-                alt={post.author?.name} 
-                className="w-20 h-20 rounded-full object-cover border border-gray-200 shrink-0 shadow-sm" 
-              />
-              <div className="space-y-3">
-                <div>
-                  <span className="text-lg font-bold text-gray-900 block">
-                    {post.author?.name}
-                  </span>
-                  <span className="text-xs font-bold text-[#00aeef] uppercase tracking-wider">
-                    Senior Financial Analyst & Educator
-                  </span>
-                </div>
-                <p className="text-gray-600 text-sm leading-relaxed max-w-2xl">
-                  With over 15 years of experience in market analysis and fintech solutions, {post.author?.name} has dedicated their career to demystifying complex financial concepts. Their work has been featured in major financial publications and they actively consult for retail investors on capital markets and sustainable portfolios.
-                </p>
-              </div>
-            </div>
-          </div>
+          {/* Author section removed per user request */}
 
         </div>
       </div>

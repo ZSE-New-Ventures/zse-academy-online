@@ -160,11 +160,11 @@ export const PopularTopics = () => {
       ...course,
       category: getCategoryName(course.category),
       instructor: instructorName,
-      duration: course.duration || `${Math.floor(Math.random() * 10) + 5} hours`,
-      students: course.students || Math.floor(Math.random() * 50000) + 1000,
-      rating: course.rating || 4.5 + Math.random() * 0.5,
-      review_count: course.review_count || Math.floor(Math.random() * 1000) + 100,
-      is_bestseller: course.is_bestseller || Math.random() > 0.7,
+      duration: course.duration,
+      students: course.students,
+      rating: course.rating,
+      review_count: course.review_count,
+      is_bestseller: course.is_bestseller,
     };
   };
 
@@ -261,54 +261,38 @@ export const PopularTopics = () => {
             const transformedCourse = transformCourseData(course);
 
             return (
-              <div
-                key={transformedCourse.id}
-                className="group bg-white overflow-hidden flex flex-col"
-              >
-                {/* Course Image - Udemy Style */}
-                <Link to={`/courses/${transformedCourse.id}`} className="block border border-gray-200">
-                  <div className="relative aspect-video overflow-hidden bg-gray-100">
+              <Link key={transformedCourse.id} to={`/courses/${transformedCourse.id}`} className="group flex">
+                <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-150 rounded-none bg-white hover:-translate-y-1 flex flex-col w-full">
+                  <div className="aspect-video relative overflow-hidden bg-gray-100">
                     <img
                       src={getThumbnail(transformedCourse)}
                       alt={transformedCourse.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-
-                    {/* Bestseller Badge - Udemy Style */}
-                    {transformedCourse.is_bestseller && (
-                      <div className="absolute top-2 left-2">
-                        <span className="bg-amber-500 text-white text-xs font-bold px-2 py-1">
-                          <FontAwesomeIcon icon={faFire} className="h-3 w-3 mr-1" />
-                          Bestseller
-                        </span>
-                      </div>
-                    )}
                   </div>
-                </Link>
-
-                {/* Content - Udemy Style */}
-                <div className="pt-2 pb-4 flex flex-col flex-grow text-left">
-                  {/* Course Title */}
-                  <Link to={`/courses/${transformedCourse.id}`}>
-                    <h3 className="font-bold text-base text-[#1c1d1f] leading-tight mb-1 line-clamp-2">
-                      {truncateTitle(transformedCourse.title, 70)}
-                    </h3>
-                  </Link>
-
-                  {/* Instructor */}
-                  <p className="text-xs text-[#6a6f73] mb-1 line-clamp-1 font-normal break-words">
-                    {transformedCourse.instructor}
-                  </p>
-
-                  {/* Rating - Udemy Style */}
-                  {renderRating(transformedCourse.rating || 4.5, transformedCourse.review_count)}
-
-                  {/* Price */}
-                  <div className="font-bold text-[#1c1d1f] flex items-center space-x-2 mt-auto">
-                    <span>Free</span>
+                  <div className="p-4 flex flex-col flex-1 justify-between text-left">
+                    <div className="mb-4">
+                      <h3 className="font-bold text-base mb-2 line-clamp-2 text-gray-900 group-hover:text-[#00aeef] transition-colors" title={transformedCourse.title}>
+                        {truncateTitle(transformedCourse.title, 70)}
+                      </h3>
+                      <p className="text-xs text-gray-500 mb-2 line-clamp-1 font-normal break-words">
+                        {transformedCourse.instructor}
+                      </p>
+                      
+                      {transformedCourse.rating != null && transformedCourse.rating > 0 && renderRating(transformedCourse.rating, transformedCourse.review_count)}
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+                      <span className="text-xs font-bold text-[#00aeef]">
+                        Free Course
+                      </span>
+                      <span className="text-[10px] font-bold text-gray-400 bg-gray-50 border border-gray-200 px-2 py-0.5 uppercase tracking-wider">
+                        {transformedCourse.level || "General"}
+                      </span>
+                    </div>
                   </div>
-                </div>
-              </div>
+                </Card>
+              </Link>
             );
           })}
         </div>
