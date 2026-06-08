@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
+import courseBg from "../assets/courseid.jpg";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -345,7 +346,8 @@ const CourseDetail = () => {
       )}
 
       {/* Udemy Header Section */}
-      <section className="bg-[#1c1d1f] text-white py-8 md:py-12">
+      <section className="relative bg-cover bg-center text-white py-8 md:py-12" style={{ backgroundImage: `url(${courseBg})` }}>
+        <div className="absolute inset-0 bg-black opacity-50" />
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-3 gap-8 relative">
             {/* Left Content Column */}

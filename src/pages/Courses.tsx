@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { courseService } from "@/services/course.service";
-import { useAuth } from "@/contexts/AuthContext";
 import { Navbar } from "@/components/Navbar";
+import coursesBg from "../assets/courses.jpg";
 import { Footer } from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -220,9 +221,13 @@ const Courses = () => {
     <div className="min-h-screen bg-gray-50 font-montserrat">
       <Navbar />
 
-      {/* Hero Section - Udemy Style */}
-      <section className="bg-gradient-to-r from-purple-700 via-purple-600 to-indigo-600 text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Hero Section - Courses Page */}
+      <section
+        className="relative bg-cover bg-center text-white py-12"
+        style={{ backgroundImage: `url(${coursesBg})` }}
+      >
+        <div className="absolute inset-0 bg-blue-900 opacity-70" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Learn from the best courses

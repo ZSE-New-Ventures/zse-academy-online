@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import blogBg from "../assets/blog.jpg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendar,
@@ -103,7 +104,8 @@ const BlogPostPage = () => {
       <Navbar />
 
       {/* Udemy-style Dark Hero Section - Margins Aligning with Navbar */}
-      <div className="bg-[#1c1d1f] text-white pt-10 pb-14 relative w-full border-b border-gray-800">
+      <div className="bg-[#1c1d1f] text-white pt-10 pb-14 relative w-full border-b border-gray-800" style={{ backgroundImage: `url(${blogBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+        <div className="absolute inset-0 bg-black opacity-50" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl w-full space-y-6">
             
