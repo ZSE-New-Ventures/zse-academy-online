@@ -1,6 +1,7 @@
-/* HeroSection.css - Default layout */
+/* ==========================================================================
+   Desktop Defaults
+   ========================================================================== */
 
-/* Container */
 .hero-section {
   display: flex;
   flex-direction: row;
@@ -13,15 +14,18 @@
 
 /* Background image slides */
 .hero-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
   width: 45%;
-  position: relative;
-  width: 50%;
-  height: 100%;
   background-size: cover;
-  background-position: center;
+  background-position: center center;
   background-repeat: no-repeat;
   opacity: 0;
   transition: opacity 1s ease-in-out;
+  mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%);
 }
 
 .hero-bg.active {
@@ -41,7 +45,6 @@
 
 /* Text content */
 .hero-content {
-  order: 0;
   width: 50%;
   padding: 2rem;
   text-align: left;
@@ -55,6 +58,10 @@
   margin-bottom: 0.5rem;
 }
 
+.hero-first-line {
+  color: #00c4f8;
+}
+
 .hero-subtitle {
   font-size: 1rem;
   line-height: 1.5;
@@ -62,7 +69,7 @@
 
 .hero-last-line {
   display: inline-block;
-  color: #00c4f8;
+  color: #ffffff;
   font-weight: 600;
   font-size: 20px;
   text-transform: uppercase;
@@ -79,7 +86,7 @@
 .rotating-word {
   display: inline-block;
   font-weight: 700;
-  background: linear-gradient(135deg, #fff 0%, #00c4f8 55%, #000 100%);
+  background: linear-gradient(135deg, #fff 0%, #00c4f8 55%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -93,50 +100,68 @@
   88% { transform: translateY(0); opacity: 1; filter: blur(0); }
   100% { transform: translateY(-15px); opacity: 0; filter: blur(2px); }
 }
+
+/* ==========================================================================
+   Mobile Responsiveness (Screens under 768px)
+   ========================================================================== */
+
 @media (max-width: 768px) {
-  .hero-bg {
-    width: 100% !important;
-    mask-image: none !important;
-    -webkit-mask-image: none !important;
-  }
-  /* Make hero container stack and use full‑width background image */
   .hero-section {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     position: relative;
-    background: transparent;
-    overflow: hidden;
+    background: #0a0a0a;
+    padding: 4rem 0;
   }
 
-  /* Full‑width image that covers the entire hero area */
+  /* Force background slides to take up full layout screen */
   .hero-bg {
-    position: absolute;
-    inset: 0;
-    width: 100% !important;
+    left: 0;
+    width: 100%;
     height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: 0;
+    z-index: 1;
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 
-  /* Black overlay over the image */
+  /* Black background overlay opacity to 0.5 */
   .hero-bg::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 1;
-  }
-
-  /* Content sits above overlay, full width */
-  .hero-content {
-    position: relative;
+    background: rgba(10, 10, 10, 0.5);
     z-index: 2;
-    width: 100%;
-    padding: 2rem;
-    text-align: center;
-    color: #fff;
   }
-  .hero-bg::before { display: none; }
-}
-  
 
+  /* Make content cover full width and center align typography */
+  .hero-content {
+    width: 100%;
+    text-align: center;
+    z-index: 3;
+    padding: 1.5rem;
+  }
+
+  .hero-text-wrapper {
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  /* Made "Build Skills On" a lighter, brighter cyan on mobile */
+  .hero-first-line {
+    color: #8ae2ff;
+  }
+
+  /* "Learn the Zimbabwe Stock Exchange" explicitly set to white */
+  .hero-last-line {
+    color: #ffffff;
+    font-size: 16px;
+  }
+
+  .hero-buttons {
+    margin-top: 2rem;
+  }
+}

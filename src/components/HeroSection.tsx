@@ -6,12 +6,7 @@ import train1 from "@/assets/train1.jpg";
 import train2 from "@/assets/train2.jpg";
 import train3 from "@/assets/train3.jpg";
 
-const backgroundImages = [
-  train1,
-  train2,
-  train3,
-];
-
+const backgroundImages = [train1, train2, train3];
 const words = ["SECURITIES", "ETFs", "REITs", "BONDS"];
 
 export const HeroSection = () => {
@@ -41,19 +36,15 @@ export const HeroSection = () => {
           className={`hero-bg absolute top-0 bottom-0 right-0 ${idx === currentBg ? "active" : "inactive"}`}
           style={{
             backgroundImage: `url(${img})`,
-            width: "45%",
-            backgroundPosition: "center center",
-            WebkitMaskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%)",
-            maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%)",
           }}
         />
       ))}
 
-      {/* Subtle vignette on the image */}
-      <div className="hero-image-vignette" />
+      {/* Subtle vignette on the image - Hidden on mobile */}
+      <div className="hero-image-vignette hidden md:block" />
 
-      {/* Dark curved left overlay */}
-      <div className="hero-curved-overlay">
+      {/* Dark curved left overlay - Hidden on mobile */}
+      <div className="hero-curved-overlay hidden md:block">
         <svg
           viewBox="0 0 1440 900"
           preserveAspectRatio="none"
@@ -64,7 +55,6 @@ export const HeroSection = () => {
               <feGaussianBlur in="SourceGraphic" stdDeviation="60" />
             </filter>
           </defs>
-          {/* Dark curved shape – blurred for a feathery edge */}
           <path
             d="M-100,-100 L-100,1000 L580,1000 C650,950 720,820 740,700 C770,540 760,360 740,200 C720,50 650,-50 580,-100 Z"
             fill="rgba(0,0,0,0.95)"
@@ -75,33 +65,35 @@ export const HeroSection = () => {
 
       {/* Content */}
       <div className="relative container mx-auto px-4 max-w-7xl flex z-10 hero-content">
-        <div className="max-w-lg text-left">
-            <h1 className="hero-title">
-              <span className="block mb-1 text-[#00c4f8]">Build Skills On</span>
-              <span className="rotating-word-container block">
-                <span key={wordIdx} className="rotating-word">
-                  {words[wordIdx]}
-                </span>
+        <div className="max-w-xl md:max-w-lg mx-auto md:mx-0 hero-text-wrapper">
+          <h1 className="hero-title">
+            <span className="block mb-1 hero-first-line">Build Skills On</span>
+            <span className="rotating-word-container block">
+              <span key={wordIdx} className="rotating-word">
+                {words[wordIdx]}
               </span>
-              <span className="hero-last-line">
-                Learn the Zimbabwe Stock Exchange
-              </span>
-            </h1>
-            <p className="hero-subtitle">
-              Professional training courses, expert insights, and tools designed to elevate your trading journey.
-            </p>
-          <Link
-            to="/courses"
-            className="inline-block mt-6 px-8 py-4 text-sm font-bold text-white bg-[#00aeef] rounded hover:bg-[#008cc0] transition-colors"
-          >
-            Explore Courses
-          </Link>
-          <Link
-            to="/login"
-            className="inline-block mt-6 ml-4 px-8 py-4 text-sm font-bold text-white bg-[#00aeef] rounded hover:bg-[#008cc0] transition-colors"
-          >
-            Get Started
-          </Link>
+            </span>
+            <span className="hero-last-line">
+              Learn the Zimbabwe Stock Exchange
+            </span>
+          </h1>
+          <p className="hero-subtitle">
+            Professional training courses, expert insights, and tools designed to elevate your trading journey.
+          </p>
+          <div className="hero-buttons flex flex-col sm:flex-row gap-4 mt-6">
+            <Link
+              to="/courses"
+              className="inline-block px-8 py-4 text-sm font-bold text-white bg-[#00aeef] rounded hover:bg-[#008cc0] transition-colors text-center"
+            >
+              Explore Courses
+            </Link>
+            <Link
+              to="/login"
+              className="inline-block px-8 py-4 text-sm font-bold text-white bg-transparent border border-white rounded hover:bg-white hover:text-[#0a0a0a] transition-colors text-center"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
       </div>
     </div>
