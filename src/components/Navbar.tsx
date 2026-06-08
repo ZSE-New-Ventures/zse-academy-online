@@ -64,18 +64,12 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-[#d1d7dc] sticky top-0 z-50 h-[72px] flex items-center font-montserrat shadow-none">
+      <nav className="bg-transparent sticky top-0 z-50 h-[72px] flex items-center font-montserrat">
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center gap-4 lg:gap-8">
 
           {/* Mobile Menu Trigger & Logo */}
           <div className="flex items-center gap-2 lg:gap-4 shrink-0">
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 text-[#1c1d1f] hover:bg-gray-100 transition-colors"
-            >
-              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="h-6 w-6" />
-            </button>
             <Link to="/" className="flex items-center">
               <img
                 src={logo}
@@ -83,6 +77,12 @@ export const Navbar = () => {
                 className="h-8 md:h-10 w-auto object-contain"
               />
             </Link>
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 ml-auto text-[#1c1d1f] hover:bg-gray-100 transition-colors"
+            >
+              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="h-6 w-6" />
+            </button>
           </div>
 
           {/* Categories Dropdown Label - Udemy Style */}
@@ -232,14 +232,6 @@ export const Navbar = () => {
                 </Link>
                 <button className="h-10 w-10 border border-[#1c1d1f] flex items-center justify-center hover:bg-gray-100 transition-colors hidden lg:flex">
                   <FontAwesomeIcon icon={faGlobe} className="h-5 w-5 text-[#1c1d1f]" />
-                </button>
-
-                {/* Mobile Auth Icons */}
-                <button
-                  className="lg:hidden p-2 text-[#1c1d1f] hover:bg-gray-50 transition-colors"
-                  onClick={() => navigate('/login')}
-                >
-                  <FontAwesomeIcon icon={faSearch} className="h-5 w-5" />
                 </button>
               </div>
             )}

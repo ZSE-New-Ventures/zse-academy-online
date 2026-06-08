@@ -1,45 +1,109 @@
-import { Button } from "@/components/ui/button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import heroImage from "@/assets/banner.jpg";
+import "./HeroSection.css";
+
+import train1 from "@/assets/train1.jpg";
+import train2 from "@/assets/train2.jpg";
+import train3 from "@/assets/train3.jpg";
+
+const backgroundImages = [
+  train1,
+  train2,
+  train3,
+];
+
+const words = ["SECURITIES", "ETFs", "REITs", "BONDS"];
 
 export const HeroSection = () => {
+  const [currentBg, setCurrentBg] = useState(0);
+  const [wordIdx, setWordIdx] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentBg((prev) => (prev + 1) % backgroundImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setWordIdx((prev) => (prev + 1) % words.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <section className="relative w-full text-gray-900 bg-white h-[100vh] overflow-hidden">
-      {/* Background Image Container */}
-      <div className="absolute inset-0 w-full h-full">
-        <img
-          src={heroImage}
-          alt="Zimbabwe Stock Exchange Training"
-          className="w-full h-full object-cover object-center"
+    <div className="relative min-h-[90vh] flex items-center overflow-hidden bg-[#0a0a0a] hero-section">
+      {/* Slideshow Background */}
+      {backgroundImages.map((img, idx) => (
+        <div
+          key={idx}
+          className={`hero-bg absolute top-0 bottom-0 right-0 ${idx === currentBg ? "active" : "inactive"}`}
+          style={{
+            backgroundImage: `url(${img})`,
+            width: "45%",
+            backgroundPosition: "center center",
+            WebkitMaskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%)",
+            maskImage: "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.4) 15%, rgba(0,0,0,1) 35%)",
+          }}
         />
-        {/* Subtle overlay to ensure the image isn't too overpowering if needed, though Udemy usually runs it raw */}
-        <div className="absolute inset-0 bg-black/10" />
+      ))}
+
+      {/* Subtle vignette on the image */}
+      <div className="hero-image-vignette" />
+
+      {/* Dark curved left overlay */}
+      <div className="hero-curved-overlay">
+        <svg
+          viewBox="0 0 1440 900"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <defs>
+            <filter id="feather" x="-20%" y="-20%" width="140%" height="140%">
+              <feGaussianBlur in="SourceGraphic" stdDeviation="60" />
+            </filter>
+          </defs>
+          {/* Dark curved shape – blurred for a feathery edge */}
+          <path
+            d="M-100,-100 L-100,1000 L580,1000 C650,950 720,820 740,700 C770,540 760,360 740,200 C720,50 650,-50 580,-100 Z"
+            fill="rgba(0,0,0,0.95)"
+            filter="url(#feather)"
+          />
+        </svg>
       </div>
 
-      {/* Floating Content Box */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-center">
-        <div className="bg-white p-8 md:p-10 lg:p-12 shadow-2xl max-w-lg w-full md:ml-0 mx-auto md:mx-0 sm:mt-0 mt-8">
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-[#1c1d1f] leading-tight">
-            Master the Zimbabwe Stock Exchange
-          </h1>
-          <p className="text-base sm:text-lg text-gray-700 mb-6 leading-relaxed">
-            Learn to trade and invest with ZSE Academy. Professional training courses designed to help you succeed in Zimbabwe's financial markets.
-          </p>
-
-          <div className="relative flex items-center w-full mb-2">
-            <input
-              type="text"
-              placeholder="What do you want to learn?"
-              className="w-full h-14 pl-4 pr-12 text-base text-gray-900 border border-black focus:outline-none focus:ring-1 focus:ring-black rounded-none placeholder:text-gray-500"
-            />
-            <div className="absolute right-0 h-14 w-14 flex items-center justify-center bg-white cursor-pointer hover:bg-gray-100 transition border-y border-r border-black">
-              <FontAwesomeIcon icon={faSearch} className="h-4 w-4 text-gray-900" />
-            </div>
-          </div>
+      {/* Content */}
+      <div className="relative container mx-auto px-4 max-w-7xl flex z-10 hero-content">
+        <div className="max-w-lg text-left">
+            <h1 className="hero-title">
+              <span className="block mb-1 text-[#00c4f8]">Build Skills On</span>
+              <span className="rotating-word-container block">
+                <span key={wordIdx} className="rotating-word">
+                  {words[wordIdx]}
+                </span>
+              </span>
+              <span className="hero-last-line">
+                Learn the Zimbabwe Stock Exchange
+              </span>
+            </h1>
+            <p className="hero-subtitle">
+              Professional training courses, expert insights, and tools designed to elevate your trading journey.
+            </p>
+          <Link
+            to="/courses"
+            className="inline-block mt-6 px-8 py-4 text-sm font-bold text-white bg-[#00aeef] rounded hover:bg-[#008cc0] transition-colors"
+          >
+            Explore Courses
+          </Link>
+          <Link
+            to="/login"
+            className="inline-block mt-6 ml-4 px-8 py-4 text-sm font-bold text-white bg-[#00aeef] rounded hover:bg-[#008cc0] transition-colors"
+          >
+            Get Started
+          </Link>
         </div>
       </div>
-    </section>
+    </div>
   );
 };

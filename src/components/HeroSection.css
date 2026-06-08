@@ -1,0 +1,94 @@
+/* HeroSection.css - Default layout */
+
+/* Container */
+.hero-section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 90vh;
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+/* Background image slides */
+.hero-bg {
+  position: relative;
+  width: 50%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+.hero-bg.active {
+  opacity: 1;
+  animation: zoom 30s ease-in-out infinite;
+}
+
+.hero-bg.inactive {
+  opacity: 0;
+}
+
+@keyframes zoom {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Text content */
+.hero-content {
+  order: 0;
+  width: 50%;
+  padding: 2rem;
+  text-align: left;
+  color: #fff;
+  z-index: 2;
+}
+
+.hero-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.hero-last-line {
+  display: inline-block;
+  color: #00c4f8;
+  font-weight: 600;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+
+/* Rotating word animation */
+.rotating-word-container {
+  display: block;
+  position: relative;
+  overflow: hidden;
+  height: 1.25em;
+}
+
+.rotating-word {
+  display: inline-block;
+  font-weight: 700;
+  background: linear-gradient(135deg, #fff 0%, #00c4f8 55%, #000 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  animation: rotateWord 3s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+
+@keyframes rotateWord {
+  0% { transform: translateY(15px); opacity: 0; filter: blur(2px); }
+  12% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  88% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  100% { transform: translateY(-15px); opacity: 0; filter: blur(2px); }
+}
