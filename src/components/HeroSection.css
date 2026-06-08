@@ -13,6 +13,7 @@
 
 /* Background image slides */
 .hero-bg {
+  width: 45%;
   position: relative;
   width: 50%;
   height: 100%;
@@ -92,3 +93,50 @@
   88% { transform: translateY(0); opacity: 1; filter: blur(0); }
   100% { transform: translateY(-15px); opacity: 0; filter: blur(2px); }
 }
+@media (max-width: 768px) {
+  .hero-bg {
+    width: 100% !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+  /* Make hero container stack and use full‑width background image */
+  .hero-section {
+    display: block;
+    position: relative;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  /* Full‑width image that covers the entire hero area */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+  }
+
+  /* Black overlay over the image */
+  .hero-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1;
+  }
+
+  /* Content sits above overlay, full width */
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding: 2rem;
+    text-align: center;
+    color: #fff;
+  }
+  .hero-bg::before { display: none; }
+}
+  
+
