@@ -96,6 +96,12 @@ export const HeroSection = () => {
           </div>
         </div>
       </div>
+      {/* Slider Dots */}
+      <div className="hero-dots absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-50">
+        {backgroundImages.map((_, idx) => (
+          <span key={idx} className={`dot w-2 h-2 rounded-full ${idx === currentBg ? 'bg-white' : 'bg-gray-500'}`}></span>
+        ))}
+      </div>
     </div>
   );
 };
