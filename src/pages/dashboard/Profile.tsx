@@ -24,16 +24,13 @@ import {
 
 const Profile = () => {
   const { user } = useAuth();
-  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
-    firstName: user?.name || "John",
-    
-    email: user?.email || "john.doe@example.com",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    bio: "Passionate about financial markets and continuous learning. Currently focusing on advanced trading strategies and risk management.",
-    joinDate: "January 2024"
+    firstName: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    location: user?.location || "",
+    bio: user?.bio || "",
   });
 
   useEffect(() => {
@@ -42,16 +39,9 @@ const Profile = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSave = () => {
-    // Here you would typically save to backend
-    setIsEditing(false);
-  };
 
-  const achievements = [
-    { title: "First Course Completed", date: "Jan 2024", icon: faAward },
-    { title: "5 Day Learning Streak", date: "Feb 2024", icon: faArrowTrendUp },
-    { title: "Technical Analysis Master", date: "Mar 2024", icon: faAward }
-  ];
+
+
 
   if (loading) {
     return (
@@ -61,8 +51,8 @@ const Profile = () => {
           <Skeleton className="h-10 w-32" />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="lg:col-span-2">
+        <div className="grid grid-cols-1 max-w-4xl mx-auto gap-6">
+          <Card>
             <CardHeader>
               <Skeleton className="h-6 w-48 mb-2" />
               <Skeleton className="h-4 w-64" />
@@ -87,24 +77,6 @@ const Profile = () => {
               </div>
             </CardContent>
           </Card>
-
-          <div className="space-y-6">
-            {[...Array(2)].map((_, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <Skeleton className="h-5 w-32" />
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {[...Array(index === 0 ? 4 : 3)].map((_, i) => (
-                    <div key={i} className="flex justify-between">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-4 w-16" />
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </div>
       </div>
     );
@@ -112,32 +84,14 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        
-        <Button
-          variant={isEditing ? "destructive" : "default"}
-          onClick={() => isEditing ? setIsEditing(false) : setIsEditing(true)}
-        >
-          {isEditing ? (
-            <>
-              <FontAwesomeIcon icon={faXmark} className="h-4 w-4 mr-2" />
-              Cancel
-            </>
-          ) : (
-            <>
-              <FontAwesomeIcon icon={faEdit} className="h-4 w-4 mr-2" />
-              Edit Profile
-            </>
-          )}
-        </Button>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <div className="grid grid-cols-1 max-w-4xl mx-auto gap-6">
         {/* Profile Card */}
-        <Card className="lg:col-span-2">
+        <Card>
           <CardHeader>
             <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Update your personal details and contact information</CardDescription>
+            <CardDescription>View your personal details and contact information</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex items-center space-x-4">
@@ -147,7 +101,6 @@ const Profile = () => {
               <div className="flex-1">
                 <h3 className="text-xl font-semibold">{formData.firstName} </h3>
                 <p className="text-muted-foreground">{formData.email}</p>
-                <Badge variant="secondary" className="mt-1">Intermediate Trader</Badge>
               </div>
             </div>
 
@@ -155,15 +108,14 @@ const Profile = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="firstName">First Name</Label>
+                <Label htmlFor="firstName">Full Name</Label>
                 <Input
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                  disabled={!isEditing}
+                  disabled={true}
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -171,98 +123,14 @@ const Profile = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({...formData, email: e.target.value})}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  value={formData.phone}
-                  onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="location">Location</Label>
-                <Input
-                  id="location"
-                  value={formData.location}
-                  onChange={(e) => setFormData({...formData, location: e.target.value})}
-                  disabled={!isEditing}
-                />
-              </div>
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="bio">Bio</Label>
-                <Textarea
-                  id="bio"
-                  value={formData.bio}
-                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                  disabled={!isEditing}
-                  rows={3}
+                  disabled={true}
                 />
               </div>
             </div>
-
-            {isEditing && (
-              <div className="flex space-x-2">
-                <Button onClick={handleSave}>
-                  <FontAwesomeIcon icon={faSave} className="h-4 w-4 mr-2" />
-                  Save Changes
-                </Button>
-              </div>
-            )}
           </CardContent>
         </Card>
 
-        {/* Stats & Achievements */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Quick Stats</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Joined</span>
-                <div className="flex items-center">
-                  <FontAwesomeIcon icon={faCalendar} className="h-4 w-4 mr-1" />
-                  <span>{formData.joinDate}</span>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Courses</span>
-                <span className="font-semibold">12</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Certificates</span>
-                <span className="font-semibold">3</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Total Hours</span>
-                <span className="font-semibold">45</span>
-              </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Recent Achievements</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {achievements.map((achievement, index) => (
-                <div key={index} className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                    <FontAwesomeIcon icon={achievement.icon} className="h-4 w-4 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{achievement.title}</p>
-                    <p className="text-xs text-muted-foreground">{achievement.date}</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

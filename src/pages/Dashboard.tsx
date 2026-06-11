@@ -19,7 +19,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
 import MyCourses from "./dashboard/MyCourses";
-import Certificates from "./dashboard/Certificates";
+
 import Profile from "./dashboard/Profile";
 import logo from "../assets/logo.png";
 
@@ -34,7 +34,6 @@ interface UserStats {
 const sidebarItems = [
   { icon: faHome, label: "Dashboard", key: "dashboard" },
   { icon: faBook, label: "My Courses", key: "courses" },
-  { icon: faGraduationCap, label: "Certificates", key: "certificates" },
   { icon: faUser, label: "Profile", key: "profile" }
 ];
 
@@ -140,7 +139,7 @@ const Dashboard = () => {
             <img
               src={logo}
               alt="ZSE Academy"
-              className="h-8 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </div>
           
@@ -174,7 +173,7 @@ const Dashboard = () => {
             <img
               src={logo}
               alt="ZSE Academy"
-              className={sidebarCollapsed ? "h-6 w-auto mx-auto object-contain" : "h-8 w-auto object-contain"}
+              className={sidebarCollapsed ? "h-8 w-auto mx-auto object-contain" : "h-14 w-auto object-contain"}
             />
           </div>
 
@@ -184,7 +183,7 @@ const Dashboard = () => {
               <img
                 src={logo}
                 alt="ZSE Academy"
-                className="h-8 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
             </div>
             <Button
@@ -444,7 +443,7 @@ const Dashboard = () => {
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
                   <button 
-                    className="group relative bg-gradient-to-br from-primary via-primary to-primary/80 text-white p-6 lg:p-8 rounded-xl lg:rounded-2xl shadow-medium hover:shadow-strong transition-all duration-300 hover:-translate-y-1 lg:hover:-translate-y-2 overflow-hidden"
+                    className="group relative bg-gradient-to-br from-primary via-primary to-primary/80 text-white p-6 lg:p-8 rounded-xl lg:rounded-2xl shadow-medium hover:shadow-strong transition-all duration-300 hover:-translate-y-1 lg:hover:-translate-y-2 overflow-hidden sm:col-span-2"
                     onClick={() => handleSectionChange("courses")}
                   >
                     <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -454,21 +453,6 @@ const Dashboard = () => {
                       </div>
                       <h3 className="text-base lg:text-xl font-bold mb-2">Continue Learning</h3>
                       <p className="text-primary-foreground/80 text-sm lg:text-base">Pick up where you left off</p>
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 lg:-bottom-4 lg:-right-4 w-16 h-16 lg:w-24 lg:h-24 bg-white/5 rounded-full"></div>
-                  </button>
-
-                  <button 
-                    className="group relative bg-gradient-to-br from-success via-success to-success/80 text-white p-6 lg:p-8 rounded-xl lg:rounded-2xl shadow-medium hover:shadow-strong transition-all duration-300 hover:-translate-y-1 lg:hover:-translate-y-2 overflow-hidden"
-                    onClick={() => handleSectionChange("certificates")}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative z-10 text-center">
-                      <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white/20 rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <FontAwesomeIcon icon={faGraduationCap} className="h-6 w-6 lg:h-8 lg:w-8" />
-                      </div>
-                      <h3 className="text-base lg:text-xl font-bold mb-2">View Certificates</h3>
-                      <p className="text-white/80 text-sm lg:text-base">See your achievements</p>
                     </div>
                     <div className="absolute -bottom-2 -right-2 lg:-bottom-4 lg:-right-4 w-16 h-16 lg:w-24 lg:h-24 bg-white/5 rounded-full"></div>
                   </button>
@@ -555,7 +539,7 @@ const Dashboard = () => {
           )}
           
           {activeSection === "courses" && <MyCourses />}
-          {activeSection === "certificates" && <Certificates />}
+
           {activeSection === "profile" && <Profile />}
         </main>
       </div>
