@@ -298,7 +298,7 @@ const Dashboard = () => {
           {activeSection === "dashboard" && (
             <div className="space-y-6 lg:space-y-8">
               {/* Welcome Section */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary rounded-2xl lg:rounded-3xl p-6 lg:p-8 text-white">
+              <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary rounded-md lg:rounded-lg p-6 lg:p-8 text-white">
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm"></div>
                 <div className="relative z-10">
                   <h2 className="text-xl lg:text-3xl font-bold mb-2">Welcome back, {user?.name}! 🎯</h2>
@@ -315,9 +315,9 @@ const Dashboard = () => {
               {loading ? (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
                   {[...Array(4)].map((_, index) => (
-                    <div key={index} className="bg-card rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-border/50 animate-pulse">
+                    <div key={index} className="bg-card rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 animate-pulse">
                       <div className="flex items-start justify-between mb-3">
-                        <div className="p-2 lg:p-3 bg-muted rounded-lg lg:rounded-xl">
+                        <div className="p-2 lg:p-3 bg-muted rounded-lg lg:rounded-md">
                           <div className="h-4 w-4 lg:h-6 lg:w-6 bg-muted-foreground/20 rounded"></div>
                         </div>
                         <div className="h-6 lg:h-8 w-12 bg-muted-foreground/20 rounded"></div>
@@ -328,7 +328,7 @@ const Dashboard = () => {
                   ))}
                 </div>
               ) : error ? (
-                <div className="bg-destructive/10 border-destructive/20 rounded-xl p-6 text-center">
+                <div className="bg-destructive/10 border-destructive/20 rounded-md p-6 text-center">
                   <FontAwesomeIcon icon={faSpinner} className="h-8 w-8 text-destructive mb-2" />
                   <h3 className="font-semibold text-destructive mb-2">Failed to load statistics</h3>
                   <p className="text-destructive/80 text-sm mb-4">{error}</p>
@@ -340,11 +340,11 @@ const Dashboard = () => {
               ) : (
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-6">
                   {/* Total Courses Card */}
-                  <div className="group relative bg-gradient-to-br from-card via-card to-accent/30 rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-border/50 shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="group relative bg-gradient-to-br from-card via-card to-accent/30 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
                       <div className="flex items-start justify-between mb-3 lg:mb-4">
-                        <div className="p-2 lg:p-3 bg-primary/10 rounded-lg lg:rounded-xl group-hover:bg-primary/20 transition-colors duration-300">
+                        <div className="p-2 lg:p-3 bg-primary/10 rounded-lg lg:rounded-md group-hover:bg-primary/20 transition-colors duration-300">
                           <FontAwesomeIcon icon={faBook} className="h-4 w-4 lg:h-6 lg:w-6 text-primary" />
                         </div>
                         <div className="text-right">
@@ -361,11 +361,11 @@ const Dashboard = () => {
                   </div>
 
                   {/* Completed Courses Card */}
-                  <div className="group relative bg-gradient-to-br from-card via-card to-success/10 rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-border/50 shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="group relative bg-gradient-to-br from-card via-card to-success/10 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-success/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
                       <div className="flex items-start justify-between mb-3 lg:mb-4">
-                        <div className="p-2 lg:p-3 bg-success/10 rounded-lg lg:rounded-xl group-hover:bg-success/20 transition-colors duration-300">
+                        <div className="p-2 lg:p-3 bg-success/10 rounded-lg lg:rounded-md group-hover:bg-success/20 transition-colors duration-300">
                           <FontAwesomeIcon icon={faGraduationCap} className="h-4 w-4 lg:h-6 lg:w-6 text-success" />
                         </div>
                         <div className="text-right">
@@ -384,11 +384,11 @@ const Dashboard = () => {
                   </div>
 
                   {/* Study Hours Card */}
-                  <div className="group relative bg-gradient-to-br from-card via-card to-orange-500/10 rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-border/50 shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="group relative bg-gradient-to-br from-card via-card to-orange-500/10 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
                       <div className="flex items-start justify-between mb-3 lg:mb-4">
-                        <div className="p-2 lg:p-3 bg-orange-500/10 rounded-lg lg:rounded-xl group-hover:bg-orange-500/20 transition-colors duration-300">
+                        <div className="p-2 lg:p-3 bg-orange-500/10 rounded-lg lg:rounded-md group-hover:bg-orange-500/20 transition-colors duration-300">
                           <FontAwesomeIcon icon={faChartColumn} className="h-4 w-4 lg:h-6 lg:w-6 text-orange-500" />
                         </div>
                         <div className="text-right">
@@ -407,11 +407,11 @@ const Dashboard = () => {
                   </div>
 
                   {/* Learning Streak Card */}
-                  <div className="group relative bg-gradient-to-br from-card via-card to-purple-500/10 rounded-xl lg:rounded-2xl p-4 lg:p-6 border border-border/50 shadow-soft hover:shadow-medium transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  <div className="group relative bg-gradient-to-br from-card via-card to-purple-500/10 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
                       <div className="flex items-start justify-between mb-3 lg:mb-4">
-                        <div className="p-2 lg:p-3 bg-purple-500/10 rounded-lg lg:rounded-xl group-hover:bg-purple-500/20 transition-colors duration-300">
+                        <div className="p-2 lg:p-3 bg-purple-500/10 rounded-lg lg:rounded-md group-hover:bg-purple-500/20 transition-colors duration-300">
                           <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 lg:h-6 lg:w-6 text-purple-500" />
                         </div>
                         <div className="text-right">
@@ -429,39 +429,11 @@ const Dashboard = () => {
                 </div>
               )}
 
-              {/* Quick Actions Section */}
-              <div className="bg-gradient-to-br from-card via-card to-muted/30 rounded-2xl lg:rounded-3xl p-6 lg:p-8 border border-border/50 shadow-soft">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h2 className="text-lg lg:text-2xl font-bold text-foreground">Quick Actions</h2>
-                    <p className="text-muted-foreground text-sm lg:text-base">Jump into your learning journey</p>
-                  </div>
-                  <div className="p-2 lg:p-3 bg-primary/10 rounded-lg lg:rounded-xl">
-                    <FontAwesomeIcon icon={faArrowTrendUp} className="h-4 w-4 lg:h-6 lg:w-6 text-primary" />
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 lg:gap-6">
-                  <button 
-                    className="group relative bg-gradient-to-br from-primary via-primary to-primary/80 text-white p-6 lg:p-8 rounded-xl lg:rounded-2xl shadow-medium hover:shadow-strong transition-all duration-300 hover:-translate-y-1 lg:hover:-translate-y-2 overflow-hidden sm:col-span-2"
-                    onClick={() => handleSectionChange("courses")}
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <div className="relative z-10 text-center">
-                      <div className="w-12 h-12 lg:w-16 lg:h-16 bg-white/20 rounded-xl lg:rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:scale-110 transition-transform duration-300">
-                        <FontAwesomeIcon icon={faBook} className="h-6 w-6 lg:h-8 lg:w-8" />
-                      </div>
-                      <h3 className="text-base lg:text-xl font-bold mb-2">Continue Learning</h3>
-                      <p className="text-primary-foreground/80 text-sm lg:text-base">Pick up where you left off</p>
-                    </div>
-                    <div className="absolute -bottom-2 -right-2 lg:-bottom-4 lg:-right-4 w-16 h-16 lg:w-24 lg:h-24 bg-white/5 rounded-full"></div>
-                  </button>
-                </div>
-              </div>
+
 
               {/* Recent Activity Section */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                <div className="bg-gradient-to-br from-card via-card to-muted/20 rounded-2xl lg:rounded-3xl p-4 lg:p-6 border border-border/50 shadow-soft">
+                <div className="bg-gradient-to-br from-card via-card to-muted/20 rounded-md lg:rounded-lg p-4 lg:p-6 border border-border/50 shadow-sm">
                   <h3 className="text-lg lg:text-xl font-bold text-foreground mb-4 flex items-center">
                     <div className="w-6 h-6 lg:w-8 lg:h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                       <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 lg:h-4 lg:w-4 text-primary" />
@@ -469,7 +441,7 @@ const Dashboard = () => {
                     Recent Activity
                   </h3>
                   <div className="space-y-3 lg:space-y-4">
-                    <div className="flex items-center p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-xl border border-primary/10">
+                    <div className="flex items-center p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-md border border-primary/10">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
                         <FontAwesomeIcon icon={faGraduationCap} className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
                       </div>
@@ -478,7 +450,7 @@ const Dashboard = () => {
                         <p className="text-xs lg:text-sm text-muted-foreground truncate">{stats?.total_quiz_attempts || 0} total attempts</p>
                       </div>
                     </div>
-                    <div className="flex items-center p-3 bg-gradient-to-r from-success/5 to-transparent rounded-xl border border-success/10">
+                    <div className="flex items-center p-3 bg-gradient-to-r from-success/5 to-transparent rounded-md border border-success/10">
                       <div className="w-8 h-8 lg:w-10 lg:h-10 bg-success/10 rounded-lg flex items-center justify-center mr-3">
                         <FontAwesomeIcon icon={faBook} className="h-4 w-4 lg:h-5 lg:w-5 text-success" />
                       </div>
@@ -490,7 +462,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-br from-card via-card to-accent/20 rounded-2xl lg:rounded-3xl p-4 lg:p-6 border border-border/50 shadow-soft">
+                <div className="bg-gradient-to-br from-card via-card to-accent/20 rounded-md lg:rounded-lg p-4 lg:p-6 border border-border/50 shadow-sm">
                   <h3 className="text-lg lg:text-xl font-bold text-foreground mb-4 flex items-center">
                     <div className="w-6 h-6 lg:w-8 lg:h-8 bg-orange-500/10 rounded-lg flex items-center justify-center mr-3">
                       <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 lg:h-4 lg:w-4 text-orange-500" />
@@ -498,7 +470,7 @@ const Dashboard = () => {
                     Learning Goals
                   </h3>
                   <div className="space-y-3 lg:space-y-4">
-                    <div className="p-3 lg:p-4 bg-gradient-to-r from-orange-500/5 to-transparent rounded-xl border border-orange-500/10">
+                    <div className="p-3 lg:p-4 bg-gradient-to-r from-orange-500/5 to-transparent rounded-md border border-orange-500/10">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium text-foreground text-sm lg:text-base">Course Completion</span>
                         <span className="text-xs lg:text-sm text-orange-500 font-bold">
@@ -515,7 +487,7 @@ const Dashboard = () => {
                         {stats?.total_enrolled_courses ? stats.total_enrolled_courses - completedCourses : 0} courses remaining
                       </p>
                     </div>
-                    <div className="p-3 lg:p-4 bg-gradient-to-r from-purple-500/5 to-transparent rounded-xl border border-purple-500/10">
+                    <div className="p-3 lg:p-4 bg-gradient-to-r from-purple-500/5 to-transparent rounded-md border border-purple-500/10">
                       <div className="flex justify-between items-center mb-2">
                         <span className="font-medium text-foreground text-sm lg:text-base">Quiz Mastery</span>
                         <span className="text-xs lg:text-sm text-purple-500 font-bold">
