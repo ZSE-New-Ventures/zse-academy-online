@@ -19,6 +19,7 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import tutorialsBg from "../assets/tutorials.jpg";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 
 // -------------------------
@@ -28,12 +29,13 @@ interface Tutorial {
   id: string;
   title: string;
   description: string;
-  category: "web" | "mobile";
+  category: "zse" | "vfex";
   duration: string;
   completed: boolean;
   order: number;
   icon: IconDefinition;
   gradient: string;
+  embedUrl?: string;
 }
 
 // -------------------------
@@ -45,18 +47,19 @@ const tutorials: Tutorial[] = [
     title: "Account Setup",
     description:
       "Learn how to create and verify your trading account step by step",
-    category: "web",
+    category: "zse",
     duration: "3 min",
     completed: true,
     order: 1,
     icon: faUserPlus,
     gradient: "from-blue-500 to-cyan-500",
+    embedUrl: "https://app.guideflow.com/player/qp7o047ijr",
   },
   {
     id: "deposit-funds",
     title: "Deposit Funds",
     description: "Add money to your account and start trading immediately",
-    category: "web",
+    category: "zse",
     duration: "2 min",
     completed: true,
     order: 2,
@@ -67,7 +70,7 @@ const tutorials: Tutorial[] = [
     id: "withdraw-funds",
     title: "Withdraw Profits",
     description: "Learn the secure withdrawal process for your earnings",
-    category: "web",
+    category: "zse",
     duration: "2 min",
     completed: false,
     order: 3,
@@ -78,7 +81,7 @@ const tutorials: Tutorial[] = [
     id: "place-order",
     title: "Place Trade",
     description: "Execute buy and sell orders like a professional trader",
-    category: "web",
+    category: "zse",
     duration: "4 min",
     completed: false,
     order: 4,
@@ -89,7 +92,7 @@ const tutorials: Tutorial[] = [
     id: "mobile-create",
     title: "Mobile Setup",
     description: "Install our mobile app and set up your account on the go",
-    category: "mobile",
+    category: "vfex",
     duration: "3 min",
     completed: false,
     order: 1,
@@ -100,7 +103,7 @@ const tutorials: Tutorial[] = [
     id: "mobile-deposit",
     title: "Mobile Deposit",
     description: "Quick and easy deposit process from your mobile device",
-    category: "mobile",
+    category: "vfex",
     duration: "2 min",
     completed: false,
     order: 2,
@@ -111,7 +114,7 @@ const tutorials: Tutorial[] = [
     id: "mobile-withdraw",
     title: "Mobile Withdraw",
     description: "Withdraw your funds anytime, anywhere from mobile",
-    category: "mobile",
+    category: "vfex",
     duration: "2 min",
     completed: false,
     order: 3,
@@ -122,7 +125,7 @@ const tutorials: Tutorial[] = [
     id: "mobile-trade",
     title: "Mobile Trading",
     description: "Master trading on the go with our mobile platform",
-    category: "mobile",
+    category: "vfex",
     duration: "4 min",
     completed: false,
     order: 4,
@@ -218,7 +221,7 @@ const TutorialCard = ({
               Step {tutorial.order} of 4
             </span>
             <span className="text-xs bg-muted px-2 py-1 rounded font-medium text-muted-foreground">
-              {tutorial.category === "web" ? "Web Platform" : "Mobile App"}
+              {tutorial.category === "zse" ? "ZSE" : "VFEX"}
             </span>
           </div>
         </div>
@@ -228,13 +231,13 @@ const TutorialCard = ({
 };
 
 // -------------------------
-// Supademo Viewer
+// Tutorial Viewer
 // -------------------------
-const SupademoViewer = ({ tutorialId }: { tutorialId: string }) => {
+const TutorialViewer = ({ url }: { url: string }) => {
   return (
     <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
       <iframe
-        src={'https://app.supademo.com/embed/cmir6flhu0pj6l821l4stwbjg'}
+        src={url}
         className="w-full h-[600px]"
         title="Tutorial Demo"
         allow="clipboard-write"
@@ -249,8 +252,8 @@ const SupademoViewer = ({ tutorialId }: { tutorialId: string }) => {
 export default function TutorialsDashboard() {
   const [selectedTutorial, setSelectedTutorial] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<
-    "all" | "web" | "mobile"
-  >("web");
+    "all" | "zse" | "vfex"
+  >("all");
 
   const filteredTutorials = tutorials
     .filter((t) =>
@@ -270,7 +273,7 @@ export default function TutorialsDashboard() {
       <div className="min-h-screen bg-background">
         <Navbar />
 
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <Button
             variant="ghost"
             onClick={() => setSelectedTutorial(null)}
@@ -312,7 +315,7 @@ export default function TutorialsDashboard() {
             </div>
           </div>
 
-          <SupademoViewer tutorialId="cmidcq8rb9r6mb7b45svbkd9l" />
+          <TutorialViewer url={tutorial.embedUrl || "https://app.supademo.com/embed/cmir6flhu0pj6l821l4stwbjg"} />
         </div>
 
         <Footer />
@@ -328,7 +331,11 @@ export default function TutorialsDashboard() {
       <Navbar />
 
       {/* Hero Section - Trading Themed */}
-      <div className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b border-border overflow-hidden">
+      <div 
+        className="relative bg-cover bg-center border-b border-border overflow-hidden"
+        style={{ backgroundImage: `url(${tutorialsBg})` }}
+      >
+        <div className="absolute inset-0 bg-black/60 z-0" />
         {/* Animated Grid Background */}
         <div className="absolute inset-0 opacity-20">
           <div
@@ -403,7 +410,7 @@ export default function TutorialsDashboard() {
         <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-green-500/10 rounded-full blur-3xl" />
 
         {/* Content */}
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
           <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
             Master Trading with
             <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
@@ -418,7 +425,7 @@ export default function TutorialsDashboard() {
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Categories */}
         <div className="flex gap-2 mb-8 border-b border-border pb-4">
           <Button
@@ -430,21 +437,21 @@ export default function TutorialsDashboard() {
           </Button>
 
           <Button
-            variant={activeCategory === "web" ? "default" : "outline"}
-            onClick={() => setActiveCategory("web")}
+            variant={activeCategory === "zse" ? "default" : "outline"}
+            onClick={() => setActiveCategory("zse")}
             size="sm"
           >
             <FontAwesomeIcon icon={faDesktop} className="mr-2 h-4 w-4" />
-            Web Platform
+            ZSE
           </Button>
 
           <Button
-            variant={activeCategory === "mobile" ? "default" : "outline"}
-            onClick={() => setActiveCategory("mobile")}
+            variant={activeCategory === "vfex" ? "default" : "outline"}
+            onClick={() => setActiveCategory("vfex")}
             size="sm"
           >
             <FontAwesomeIcon icon={faMobileScreen} className="mr-2 h-4 w-4" />
-            Mobile App
+            VFEX
           </Button>
         </div>
 

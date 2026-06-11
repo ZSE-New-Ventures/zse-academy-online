@@ -64,7 +64,7 @@ export const Navbar = () => {
   };
 
   return (
-      <nav className="bg-transparent sticky top-0 z-50 h-[72px] flex items-center font-montserrat">
+      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 h-[72px] flex items-center font-montserrat">
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center gap-4 lg:gap-8">
 
@@ -114,8 +114,8 @@ export const Navbar = () => {
             <Link to="/about" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors whitespace-nowrap">
               About Us
             </Link>
-            <Link to="/contact" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors whitespace-nowrap">
-              Contact Us
+            <Link to="/tutorials" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors whitespace-nowrap">
+              Tutorials
             </Link>
           </div>
 

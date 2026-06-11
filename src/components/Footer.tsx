@@ -23,7 +23,7 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#08101f] text-gray-300 font-montserrat">
+    <footer className="bg-white border-t border-gray-200 text-gray-600 font-montserrat">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
           {/* Brand / About */}
@@ -32,10 +32,10 @@ export const Footer = () => {
               <img
                 src={ZSELogo}
                 alt="Zimbabwe Stock Exchange"
-                className="h-10 w-auto brightness-110"
+                className="h-10 w-auto"
               />
             </Link>
-            <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
+            <p className="text-gray-600 mb-6 leading-relaxed max-w-md">
               ZSE Training offers professional development courses tailored for
               Zimbabwe’s financial markets. Learn from experts and earn
               certifications recognized locally and regionally.
@@ -45,7 +45,7 @@ export const Footer = () => {
           {/* Links Sections */}
           {Object.entries(footerLinks).map(([title, links]) => (
             <div key={title}>
-              <h3 className="text-lg font-semibold mb-4 text-white capitalize">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900 capitalize">
                 {title}
               </h3>
               <ul className="space-y-2 text-sm">
@@ -56,14 +56,14 @@ export const Footer = () => {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-white transition-colors"
+                        className="hover:text-[#00aeef] transition-colors"
                       >
                         {link.name}
                       </a>
                     ) : (
                       <Link
                         to={link.href}
-                        className="hover:text-white transition-colors"
+                        className="hover:text-[#00aeef] transition-colors"
                       >
                         {link.name}
                       </Link>
@@ -76,21 +76,21 @@ export const Footer = () => {
 
           {/* Contact / Address */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-4 text-white capitalize">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 capitalize">
               Contact
             </h3>
-            <div className="text-gray-400 space-y-3 text-sm">
+            <div className="text-gray-600 space-y-3 text-sm">
               <p>
-                <strong className="text-white font-medium block mb-1">Address:</strong> 
+                <strong className="text-gray-900 font-medium block mb-1">Address:</strong> 
                 44 Ridgeway North, Highlands, Harare, Zimbabwe
               </p>
               <p>
-                <strong className="text-white font-medium block mb-1">Phone:</strong> 
+                <strong className="text-gray-900 font-medium block mb-1">Phone:</strong> 
                 +263 242 886830-5<br />
                 +263 8677009115
               </p>
               <p>
-                <strong className="text-white font-medium block mb-1">Trading Hours:</strong> 
+                <strong className="text-gray-900 font-medium block mb-1">Trading Hours:</strong> 
                 Mon - Fri: 09:00 AM - 1:00 PM CAT
               </p>
             </div>
@@ -98,9 +98,9 @@ export const Footer = () => {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
+        <div className="border-t border-gray-200 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="text-gray-400 text-sm mb-4 md:mb-0 text-center md:text-left">
+            <div className="text-gray-600 text-sm mb-4 md:mb-0 text-center md:text-left">
               © {new Date().getFullYear()} Zimbabwe Stock Exchange Training. All
               rights reserved.
             </div>

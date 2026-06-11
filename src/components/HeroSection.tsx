@@ -63,6 +63,14 @@ export const HeroSection = () => {
         </svg>
       </div>
 
+      {/* Falling Animated Lines - Hidden on mobile */}
+      <div className="hidden md:block absolute inset-0 pointer-events-none z-10 hero-falling-lines">
+        <div className="falling-line line-1"></div>
+        <div className="falling-line line-2"></div>
+        <div className="falling-line line-3"></div>
+        <div className="falling-line line-4"></div>
+      </div>
+
       {/* Content */}
       <div className="relative container mx-auto px-4 max-w-7xl flex z-10 hero-content">
         <div className="max-w-xl md:max-w-lg mx-auto md:mx-0 hero-text-wrapper">
@@ -73,7 +81,7 @@ export const HeroSection = () => {
                 {words[wordIdx]}
               </span>
             </span>
-            <span className="hero-last-line">
+            <span className="hero-last-line text-white !text-[#ffffff]">
               Learn the Zimbabwe Stock Exchange
             </span>
           </h1>

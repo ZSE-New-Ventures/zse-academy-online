@@ -69,7 +69,7 @@
 
 .hero-last-line {
   display: inline-block;
-  color: #ffffff;
+  color: #ffffff ;
   font-weight: 600;
   font-size: 20px;
   text-transform: uppercase;
@@ -102,6 +102,67 @@
 }
 
 /* ==========================================================================
+   Falling Lines Animation
+   ========================================================================== */
+
+.hero-falling-lines {
+  width: 50%;
+  overflow: hidden;
+}
+
+.falling-line {
+  position: absolute;
+  top: -150px;
+  width: 2px;
+  height: 120px;
+  background: linear-gradient(to bottom, rgba(0, 196, 248, 0), rgba(0, 196, 248, 0.4));
+  animation: fall linear infinite;
+  opacity: 0;
+  border-radius: 4px;
+}
+
+.falling-line.line-1 {
+  left: 15%;
+  animation-duration: 7s;
+  animation-delay: 0s;
+}
+
+.falling-line.line-2 {
+  left: 35%;
+  animation-duration: 8s;
+  animation-delay: 2.5s;
+}
+
+.falling-line.line-3 {
+  left: 65%;
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+.falling-line.line-4 {
+  left: 85%;
+  animation-duration: 9s;
+  animation-delay: 4s;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.3;
+  }
+  90% {
+    opacity: 0.1;
+  }
+  100% {
+    transform: translateY(110vh);
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
    Mobile Responsiveness (Screens under 768px)
    ========================================================================== */
 
@@ -130,7 +191,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(10, 10, 10, 0.5);
+    background: rgba(0, 41, 62, 0.5);
     z-index: 2;
   }
 
@@ -152,12 +213,13 @@
 
   /* Made "Build Skills On" a lighter, brighter cyan on mobile */
   .hero-first-line {
-    color: #8ae2ff;
+    color: #ffffff !important;
+    font-size: 2.8rem !important;
   }
 
   /* "Learn the Zimbabwe Stock Exchange" explicitly set to white */
   .hero-last-line {
-    color: #ffffff;
+    color: #ffffff !important;
     font-size: 16px;
   }
 
