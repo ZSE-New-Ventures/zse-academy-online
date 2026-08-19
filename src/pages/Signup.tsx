@@ -10,8 +10,18 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEye, faEyeSlash, faEnvelope, faLock, faExclamationCircle, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faEye, faEyeSlash, faEnvelope, faLock, faExclamationCircle, faUser, faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL, API_ENDPOINTS } from "@/constants/api";
+import { sanitizeInput, validateName, validateEmail } from "@/utils/sanitization";
+
+interface PasswordPolicy {
+  min_length: number;
+  require_uppercase: boolean;
+  require_lowercase: boolean;
+  require_numbers: boolean;
+  require_special_characters: boolean;
+}
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -24,13 +34,45 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [policy, setPolicy] = useState<PasswordPolicy | null>(null);
   const { toast } = useToast();
   const { signup, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchPolicy = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}${API_ENDPOINTS.PASSWORD_POLICY}`, {
+          headers: { 'Accept': 'application/json' }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setPolicy(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch password policy", err);
+      }
+    };
+    fetchPolicy();
+  }, []);
+
+  useEffect(() => {
     if (isAuthenticated) navigate("/dashboard");
   }, [isAuthenticated, navigate]);
+
+  const validatePassword = (password: string) => {
+    if (!policy) return true;
+    
+    const isValid = [
+      password.length >= policy.min_length,
+      !policy.require_uppercase || /[A-Z]/.test(password),
+      !policy.require_lowercase || /[a-z]/.test(password),
+      !policy.require_numbers || /[0-9]/.test(password),
+      !policy.require_special_characters || /[^A-Za-z0-9]/.test(password)
+    ].every(Boolean);
+
+    return isValid;
+  };
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -38,6 +80,36 @@ const Signup = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const sanitizedName = sanitizeInput(formData.name);
+    const sanitizedEmail = sanitizeInput(formData.email);
+
+    if (!validateName(sanitizedName)) {
+      toast({
+        title: "Invalid Name",
+        description: "Name contains invalid characters. Please use only letters.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!validateEmail(sanitizedEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (policy && !validatePassword(formData.password)) {
+      toast({
+        title: "Weak Password",
+        description: "Your password does not meet the required security policy.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (formData.password !== formData.passwordConfirmation) {
       toast({
@@ -59,12 +131,12 @@ const Signup = () => {
 
     setIsLoading(true);
     try {
-      await signup(formData.name, formData.email, formData.password, formData.passwordConfirmation);
+      await signup(sanitizedName, sanitizedEmail, formData.password, formData.passwordConfirmation);
       toast({
         title: "Registration Successful!",
         description: "Please check your email for the verification code.",
       });
-      navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
+      navigate(`/verify-otp?email=${encodeURIComponent(sanitizedEmail)}`);
     } catch (error) {
       toast({
         title: "Registration Failed",
@@ -145,6 +217,41 @@ const Signup = () => {
                       {showPassword ? <FontAwesomeIcon icon={faEyeSlash} /> : <FontAwesomeIcon icon={faEye} />}
                     </button>
                   </div>
+                  {policy && formData.password && (
+                    <div className="mt-3 space-y-2 p-3 bg-gray-50 rounded-md border border-gray-100">
+                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Password Requirements</p>
+                      <ul className="text-sm space-y-1">
+                        <li className={`flex items-center gap-2 ${formData.password.length >= policy.min_length ? 'text-green-600' : 'text-gray-500'}`}>
+                          <FontAwesomeIcon icon={formData.password.length >= policy.min_length ? faCheck : faTimes} className="w-3 h-3" />
+                          At least {policy.min_length} characters
+                        </li>
+                        {policy.require_uppercase && (
+                          <li className={`flex items-center gap-2 ${/[A-Z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                            <FontAwesomeIcon icon={/[A-Z]/.test(formData.password) ? faCheck : faTimes} className="w-3 h-3" />
+                            At least 1 uppercase letter
+                          </li>
+                        )}
+                        {policy.require_lowercase && (
+                          <li className={`flex items-center gap-2 ${/[a-z]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                            <FontAwesomeIcon icon={/[a-z]/.test(formData.password) ? faCheck : faTimes} className="w-3 h-3" />
+                            At least 1 lowercase letter
+                          </li>
+                        )}
+                        {policy.require_numbers && (
+                          <li className={`flex items-center gap-2 ${/[0-9]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                            <FontAwesomeIcon icon={/[0-9]/.test(formData.password) ? faCheck : faTimes} className="w-3 h-3" />
+                            At least 1 number
+                          </li>
+                        )}
+                        {policy.require_special_characters && (
+                          <li className={`flex items-center gap-2 ${/[^A-Za-z0-9]/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}`}>
+                            <FontAwesomeIcon icon={/[^A-Za-z0-9]/.test(formData.password) ? faCheck : faTimes} className="w-3 h-3" />
+                            At least 1 special character
+                          </li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
                 </div>
 
                 {/* Confirm Password */}

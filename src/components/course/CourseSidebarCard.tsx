@@ -16,6 +16,7 @@ interface CourseSidebarCardProps {
   isCompleted?: boolean;
   totalLessons: number;
   modulesCount: number;
+  duration?: string;
   hasSampleVideos: boolean;
   courseId?: string | number;
   onPreviewClick?: () => void;
@@ -31,6 +32,7 @@ export const CourseSidebarCard = ({
   isCompleted,
   totalLessons,
   modulesCount,
+  duration,
   hasSampleVideos,
   onPreviewClick,
   onEnrollClick,
@@ -102,6 +104,13 @@ export const CourseSidebarCard = ({
                 icon={faClock}
                 className="h-3.5 w-3.5 mr-4 text-gray-800"
               />
+              <span>{duration || "Self-paced"} duration</span>
+            </div>
+            <div className="flex items-center text-sm text-gray-700">
+              <FontAwesomeIcon
+                icon={faClock}
+                className="h-3.5 w-3.5 mr-4 text-gray-800"
+              />
               <span>{totalLessons} lessons</span>
             </div>
             <div className="flex items-center text-sm text-gray-700">
@@ -117,13 +126,6 @@ export const CourseSidebarCard = ({
                 className="h-3.5 w-3.5 mr-4 text-gray-800"
               />
               <span>Downloadable resources</span>
-            </div>
-            <div className="flex items-center text-sm text-gray-700">
-              <FontAwesomeIcon
-                icon={faAward}
-                className="h-3.5 w-3.5 mr-4 text-gray-800"
-              />
-              <span>Certificate of completion</span>
             </div>
           </div>
         </div>

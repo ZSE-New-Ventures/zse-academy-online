@@ -17,7 +17,6 @@ export const CourseOverviewTab = ({
     "Learn from industry experts with years of ZSE experience",
     "Hands-on projects and real-world market applications",
     "Build a strong foundation in Zimbabwean financial markets",
-    "Certificate of completion to showcase your achievement",
     "Access to exclusive ZSE Academy community resources"
   ];
 

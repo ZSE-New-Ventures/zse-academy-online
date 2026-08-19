@@ -15,25 +15,61 @@ import {
   faUser,
   faBars,
   faXmark,
-  faSpinner
+  faSpinner,
+  faHistory,
+  faHeart
 } from "@fortawesome/free-solid-svg-icons";
 import { useNavigate } from "react-router-dom";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import MyCourses from "./dashboard/MyCourses";
+import RecentActivityTab from "./dashboard/RecentActivityTab";
+import WishlistTab from "./dashboard/WishlistTab";
 
 import Profile from "./dashboard/Profile";
 import logo from "../assets/logo.png";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import { API_BASE_URL } from "@/constants/api";
 
 interface UserStats {
   total_enrolled_courses: number;
   total_reviews_written: number;
   total_quiz_attempts: number;
+  average_quiz_score: number;
+  total_completed_courses: number;
+  total_completed_modules: number;
+  total_blog_comments: number;
+  goal_target_courses: number;
+  goal_target_quizzes: number;
+}
+
+interface ActivityItem {
+  id: string | number;
+  type: "quiz" | "course" | "review" | string;
+  title: string;
+  subtitle: string;
+  created_at: string;
+}
+
+interface ContinueLearning {
+  course_id: number;
+  title: string;
+  thumbnail_url: string;
+  progress_percentage: number;
+  last_accessed_module: string;
+  next_lesson_url: string;
 }
 
 const sidebarItems = [
   { icon: faHome, label: "Dashboard", key: "dashboard" },
   { icon: faBook, label: "My Courses", key: "courses" },
+  { icon: faHistory, label: "Recent Activity", key: "activity" },
+  { icon: faHeart, label: "Wishlist", key: "wishlist" },
   { icon: faUser, label: "Profile", key: "profile" }
 ];
 
@@ -46,6 +82,9 @@ const Dashboard = () => {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showHomeModal, setShowHomeModal] = useState(false);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [continueLearningData, setContinueLearningData] = useState<ContinueLearning | null>(null);
 
   // Redirect admin users to admin dashboard
   useEffect(() => {
@@ -81,13 +120,49 @@ const Dashboard = () => {
 
       if (!response.ok) {
         if (response.status === 401) {
-          throw new Error("Authentication failed. Please log in again.");
+          handleLogout(); // Automatically clear session and navigate
+          return;
         }
         throw new Error(`Failed to fetch stats: ${response.status}`);
       }
 
       const data = await response.json();
       setStats(data);
+
+      // Fetch Recent Activity
+      try {
+        const actRes = await fetch(`${API_BASE_URL}/user/activity`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json",
+          },
+        });
+        if (actRes.ok) {
+          const actData = await actRes.json();
+          setActivity(actData);
+        }
+      } catch (e) {
+        console.error("Error fetching activity:", e);
+      }
+
+      // Fetch Continue Learning
+      try {
+        const contRes = await fetch(`${API_BASE_URL}/user/continue-learning`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+            "Accept": "application/json",
+          },
+        });
+        if (contRes.status === 200) {
+          const contData = await contRes.json();
+          setContinueLearningData(contData);
+        } else if (contRes.status === 204) {
+          setContinueLearningData(null);
+        }
+      } catch (e) {
+        console.error("Error fetching continue learning:", e);
+      }
+      
     } catch (err: any) {
       console.error("Error fetching user stats:", err);
       setError(err.message || "Failed to load user statistics");
@@ -114,10 +189,7 @@ const Dashboard = () => {
     fetchUserStats();
   };
 
-  // Calculate derived stats
-  const completedCourses = Math.floor((stats?.total_enrolled_courses || 0) * 0.2); // 20% completion rate
-  const studyHours = (stats?.total_quiz_attempts || 0) * 2.8; // Assuming ~2.8 hours per quiz attempt
-  const learningStreak = 7; // This could come from API if available
+  // No derived stats needed anymore, using real API data.
 
   return (
     <div className="min-h-screen bg-background font-montserrat">
@@ -141,14 +213,20 @@ const Dashboard = () => {
               alt="ZSE Academy"
               className="h-12 w-auto object-contain"
             />
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            {activeSection === "dashboard" && (
-              <Badge variant="secondary" className="bg-primary/10 text-primary text-xs">
-                Intermediate
-              </Badge>
-            )}
+            <div className="flex items-center space-x-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowHomeModal(true)}
+                className="text-xs"
+              >
+                <FontAwesomeIcon icon={faHome} className="mr-1 h-3 w-3" />
+                Home
+              </Button>
+              <div className="h-8 w-8 bg-[#1c1d1f] text-white rounded-full flex items-center justify-center font-bold text-xs uppercase shrink-0">
+                {user?.name?.charAt(0) || 'U'}
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -236,7 +314,7 @@ const Dashboard = () => {
         ${mobileSidebarOpen ? "lg:ml-64" : ""}
       `}>
         {/* Desktop Header */}
-        <header className="hidden lg:block bg-white border-b border-border px-6 py-4">
+        <header className="hidden lg:block bg-white border-b border-border px-6 py-4 sticky top-0 z-50">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button
@@ -252,26 +330,38 @@ const Dashboard = () => {
               </Button>
               <div>
                 <h1 className="text-2xl font-bold text-secondary">
-                  {activeSection === "dashboard" 
-                    ? `Welcome back, ${user?.name}!` 
-                    : sidebarItems.find(item => item.key === activeSection)?.label
-                  }
+                  {sidebarItems.find(item => item.key === activeSection)?.label}
                 </h1>
                 <p className="text-muted-foreground">
-                  {activeSection === "dashboard" 
-                    ? "Continue your financial education journey"
-                    : `Manage your ${sidebarItems.find(item => item.key === activeSection)?.label.toLowerCase()}`
-                  }
+                  Manage your {sidebarItems.find(item => item.key === activeSection)?.label.toLowerCase()}
                 </p>
               </div>
             </div>
-            {activeSection === "dashboard" && (
-              <div className="flex items-center space-x-4">
-                <Badge variant="secondary" className="bg-primary/10 text-primary">
-                  Intermediate Trader
-                </Badge>
+
+            {/* Right Side Header Items */}
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={() => setShowHomeModal(true)}
+                className="border-primary text-primary hover:bg-primary/10 transition-colors"
+              >
+                <FontAwesomeIcon icon={faHome} className="mr-2" />
+                Go Back Home
+              </Button>
+              
+              <Button
+                variant="ghost"
+                onClick={handleLogout}
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+              >
+                <FontAwesomeIcon icon={faRightFromBracket} className="mr-2" />
+                Logout
+              </Button>
+
+              <div className="h-10 w-10 bg-[#1c1d1f] text-white rounded-full flex items-center justify-center font-bold text-sm uppercase shrink-0 shadow-sm">
+                {user?.name?.charAt(0) || 'U'}
               </div>
-            )}
+            </div>
           </div>
         </header>
 
@@ -279,16 +369,10 @@ const Dashboard = () => {
         <div className="lg:hidden bg-white border-b border-border px-4 py-3">
           <div>
             <h1 className="text-xl font-bold text-secondary">
-              {activeSection === "dashboard" 
-                ? `Welcome, ${user?.name}!` 
-                : sidebarItems.find(item => item.key === activeSection)?.label
-              }
+              {sidebarItems.find(item => item.key === activeSection)?.label}
             </h1>
             <p className="text-muted-foreground text-sm">
-              {activeSection === "dashboard" 
-                ? "Continue your learning journey"
-                : `Manage your ${sidebarItems.find(item => item.key === activeSection)?.label.toLowerCase()}`
-              }
+              Manage your {sidebarItems.find(item => item.key === activeSection)?.label.toLowerCase()}
             </p>
           </div>
         </div>
@@ -297,19 +381,45 @@ const Dashboard = () => {
         <main className="p-4 lg:p-6 bg-gradient-to-br from-muted/30 via-background to-accent/20 min-h-screen">
           {activeSection === "dashboard" && (
             <div className="space-y-6 lg:space-y-8">
-              {/* Welcome Section */}
-              <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary rounded-md lg:rounded-lg p-6 lg:p-8 text-white">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm"></div>
-                <div className="relative z-10">
-                  <h2 className="text-xl lg:text-3xl font-bold mb-2">Welcome back, {user?.name}! 🎯</h2>
-                  <p className="text-primary-foreground/80 text-sm lg:text-lg mb-4">
-                    Ready to continue your financial education journey?
-                  </p>
-                  
+              {/* Welcome Section / Continue Learning */}
+              {continueLearningData ? (
+                <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary rounded-md lg:rounded-lg p-6 lg:p-8 text-white flex flex-col md:flex-row items-center gap-6">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm"></div>
+                  <div className="relative z-10 flex-1">
+                    <h2 className="text-xl lg:text-3xl font-bold mb-2">Jump Back In! 🚀</h2>
+                    <p className="text-primary-foreground/80 text-sm lg:text-lg mb-4">
+                      You were learning <strong>{continueLearningData.title}</strong>
+                    </p>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                      <Button onClick={() => navigate(continueLearningData.next_lesson_url)} className="bg-white text-primary hover:bg-gray-100 font-bold px-8">
+                        Continue to {continueLearningData.last_accessed_module}
+                      </Button>
+                      <div className="text-sm font-semibold opacity-90">
+                        {continueLearningData.progress_percentage}% Complete
+                      </div>
+                    </div>
+                  </div>
+                  {continueLearningData.thumbnail_url && (
+                    <div className="relative z-10 hidden md:block w-48 aspect-video rounded-lg overflow-hidden border-2 border-white/20 shadow-xl">
+                      <img src={continueLearningData.thumbnail_url} alt="Course" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full pointer-events-none"></div>
+                  <div className="absolute -left-5 -bottom-5 w-32 h-32 bg-white/5 rounded-full pointer-events-none"></div>
                 </div>
-                <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full"></div>
-                <div className="absolute -left-5 -bottom-5 w-32 h-32 bg-white/5 rounded-full"></div>
-              </div>
+              ) : (
+                <div className="relative overflow-hidden bg-gradient-to-r from-primary via-primary/90 to-secondary rounded-md lg:rounded-lg p-6 lg:p-8 text-white">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm"></div>
+                  <div className="relative z-10">
+                    <h2 className="text-xl lg:text-3xl font-bold mb-2">Welcome back, {user?.name}! 🎯</h2>
+                    <p className="text-primary-foreground/80 text-sm lg:text-lg mb-4">
+                      Ready to continue your financial education journey?
+                    </p>
+                  </div>
+                  <div className="absolute -right-10 -top-10 w-40 h-40 bg-white/5 rounded-full pointer-events-none"></div>
+                  <div className="absolute -left-5 -bottom-5 w-32 h-32 bg-white/5 rounded-full pointer-events-none"></div>
+                </div>
+              )}
 
               {/* Stats Grid */}
               {loading ? (
@@ -370,10 +480,10 @@ const Dashboard = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xl lg:text-3xl font-bold text-success mb-1">
-                            {completedCourses}
+                            {stats?.total_completed_courses || 0}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {stats?.total_enrolled_courses ? `${Math.round((completedCourses / stats.total_enrolled_courses) * 100)}% completion` : "0% completion"}
+                            {stats?.total_enrolled_courses ? `${Math.round(((stats?.total_completed_courses || 0) / stats.total_enrolled_courses) * 100)}% completion` : "0% completion"}
                           </p>
                         </div>
                       </div>
@@ -383,7 +493,7 @@ const Dashboard = () => {
                     <div className="absolute -bottom-2 -right-2 w-12 h-12 lg:w-20 lg:h-20 bg-success/5 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
                   </div>
 
-                  {/* Study Hours Card */}
+                  {/* Average Quiz Score Card */}
                   <div className="group relative bg-gradient-to-br from-card via-card to-orange-500/10 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
@@ -393,20 +503,20 @@ const Dashboard = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xl lg:text-3xl font-bold text-orange-500 mb-1">
-                            {stats?.total_quiz_attempts || 0}
+                            {stats?.average_quiz_score ? `${stats.average_quiz_score}%` : "0%"}
                           </p>
                           <p className="text-xs text-muted-foreground">
-                            {stats?.total_quiz_attempts || 0} quizzes
+                            {stats?.total_quiz_attempts || 0} quizzes taken
                           </p>
                         </div>
                       </div>
-                      <h3 className="font-semibold text-foreground text-sm lg:text-base mb-1">Quiz Attempts</h3>
-                      <p className="text-xs lg:text-sm text-muted-foreground">Total quiz attempts</p>
+                      <h3 className="font-semibold text-foreground text-sm lg:text-base mb-1">Avg. Quiz Score</h3>
+                      <p className="text-xs lg:text-sm text-muted-foreground">Across all attempts</p>
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-12 h-12 lg:w-20 lg:h-20 bg-orange-500/5 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
                   </div>
 
-                  {/* Learning Streak Card */}
+                  {/* Completed Modules Card */}
                   <div className="group relative bg-gradient-to-br from-card via-card to-purple-500/10 rounded-md lg:rounded-md p-4 lg:p-6 border border-border/50 shadow-sm hover:shadow-sm transition-all duration-300  overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     <div className="relative z-10">
@@ -416,13 +526,13 @@ const Dashboard = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-xl lg:text-3xl font-bold text-purple-500 mb-1">
-                            {learningStreak}
+                            {stats?.total_completed_modules || 0}
                           </p>
-                          <p className="text-xs text-muted-foreground">days in a row</p>
+                          <p className="text-xs text-muted-foreground">modules done</p>
                         </div>
                       </div>
-                      <h3 className="font-semibold text-foreground text-sm lg:text-base mb-1">Learning Streak</h3>
-                      <p className="text-xs lg:text-sm text-muted-foreground">Current streak</p>
+                      <h3 className="font-semibold text-foreground text-sm lg:text-base mb-1">Completed Modules</h3>
+                      <p className="text-xs lg:text-sm text-muted-foreground">Overall progress</p>
                     </div>
                     <div className="absolute -bottom-2 -right-2 w-12 h-12 lg:w-20 lg:h-20 bg-purple-500/5 rounded-full group-hover:scale-110 transition-transform duration-300"></div>
                   </div>
@@ -431,80 +541,52 @@ const Dashboard = () => {
 
 
 
-              {/* Recent Activity Section */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
-                <div className="bg-gradient-to-br from-card via-card to-muted/20 rounded-md lg:rounded-lg p-4 lg:p-6 border border-border/50 shadow-sm">
-                  <h3 className="text-lg lg:text-xl font-bold text-foreground mb-4 flex items-center">
-                    <div className="w-6 h-6 lg:w-8 lg:h-8 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                      <FontAwesomeIcon icon={faArrowTrendUp} className="h-3 w-3 lg:h-4 lg:w-4 text-primary" />
-                    </div>
-                    Recent Activity
-                  </h3>
-                  <div className="space-y-3 lg:space-y-4">
-                    <div className="flex items-center p-3 bg-gradient-to-r from-primary/5 to-transparent rounded-md border border-primary/10">
-                      <div className="w-8 h-8 lg:w-10 lg:h-10 bg-primary/10 rounded-lg flex items-center justify-center mr-3">
-                        <FontAwesomeIcon icon={faGraduationCap} className="h-4 w-4 lg:h-5 lg:w-5 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm lg:text-base truncate">Quiz Completed</p>
-                        <p className="text-xs lg:text-sm text-muted-foreground truncate">{stats?.total_quiz_attempts || 0} total attempts</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center p-3 bg-gradient-to-r from-success/5 to-transparent rounded-md border border-success/10">
-                      <div className="w-8 h-8 lg:w-10 lg:h-10 bg-success/10 rounded-lg flex items-center justify-center mr-3">
-                        <FontAwesomeIcon icon={faBook} className="h-4 w-4 lg:h-5 lg:w-5 text-success" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-foreground text-sm lg:text-base truncate">Course Progress</p>
-                        <p className="text-xs lg:text-sm text-muted-foreground truncate">{stats?.total_enrolled_courses || 0} enrolled courses</p>
-                      </div>
-                    </div>
+              {/* Learning Goals Section */}
+              <div className="bg-gradient-to-br from-card via-card to-accent/20 rounded-md lg:rounded-lg p-4 lg:p-6 border border-border/50 shadow-sm">
+                <h3 className="text-lg lg:text-xl font-bold text-foreground mb-4 flex items-center">
+                  <div className="w-6 h-6 lg:w-8 lg:h-8 bg-orange-500/10 rounded-lg flex items-center justify-center mr-3">
+                    <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 lg:h-4 lg:w-4 text-orange-500" />
                   </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-card via-card to-accent/20 rounded-md lg:rounded-lg p-4 lg:p-6 border border-border/50 shadow-sm">
-                  <h3 className="text-lg lg:text-xl font-bold text-foreground mb-4 flex items-center">
-                    <div className="w-6 h-6 lg:w-8 lg:h-8 bg-orange-500/10 rounded-lg flex items-center justify-center mr-3">
-                      <FontAwesomeIcon icon={faChartColumn} className="h-3 w-3 lg:h-4 lg:w-4 text-orange-500" />
-                    </div>
-                    Learning Goals
-                  </h3>
-                  <div className="space-y-3 lg:space-y-4">
+                  Learning Goals
+                </h3>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+                  {/* Dynamic Course Goal */}
                     <div className="p-3 lg:p-4 bg-gradient-to-r from-orange-500/5 to-transparent rounded-md border border-orange-500/10">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-foreground text-sm lg:text-base">Course Completion</span>
+                        <span className="font-medium text-foreground text-sm lg:text-base">Course Completion Goal</span>
                         <span className="text-xs lg:text-sm text-orange-500 font-bold">
-                          {completedCourses}/{stats?.total_enrolled_courses || 0}
+                          {stats?.total_completed_courses || 0}/{stats?.goal_target_courses || 5}
                         </span>
                       </div>
                       <div className="w-full bg-orange-500/10 rounded-full h-2 mb-1">
                         <div 
                           className="bg-orange-500 h-2 rounded-full" 
-                          style={{width: stats?.total_enrolled_courses ? `${(completedCourses / stats.total_enrolled_courses) * 100}%` : '0%'}}
+                          style={{width: stats?.goal_target_courses ? `${Math.min(((stats?.total_completed_courses || 0) / stats.goal_target_courses) * 100, 100)}%` : '0%'}}
                         ></div>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {stats?.total_enrolled_courses ? stats.total_enrolled_courses - completedCourses : 0} courses remaining
+                        {Math.max(0, (stats?.goal_target_courses || 5) - (stats?.total_completed_courses || 0))} courses remaining to hit your target!
                       </p>
                     </div>
+
+                    {/* Dynamic Quiz Goal */}
                     <div className="p-3 lg:p-4 bg-gradient-to-r from-purple-500/5 to-transparent rounded-md border border-purple-500/10">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-medium text-foreground text-sm lg:text-base">Quiz Mastery</span>
+                        <span className="font-medium text-foreground text-sm lg:text-base">Quiz Mastery Goal</span>
                         <span className="text-xs lg:text-sm text-purple-500 font-bold">
-                          {stats?.total_quiz_attempts || 0} attempts
+                          {stats?.total_quiz_attempts || 0}/{stats?.goal_target_quizzes || 15}
                         </span>
                       </div>
                       <div className="w-full bg-purple-500/10 rounded-full h-2 mb-1">
                         <div 
                           className="bg-purple-500 h-2 rounded-full" 
-                          style={{width: stats?.total_quiz_attempts ? `${Math.min((stats.total_quiz_attempts / 20) * 100, 100)}%` : '0%'}}
+                          style={{width: stats?.goal_target_quizzes ? `${Math.min(((stats?.total_quiz_attempts || 0) / stats.goal_target_quizzes) * 100, 100)}%` : '0%'}}
                         ></div>
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {Math.max(0, 20 - (stats?.total_quiz_attempts || 0))} more for expert level
+                        {Math.max(0, (stats?.goal_target_quizzes || 15) - (stats?.total_quiz_attempts || 0))} more quizzes to reach your goal
                       </p>
                     </div>
-                  </div>
                 </div>
               </div>
             </div>
@@ -512,9 +594,45 @@ const Dashboard = () => {
           
           {activeSection === "courses" && <MyCourses />}
 
+          {activeSection === "activity" && <RecentActivityTab />}
+          
+          {activeSection === "wishlist" && <WishlistTab />}
+
           {activeSection === "profile" && <Profile />}
         </main>
       </div>
+
+      {/* Home Navigation Modal */}
+      <Dialog open={showHomeModal} onOpenChange={setShowHomeModal}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>Return to Home</DialogTitle>
+            <DialogDescription>
+              Would you like to log out before returning to the home page, or stay logged in?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 mt-4 sm:justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowHomeModal(false);
+                navigate("/");
+              }}
+            >
+              Go back without logout
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                setShowHomeModal(false);
+                handleLogout();
+              }}
+            >
+              Logout and go back
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -19,8 +19,10 @@ import {
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import tutorialsBg from "../assets/tutorials.jpg";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { API_BASE_URL } from "@/constants/api";
 
 // -------------------------
 // Tutorial Type
@@ -35,103 +37,20 @@ interface Tutorial {
   order: number;
   icon: IconDefinition;
   gradient: string;
-  embedUrl?: string;
+  iframecode?: string;
 }
 
-// -------------------------
-// Tutorial Data
-// -------------------------
-const tutorials: Tutorial[] = [
-  {
-    id: "create-account",
-    title: "Account Setup",
-    description:
-      "Learn how to create and verify your trading account step by step",
-    category: "zse",
-    duration: "3 min",
-    completed: true,
-    order: 1,
-    icon: faUserPlus,
-    gradient: "from-blue-500 to-cyan-500",
-    embedUrl: "https://app.guideflow.com/player/qp7o047ijr",
-  },
-  {
-    id: "deposit-funds",
-    title: "Deposit Funds",
-    description: "Add money to your account and start trading immediately",
-    category: "zse",
-    duration: "2 min",
-    completed: true,
-    order: 2,
-    icon: faWallet,
-    gradient: "from-green-500 to-emerald-500",
-  },
-  {
-    id: "withdraw-funds",
-    title: "Withdraw Profits",
-    description: "Learn the secure withdrawal process for your earnings",
-    category: "zse",
-    duration: "2 min",
-    completed: false,
-    order: 3,
-    icon: faMoneyBillTransfer,
-    gradient: "from-purple-500 to-pink-500",
-  },
-  {
-    id: "place-order",
-    title: "Place Trade",
-    description: "Execute buy and sell orders like a professional trader",
-    category: "zse",
-    duration: "4 min",
-    completed: false,
-    order: 4,
-    icon: faChartLine,
-    gradient: "from-orange-500 to-red-500",
-  },
-  {
-    id: "mobile-create",
-    title: "Mobile Setup",
-    description: "Install our mobile app and set up your account on the go",
-    category: "vfex",
-    duration: "3 min",
-    completed: false,
-    order: 1,
-    icon: faMobileAlt,
-    gradient: "from-indigo-500 to-purple-500",
-  },
-  {
-    id: "mobile-deposit",
-    title: "Mobile Deposit",
-    description: "Quick and easy deposit process from your mobile device",
-    category: "vfex",
-    duration: "2 min",
-    completed: false,
-    order: 2,
-    icon: faDownload,
-    gradient: "from-teal-500 to-green-500",
-  },
-  {
-    id: "mobile-withdraw",
-    title: "Mobile Withdraw",
-    description: "Withdraw your funds anytime, anywhere from mobile",
-    category: "vfex",
-    duration: "2 min",
-    completed: false,
-    order: 3,
-    icon: faUpload,
-    gradient: "from-rose-500 to-orange-500",
-  },
-  {
-    id: "mobile-trade",
-    title: "Mobile Trading",
-    description: "Master trading on the go with our mobile platform",
-    category: "vfex",
-    duration: "4 min",
-    completed: false,
-    order: 4,
-    icon: faCoins,
-    gradient: "from-amber-500 to-yellow-500",
-  },
+const bgGradients = [
+  "from-blue-500 to-cyan-500",
+  "from-green-500 to-emerald-500",
+  "from-purple-500 to-pink-500",
+  "from-orange-500 to-red-500",
+  "from-indigo-500 to-purple-500",
+  "from-teal-500 to-green-500",
+];
+
+const iconsList = [
+  faUserPlus, faWallet, faMoneyBillTransfer, faChartLine, faMobileAlt, faDownload, faUpload, faCoins
 ];
 
 // -------------------------
@@ -233,15 +152,73 @@ const TutorialCard = ({
 // -------------------------
 // Tutorial Viewer
 // -------------------------
-const TutorialViewer = ({ url }: { url: string }) => {
+const TutorialViewer = ({ url, iframecode }: { url?: string; iframecode?: string }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const iframecodeContainerRef = useRef<HTMLDivElement>(null);
+
+  // Manually execute scripts found in the injected HTML
+  useEffect(() => {
+    if (!iframecode || !iframecodeContainerRef.current) return;
+    
+    const scripts = iframecodeContainerRef.current.querySelectorAll("script");
+    scripts.forEach((oldScript) => {
+      const newScript = document.createElement("script");
+      Array.from(oldScript.attributes).forEach((attr) => {
+        newScript.setAttribute(attr.name, attr.value);
+      });
+      if (oldScript.innerHTML) {
+        newScript.innerHTML = oldScript.innerHTML;
+      }
+      oldScript.parentNode?.replaceChild(newScript, oldScript);
+    });
+  }, [iframecode]);
+  
+  useEffect(() => {
+    if (!url || !containerRef.current) return;
+    const idMatch = url.match(/(?:embed|player)\/([a-zA-Z0-9]+)/);
+    const id = idMatch ? idMatch[1] : null;
+    
+    if (id && !document.querySelector(`script[data-iframe-id="${id}"]`)) {
+      const script = document.createElement("script");
+      script.src = "https://app.guideflow.com/assets/opt.js";
+      script.setAttribute("data-iframe-id", id);
+      script.async = true;
+      containerRef.current.appendChild(script);
+    }
+  }, [url]);
+
+  if (iframecode) {
+    return (
+      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden w-full">
+        <div 
+          ref={iframecodeContainerRef}
+          dangerouslySetInnerHTML={{ __html: iframecode }}
+          className="w-full flex justify-center bg-black/5"
+        />
+      </div>
+    );
+  }
+
+  const idMatch = url?.match(/(?:embed|player)\/([a-zA-Z0-9]+)/);
+  const id = idMatch ? idMatch[1] : "zkj6z3diwp";
+
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden">
-      <iframe
-        src={url}
-        className="w-full h-[600px]"
-        title="Tutorial Demo"
-        allow="clipboard-write"
-      />
+    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden w-full">
+      <div 
+        ref={containerRef}
+        style={{ position: "relative", paddingBottom: "calc(47.4609375% + 47px)", height: 0 }}
+      >
+        <iframe
+          id={id}
+          src={`https://app.guideflow.com/embed/${id}`}
+          width="100%"
+          height="100%"
+          style={{ overflow: "hidden", position: "absolute", border: "none" }}
+          scrolling="no"
+          allow="clipboard-read; clipboard-write"
+          allowFullScreen
+        ></iframe>
+      </div>
     </div>
   );
 };
@@ -251,9 +228,57 @@ const TutorialViewer = ({ url }: { url: string }) => {
 // -------------------------
 export default function TutorialsDashboard() {
   const [selectedTutorial, setSelectedTutorial] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState<
-    "all" | "zse" | "vfex"
-  >("all");
+  const [activeCategory, setActiveCategory] = useState<"all" | "zse" | "vfex">("all");
+  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTutorials = async () => {
+      try {
+        const token = localStorage.getItem("zse_training_token");
+        const response = await fetch(`${API_BASE_URL}/tutorials`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json'
+          }
+        });
+        
+        if (!response.ok) {
+          if (response.status === 401 || response.status === 403) {
+            throw new Error("You do not have permission to view tutorials. Please ensure you are logged in as an admin.");
+          }
+          throw new Error("Failed to fetch tutorials");
+        }
+
+        const data = await response.json();
+        console.log("Tutorials API Response:", data);
+
+        // Safely map the data, falling back to safe defaults if fields are missing
+        const mappedData: Tutorial[] = data.map((t: any, index: number) => ({
+          id: t.id?.toString() || String(index),
+          title: t.name || "Untitled Tutorial",
+          description: `Interactive tutorial on ${t.name || "this topic"}`,
+          category: t.exchange?.toLowerCase() === "vfex" ? "vfex" : "zse",
+          duration: "3 min",
+          completed: false,
+          order: index + 1,
+          icon: iconsList[index % iconsList.length],
+          gradient: bgGradients[index % bgGradients.length],
+          iframecode: t.iframecode
+        }));
+        
+        setTutorials(mappedData);
+      } catch (err: any) {
+        console.error("Tutorials fetch error:", err);
+        setError(err.message || "An unknown error occurred while fetching tutorials.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchTutorials();
+  }, []);
 
   const filteredTutorials = tutorials
     .filter((t) =>
@@ -315,7 +340,7 @@ export default function TutorialsDashboard() {
             </div>
           </div>
 
-          <TutorialViewer url={tutorial.embedUrl || "https://app.supademo.com/embed/cmir6flhu0pj6l821l4stwbjg"} />
+          <TutorialViewer url={tutorial.embedUrl} iframecode={tutorial.iframecode} />
         </div>
 
         <Footer />
@@ -410,15 +435,14 @@ export default function TutorialsDashboard() {
         <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-green-500/10 rounded-full blur-3xl" />
 
         {/* Content */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-20">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
-            Master Trading with
-            <span className="block bg-gradient-to-r from-blue-400 via-cyan-400 to-green-400 bg-clip-text text-transparent">
-              Interactive Tutorials
-            </span>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
+          <Badge className="bg-[#00aeef] hover:bg-[#00aeef] text-white border-0 mb-6 px-4 py-1 uppercase tracking-widest text-xs drop-shadow-md">
+            Interactive Demos
+          </Badge>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight drop-shadow-md text-white">
+            Interactive Trading Tutorials
           </h1>
-
-          <p className="text-lg text-slate-300 max-w-2xl mb-8">
+          <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
             Step-by-step guided demos to help you navigate deposits,
             withdrawals, and trading like a pro. Learn at your own pace.
           </p>
@@ -456,10 +480,18 @@ export default function TutorialsDashboard() {
         </div>
 
         {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-6">
-          {filteredTutorials.length} tutorial
-          {filteredTutorials.length !== 1 ? "s" : ""} available
-        </p>
+        {loading ? (
+          <p className="text-sm text-muted-foreground mb-6">Loading tutorials...</p>
+        ) : error ? (
+          <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6 border border-red-200">
+            {error}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground mb-6">
+            {filteredTutorials.length} tutorial
+            {filteredTutorials.length !== 1 ? "s" : ""} available
+          </p>
+        )}
 
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">

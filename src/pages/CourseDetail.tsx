@@ -90,30 +90,8 @@ const CourseDetail = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
-  const [reviewsData, setReviewsData] = useState<{
-    average_rating: number;
-    reviews: any[];
-  } | null>(null);
-
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await fetch(`http://127.0.0.1:8000/api/courses/${id}/reviews`);
-        if (response.ok) {
-          const data = await response.json();
-          setReviewsData({
-            average_rating: Number(data.average_rating || 0),
-            reviews: data.reviews || [],
-          });
-        }
-      } catch (err) {
-        console.error("Error loading reviews info:", err);
-      }
-    };
-    if (id) {
-      fetchReviews();
-    }
-  }, [id]);
+  // The secondary reviews fetch has been removed because the backend
+  // now explicitly injects `reviews_count` and `reviews_avg_rating` into the course payload!
 
   const { data: course, isLoading: loading, error: fetchError } = useCourse(id);
   const { data: similarCourses = [] } = useSimilarCourses(id);
@@ -348,10 +326,10 @@ const CourseDetail = () => {
       {/* Udemy Header Section */}
       <section className="relative bg-cover bg-center text-white py-8 md:py-12" style={{ backgroundImage: `url(${courseBg})` }}>
         <div className="absolute inset-0 bg-black opacity-50" />
-        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-8 relative">
+        <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8 relative">
             {/* Left Content Column */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
               {/* Breadcrumb - White on Dark */}
               <nav className="flex items-center space-x-2 text-sm text-[#cec0fc] font-bold">
                 <Link to="/courses" className="hover:underline">
@@ -388,13 +366,11 @@ const CourseDetail = () => {
               <div className="flex flex-wrap items-center gap-4 text-left">
                 <div className="flex items-center space-x-1">
                   <span className="font-bold text-[#f3ca8c]">
-                    {reviewsData?.average_rating 
-                      ? reviewsData.average_rating.toFixed(1) 
-                      : (course.rating || 4.7).toFixed(1)}
+                    {((course as any).reviews_avg_rating || course.rating || 0).toFixed(1)}
                   </span>
                   <div className="flex">
                     {[...Array(5)].map((_, i) => {
-                      const ratingVal = reviewsData?.average_rating || course.rating || 4.7;
+                      const ratingVal = (course as any).reviews_avg_rating || course.rating || 0;
                       return (
                         <Star
                           key={i}
@@ -407,7 +383,7 @@ const CourseDetail = () => {
                     })}
                   </div>
                   <span className="text-[#cec0fc] hover:underline cursor-pointer" onClick={() => setActiveTab("reviews")}>
-                    ({reviewsData?.reviews?.length ?? 0} {reviewsData?.reviews?.length === 1 ? "rating" : "ratings"})
+                    ({(course as any).reviews_count ?? 0} {(course as any).reviews_count === 1 ? "rating" : "ratings"})
                   </span>
                 </div>
               </div>
@@ -426,7 +402,7 @@ const CourseDetail = () => {
 
 
             {/* Mobile Sidebar Card - Simplified */}
-            <div className="lg:hidden">
+            <div className="lg:hidden w-full mt-4">
               <img
                 src={course.thumbnail_url || course.thumbnail || "/placeholder.svg"}
                 alt={course.title}
@@ -455,11 +431,11 @@ const CourseDetail = () => {
       {/* Main Content Area */}
       <section className="py-8 bg-white">
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-12">
-            <div className="lg:col-span-2 space-y-8">
+          <div className="flex flex-col lg:grid lg:grid-cols-3 gap-8 lg:gap-12">
+            <div className="lg:col-span-2 space-y-6 lg:space-y-8">
               {/* Udemy Styled Tabs - Sticky or Flat */}
               <div className="border-b border-gray-200">
-                <div className="flex overflow-x-auto space-x-8 no-scrollbar">
+                <div className="flex overflow-x-auto space-x-6 md:space-x-8 no-scrollbar pb-1">
                   {["overview", "content", "instructor", "reviews", "quizzes"].map((tab) => (
                     <button
                       key={tab}
@@ -506,7 +482,7 @@ const CourseDetail = () => {
 
             {/* Empty space for the sticky card overflow */}
             <div className="hidden lg:block lg:col-span-1 relative z-30">
-              <div className="-mt-[360px]">
+              <div className="-mt-[320px] xl:-mt-[360px] sticky top-24">
                 <CourseSidebarCard
                   thumbnailUrl={
                     course.thumbnail_url || course.thumbnail || "/placeholder.svg"
@@ -516,6 +492,7 @@ const CourseDetail = () => {
                   isCompleted={course.progress === 100 || (course as any).is_completed}
                   totalLessons={totalLessons}
                   modulesCount={course.contents?.length || 0}
+                  duration={course.duration}
                   onEnrollClick={handleEnrollNow}
                   onWishlistClick={handleAddToWishlist}
                   onShareClick={handleShareClick}
@@ -527,7 +504,7 @@ const CourseDetail = () => {
           </div>
 
           {/* Similar Courses Section - Rendered full width inside container */}
-          <div className="pt-12 border-t border-gray-200 mt-16">
+          <div className="pt-8 lg:pt-12 border-t border-gray-200 mt-10 lg:mt-16 w-full overflow-hidden">
             <SimilarCoursesSection courses={similarCourses} />
           </div>
         </div>

@@ -9,6 +9,13 @@ export const API_ENDPOINTS = {
   RESEND_OTP: "/resend-otp",
   ME: "/me",
   LOGOUT: "/logout",
+  PASSWORD_POLICY: "/public/password-policy",
+
+  // User Dashboard endpoints
+  USER_ACTIVITY: "/user/activity",
+  CONTINUE_LEARNING: "/user/continue-learning",
+  USER_STATS: "/user/stats",
+  USER_GOALS: "/user/goals",
 
   // Course endpoints
   COURSES: "/courses",

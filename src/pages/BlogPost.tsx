@@ -47,11 +47,8 @@ const BlogPostPage = () => {
 
   const fetchRelatedPosts = async (currentPost: BlogPost) => {
     try {
-      const data = await blogService.getPublicPosts();
-      const related = data
-        .filter((p: any) => p.id !== currentPost.id)
-        .slice(0, 4) // Show 4 related articles in a row on desktop
-        .map(transformBlogPost);
+      const data = await blogService.getRelatedPosts(currentPost.id);
+      const related = data.slice(0, 4).map(transformBlogPost);
       setRelatedPosts(related);
     } catch (error) {
       console.error('Error fetching related posts:', error);
@@ -105,7 +102,7 @@ const BlogPostPage = () => {
 
       {/* Udemy-style Dark Hero Section - Margins Aligning with Navbar */}
       <div className="bg-[#1c1d1f] text-white pt-10 pb-14 relative w-full border-b border-gray-800" style={{ backgroundImage: `url(${blogBg})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-        <div className="absolute inset-0 bg-black opacity-50" />
+        <div className="absolute inset-0 bg-black/75" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="max-w-4xl w-full space-y-6">
             
@@ -138,7 +135,7 @@ const BlogPostPage = () => {
 
               <div className="flex items-center">
                 <FontAwesomeIcon icon={faGlobe} className="h-3.5 w-3.5 mr-2" />
-                English
+                {post.language || "English"}
               </div>
 
               <div className="flex items-center text-[#cec8c2]">

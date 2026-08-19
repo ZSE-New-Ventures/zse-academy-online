@@ -72,9 +72,9 @@ export const QuizzesSection = ({ courseId }: QuizzesSectionProps) => {
   return (
     <>
       <Card>
-        <CardContent className="p-6">
-          <h2 className="text-xl font-bold mb-4">Course Quizzes</h2>
-          <div className="space-y-4">
+        <CardContent className="p-4 sm:p-6">
+          <h2 className="text-lg sm:text-xl font-bold mb-3 sm:mb-4">Course Quizzes</h2>
+          <div className="space-y-3 sm:space-y-4">
             {quizzes.map((quiz) => (
               <QuizCard key={quiz.id} quiz={quiz} onStartQuiz={handleStartQuiz} />
             ))}

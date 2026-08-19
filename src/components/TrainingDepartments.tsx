@@ -6,15 +6,40 @@ import bentoImage from "@/assets/bento.jpg";
 import image2 from "@/assets/hero-image.jpg";
 import image3 from "@/assets/business-analyst-looking-into-statistics-reports-detect-any-obstacles.jpg";
 
-const bentoImages = [bentoImage, image2, image3];
+const centerCardContent = [
+  {
+    image: bentoImage,
+    title: "ZEEX",
+    description: "A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.",
+    buttonText: "Explore ZEEX",
+    link: "https://zeex.co.zw",
+    isExternal: true,
+  },
+  {
+    image: image2,
+    title: "ZEEX",
+    description: "A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.",
+    buttonText: "Explore ZEEX",
+    link: "https://zeex.co.zw",
+    isExternal: true,
+  },
+  {
+    image: image3,
+    title: "ZEEX",
+    description: "A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.",
+    buttonText: "Explore ZEEX",
+    link: "https://zeex.co.zw",
+    isExternal: true,
+  }
+];
 
 export const TrainingDepartments = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % bentoImages.length);
-    }, 3000);
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % centerCardContent.length);
+    }, 4000);
     return () => clearInterval(interval);
   }, []);
 
@@ -111,11 +136,11 @@ export const TrainingDepartments = () => {
           {/* COLUMN 2: CENTER TALL CARD */}
           <div className="relative overflow-hidden group min-h-[500px] lg:min-h-full flex flex-col justify-end shadow-sm hover:shadow-md transition-shadow duration-300">
             {/* Background portrait images with slideshow */}
-            {bentoImages.map((img, index) => (
+            {centerCardContent.map((content, index) => (
               <img
                 key={index}
-                src={img}
-                alt={`ZSE Academy Velocity ${index + 1}`}
+                src={content.image}
+                alt={content.title}
                 className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ${
                   index === currentImageIndex ? "opacity-100 z-0" : "opacity-0 -z-10"
                 }`}
@@ -126,7 +151,7 @@ export const TrainingDepartments = () => {
 
             {/* Slideshow Indicators */}
             <div className="absolute top-4 right-4 z-20 flex gap-2">
-              {bentoImages.map((_, index) => (
+              {centerCardContent.map((_, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
@@ -138,24 +163,27 @@ export const TrainingDepartments = () => {
               ))}
             </div>
 
-            {/* Content overlay */}
+            {/* Content overlay - Static ZEEX Content */}
             <div className="relative z-10 p-8 space-y-6">
               <div className="space-y-2">
                 <h3 className="text-3xl font-black text-white tracking-tight leading-tight pt-2">
-                  ZSE Training
+                  ZEEX
                 </h3>
                 <p className="text-xs text-gray-300 leading-relaxed">
-                  Experience the future of trading education. Access professional investment modules, tutorials, and certifications directly from Zimbabwe's capital markets hub.
+                  A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.
                 </p>
               </div>
 
               <div className="pt-2">
-                <Link
-                  to="/courses"
+                <a
+                  href="https://zeex.co.zw"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center justify-center bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-sm h-12 px-6 transition-colors w-full sm:w-auto"
                 >
-                  Start Learning Now
-                </Link>
+                  <span>Explore ZEEX</span>
+                  <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-2 h-3 w-3" />
+                </a>
               </div>
             </div>
           </div>
@@ -197,35 +225,35 @@ export const TrainingDepartments = () => {
               </div>
             </div>
 
-            {/* Box 5: Trade Anywhere (Vibrant ZSE Blue Background - rgb(0, 174, 239)) */}
+            {/* Box 5: InvoiceX (Vibrant ZSE Blue Background - rgb(0, 174, 239)) */}
             <div className="bg-[#00aeef] text-white p-8 flex flex-col justify-between min-h-[250px] flex-1 shadow-sm hover:shadow-md transition-shadow duration-300">
               <div className="space-y-6">
-                {/* Responsive Devices Icon - Styled in White for high contrast */}
+                {/* Document/Invoice Icon - Styled in White for high contrast */}
                 <div className="w-12 h-12">
-                  <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
-                    <rect x="2" y="5" width="13" height="9" rx="1" fill="none" />
-                    <path d="M6 14v3h5v-3" strokeLinecap="round" />
-                    <rect x="16" y="8" width="5" height="9" rx="1" fill="white" />
-                    <circle cx="18.5" cy="14" r="0.75" fill="#00aeef" />
+                  <svg className="w-12 h-12" viewBox="0 0 24 24" fill="none" strokeWidth="2">
+                    <rect x="5" y="3" width="14" height="18" rx="2" stroke="white" fill="none" />
+                    <path d="M9 7h6M9 11h6M9 15h4" stroke="white" strokeLinecap="round" />
                   </svg>
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-2xl font-black tracking-tight text-white">Trade Anywhere</h3>
+                  <h3 className="text-2xl font-black tracking-tight text-white">InvoiceX</h3>
                   <p className="text-xs text-blue-50 leading-relaxed">
-                    Access your investment portfolios on mobile, tablet, or web. Stay connected to Zimbabwe's leading trading boards everywhere.
+                    A premier invoice financing platform. Unlock working capital or invest in high-yield corporate invoices seamlessly.
                   </p>
                 </div>
               </div>
 
               <div className="pt-6">
-                <Link
-                  to="/about"
+                <a
+                  href="https://invoicex.zeex.co.zw/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-white hover:underline"
                 >
-                  <span>Learn More</span>
+                  <span>Go to InvoiceX</span>
                   <FontAwesomeIcon icon={faExternalLinkAlt} className="ml-2 h-3 w-3 text-blue-100" />
-                </Link>
+                </a>
               </div>
             </div>
 

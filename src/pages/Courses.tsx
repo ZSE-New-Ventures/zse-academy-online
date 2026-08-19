@@ -223,19 +223,27 @@ const Courses = () => {
 
       {/* Hero Section - Courses Page */}
       <section
-        className="relative bg-cover bg-center text-white py-12"
-        style={{ backgroundImage: `url(${coursesBg})` }}
+        className="relative py-20 md:py-32 text-white bg-gray-900 overflow-hidden"
       >
-        <div className="absolute inset-0 bg-blue-900 opacity-70" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Learn from the best courses
-            </h1>
-            <p className="text-lg md:text-xl text-purple-100 transition-all duration-300">
-              {heroDescription}
-            </p>
-          </div>
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ 
+            backgroundImage: `url(${coursesBg})`,
+          }}
+        />
+        {/* Dark overlay with brand color tint */}
+        <div className="absolute inset-0 bg-black/60 bg-gradient-to-r from-black/80 to-[#00aeef]/30 mix-blend-multiply" />
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Badge className="bg-[#00aeef] hover:bg-[#00aeef] text-white border-0 mb-6 px-4 py-1 uppercase tracking-widest text-xs drop-shadow-md">
+            Course Catalog
+          </Badge>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight drop-shadow-md">
+            Learn from the best courses
+          </h1>
+          <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
+            {heroDescription}
+          </p>
         </div>
       </section>
 
@@ -257,10 +265,10 @@ const Courses = () => {
             {/* Filters */}
             <div className="flex gap-3 w-full md:w-auto">
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                <SelectTrigger className="w-full md:w-48 border-gray-300">
+                <SelectTrigger className="w-full md:w-48 border-gray-300 bg-white">
                   <SelectValue placeholder="Category" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="all-categories">All Categories</SelectItem>
                   {categories.map(category => (
                     <SelectItem key={category} value={category}>{category}</SelectItem>
@@ -269,10 +277,10 @@ const Courses = () => {
               </Select>
 
               <Select value={selectedLevel} onValueChange={setSelectedLevel}>
-                <SelectTrigger className="w-full md:w-40 border-gray-300">
+                <SelectTrigger className="w-full md:w-40 border-gray-300 bg-white">
                   <SelectValue placeholder="Level" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="all-levels">All Levels</SelectItem>
                   {levels.map(level => (
                     <SelectItem key={level} value={level}>{level}</SelectItem>

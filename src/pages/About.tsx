@@ -182,7 +182,7 @@ export default function About() {
             Ready to start learning?
           </h2>
           <p className="text-sm text-[#6a6f73] max-w-md mx-auto leading-relaxed">
-            Gain immediate access to structured lessons, modules, and earn your certificate of completion today.
+            Gain immediate access to structured lessons and modules today.
           </p>
           <div className="pt-2">
             <Link

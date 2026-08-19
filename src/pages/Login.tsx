@@ -12,6 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faEnvelope, faLock, faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/hooks/use-toast";
+import { sanitizeInput, validateEmail } from "@/utils/sanitization";
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -33,15 +34,27 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const sanitizedEmail = sanitizeInput(formData.email);
+
+    if (!validateEmail(sanitizedEmail)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      await login(sanitizedEmail, formData.password);
       toast({
         title: "Welcome back!",
         description: "Successfully logged in.",
       });
-      // Don't auto-redirect, let user use the profile menu to go to dashboard
+      navigate("/dashboard");
     } catch (error: any) {
       const errorData = error.response?.data;
       if (error.response?.status === 403 && errorData?.not_verified) {

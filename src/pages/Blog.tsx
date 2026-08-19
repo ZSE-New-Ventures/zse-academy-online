@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import blogBg from "@/assets/blogroom.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -23,18 +24,12 @@ import {
   getFallbackImage,
 } from "@/utils/blogHelpers";
 
-const categories = [
-  "All",
-  "Market Analysis",
-  "Investment Tips",
-  "Risk Management",
-  "Fintech",
-  "Currency Analysis",
-  "Sustainable Finance",
-];
+
 
 const Blog = () => {
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
+  const [categories, setCategories] = useState<{id: number, name: string, slug: string}[]>([{id: 0, name: "All", slug: "all"}]);
+  const [trendingPosts, setTrendingPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
@@ -48,28 +43,37 @@ const Blog = () => {
   }, [searchTerm, activeFilter]);
 
   useEffect(() => {
-    const fetchBlogPosts = async () => {
+    const fetchBlogData = async () => {
       try {
         setLoading(true);
         setError(null);
-        const data = await blogService.getPublicPosts();
-        const transformedPosts = data.map((post, index) => ({
+        
+        const [postsData, catsData, trendingData] = await Promise.all([
+          blogService.getPublicPosts(),
+          blogService.getCategories(),
+          blogService.getTrendingPosts(),
+        ]);
+
+        const transformedPosts = postsData.map((post: any, index: number) => ({
           ...transformBlogPost(post),
           featured: index === 0,
-          rating: (4.5 + Math.random() * 0.5).toFixed(1),
-          enrolled: Math.floor(Math.random() * 5000) + 1000,
-          lessons: Math.floor(Math.random() * 10) + 5,
-          duration: `${Math.floor(Math.random() * 60) + 30}m`,
         }));
+        
         setBlogPosts(transformedPosts);
+        if (catsData && catsData.length > 0) {
+          setCategories([{id: 0, name: "All", slug: "all"}, ...catsData]);
+        }
+        if (trendingData && trendingData.length > 0) {
+          setTrendingPosts(trendingData.map((p: any) => transformBlogPost(p)));
+        }
       } catch (err) {
-        console.error("Error fetching blog posts:", err);
-        setError("Failed to load blog posts. Please try again later.");
+        console.error("Error fetching blog data:", err);
+        setError("Failed to load blog data. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
-    fetchBlogPosts();
+    fetchBlogData();
   }, []);
 
   const filteredPosts = blogPosts.filter((post) => {
@@ -86,9 +90,6 @@ const Blog = () => {
 
   const featuredPost = filteredPosts.find((post) => post.featured);
   const regularPosts = filteredPosts.filter((post) => !post.featured);
-  const trendingPosts = [...filteredPosts]
-    .sort(() => 0.5 - Math.random())
-    .slice(0, 5);
 
   const indexOfLastPost = currentPage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
@@ -122,7 +123,7 @@ const Blog = () => {
             <p className="text-gray-600 mb-4">{error}</p>
             <Button
               onClick={() => window.location.reload()}
-              className="bg-blue-600 rounded-none hover:bg-blue-700"
+              className="bg-[#00aeef] rounded-none hover:bg-[#008bc0]"
             >
               Try Again
             </Button>
@@ -138,13 +139,17 @@ const Blog = () => {
       <Navbar />
 
       {/* Flat Corporate Header */}
-      <div className="border-b border-gray-200 bg-gray-50 py-12 md:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-              Newsroom
+      <div 
+        className="relative border-b border-gray-200 py-12 md:py-20 bg-cover bg-center"
+        style={{ backgroundImage: `url(${blogBg})` }}
+      >
+        <div className="absolute inset-0 bg-black/70"></div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+          <div className="max-w-2xl text-white">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">
+              Blog
             </h1>
-            <p className="text-lg leading-relaxed text-gray-600">
+            <p className="text-lg leading-relaxed text-gray-200">
               The latest financial insights, market analysis, and platform updates straight from the experts.
             </p>
           </div>
@@ -160,7 +165,7 @@ const Blog = () => {
                 placeholder="Search articles..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 h-11 w-full border-gray-300 border rounded-none focus:ring-0 focus:border-blue-600"
+                className="pl-10 h-11 w-full border-transparent bg-white text-gray-900 rounded-md focus:ring-2 focus:ring-[#00aeef] focus:border-transparent"
               />
             </div>
           </div>
@@ -174,20 +179,20 @@ const Blog = () => {
           {/* Main Feed Column */}
           <div className="lg:w-3/4">
 
-            {/* Navigational Tabs (Categories) inside Main Feed Instead of Sidebar to ensure flat design */}
-            <div className="mb-8 border-b border-gray-200 overflow-x-auto">
-              <nav className="flex space-x-8 min-w-max">
+            {/* Navigational Tabs (Categories) Joined Segmented Control */}
+            <div className="mb-8 pb-2">
+              <nav className="inline-flex flex-wrap border border-[#00aeef] rounded-sm overflow-hidden">
                 {categories.map((category) => (
                   <button
-                    key={category}
-                    onClick={() => setActiveFilter(category)}
-                    className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors whitespace-nowrap
-                      ${activeFilter === category
-                        ? "border-blue-600 text-blue-600"
-                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    key={category.id}
+                    onClick={() => setActiveFilter(category.name)}
+                    className={`px-5 py-2 font-semibold text-sm transition-all whitespace-nowrap border-r border-[#00aeef] last:border-r-0
+                      ${activeFilter === category.name
+                        ? "bg-[#00aeef] text-white"
+                        : "bg-transparent text-[#00aeef] hover:bg-[#00aeef]/10"
                       }`}
                   >
-                    {category}
+                    {category.name}
                   </button>
                 ))}
               </nav>
@@ -208,10 +213,10 @@ const Blog = () => {
                     />
                   </div>
                   <div>
-                    <div className="text-sm font-bold text-blue-600 uppercase tracking-widest mb-3">
+                    <div className="text-sm font-bold text-[#00aeef] uppercase tracking-widest mb-3">
                       {featuredPost.category}
                     </div>
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 group-hover:text-blue-600 transition-colors">
+                    <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4 group-hover:text-[#00aeef] transition-colors">
                       {featuredPost.title}
                     </h2>
                     <p className="text-gray-600 text-base md:text-lg mb-4 line-clamp-3">
@@ -250,7 +255,7 @@ const Blog = () => {
                 <p className="text-gray-500 text-lg">There are no articles matching your criteria.</p>
                 <button
                   onClick={() => { setSearchTerm(""); setActiveFilter("All"); }}
-                  className="mt-4 text-blue-600 hover:underline font-medium"
+                  className="mt-4 text-[#00aeef] hover:underline font-medium"
                 >
                   Clear Search
                 </button>
@@ -277,10 +282,10 @@ const Blog = () => {
 
                     {/* Content on right */}
                     <div className="w-full md:w-3/5 flex flex-col justify-center py-2">
-                      <div className="text-xs font-bold text-blue-600 uppercase tracking-widest mb-2">
+                      <div className="text-xs font-bold text-[#00aeef] uppercase tracking-widest mb-2">
                         {post.category}
                       </div>
-                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors line-clamp-2">
+                      <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 group-hover:text-[#00aeef] transition-colors line-clamp-2">
                         <Link to={`/blog/${post.id}`}>{post.title}</Link>
                       </h3>
                       <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 line-clamp-2">
@@ -334,7 +339,7 @@ const Blog = () => {
                           0{index + 1}
                         </span>
                         <div>
-                          <h5 className="text-sm font-bold text-gray-900 group-hover:text-blue-600 line-clamp-3 leading-snug">
+                          <h5 className="text-sm font-bold text-gray-900 group-hover:text-[#00aeef] line-clamp-3 leading-snug">
                             {post.title}
                           </h5>
                         </div>
@@ -343,23 +348,7 @@ const Blog = () => {
                   ))}
                 </ul>
               </div>
-
-              <div className="bg-gray-50 p-6 border border-gray-200">
-                <h4 className="text-sm font-bold uppercase tracking-widest mb-4">Newsletter</h4>
-                <p className="text-sm text-gray-600 mb-4">
-                  Get the latest insights and platform updates delivered straight to your inbox.
-                </p>
-                <div className="space-y-3">
-                  <Input
-                    type="email"
-                    placeholder="Email address"
-                    className="w-full rounded-none border-gray-300 bg-white shadow-none h-11 focus:border-blue-600 focus:ring-0"
-                  />
-                  <Button className="w-full rounded-none bg-blue-600 text-white font-bold tracking-wider h-11 hover:bg-blue-700">
-                    SUBSCRIBE
-                  </Button>
-                </div>
-              </div>
+              {/* Newsletter Removed */}
             </aside>
           </div>
 

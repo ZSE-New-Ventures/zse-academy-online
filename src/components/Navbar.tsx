@@ -25,38 +25,36 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "../assets/logo.png";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useCourses } from "@/hooks/useCourses";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
-  const [wishlistCount, setWishlistCount] = useState(() => {
-    try {
-      const wishlist = JSON.parse(localStorage.getItem("zse_wishlist") || "[]");
-      return wishlist.length;
-    } catch {
-      return 0;
-    }
-  });
+  const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false);
+  const [wishlistIds, setWishlistIds] = useState<number[]>([]);
+  const { data: courses = [] } = useCourses();
+  const [wishlistCount, setWishlistCount] = useState(0);
 
   useEffect(() => {
-    const updateWishlistCount = () => {
-      const wishlist = JSON.parse(localStorage.getItem("zse_wishlist") || "[]");
-      setWishlistCount(wishlist.length);
+    const updateWishlist = () => {
+      try {
+        const wishlist = JSON.parse(localStorage.getItem("zse_wishlist") || "[]");
+        setWishlistCount(wishlist.length);
+        setWishlistIds(wishlist);
+      } catch {
+        setWishlistCount(0);
+        setWishlistIds([]);
+      }
     };
-    updateWishlistCount();
-    window.addEventListener("wishlist-updated", updateWishlistCount);
-    return () => window.removeEventListener("wishlist-updated", updateWishlistCount);
+    updateWishlist();
+    window.addEventListener("wishlist-updated", updateWishlist);
+    return () => window.removeEventListener("wishlist-updated", updateWishlist);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/courses?search=${encodeURIComponent(searchQuery)}`);
-    }
-  };
+  const wishlistCourses = courses.filter((c: any) => wishlistIds.includes(c.id));
 
   const handleLogout = () => {
     logout();
@@ -69,7 +67,8 @@ export const Navbar = () => {
         <div className="flex justify-between items-center gap-4 lg:gap-8">
 
           {/* Mobile Menu Trigger & Logo */}
-          <div className="flex items-center gap-2 lg:gap-4 shrink-0">
+          {/* Mobile Menu Trigger & Logo */}
+          <div className="flex items-center gap-2 lg:gap-8 shrink-0">
             <Link to="/" className="flex items-center">
               <img
                 src={logo}
@@ -77,68 +76,63 @@ export const Navbar = () => {
                 className="h-8 md:h-10 w-auto object-contain"
               />
             </Link>
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden p-2 ml-auto text-[#1c1d1f] hover:bg-gray-100 transition-colors"
-            >
-              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="h-6 w-6" />
-            </button>
           </div>
 
-          {/* Categories Dropdown Label - Udemy Style */}
-          <div className="hidden lg:flex items-center">
-            <Link to="/courses" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors">
+          {/* Spacer to push Nav & Auth/Profile to the right */}
+          <div className="flex-1" />
+
+          {/* Right Nav Links - Desktop */}
+          <div className="hidden lg:flex items-center gap-8 shrink-0 mr-8">
+            <Link 
+              to="/courses" 
+              className={`text-xs font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${location.pathname.startsWith('/courses') ? 'text-[#00aeef]' : 'text-[#1c1d1f] hover:text-[#00aeef]'}`}
+            >
               Courses
             </Link>
-          </div>
-
-          {/* Search Bar - Desktop */}
-          <form
-            onSubmit={handleSearch}
-            className="hidden md:flex flex-1 max-w-[800px] relative items-center group"
-          >
-            <div className="absolute left-4 text-gray-500 group-focus-within:text-[#1c1d1f]">
-              <FontAwesomeIcon icon={faSearch} className="h-4 w-4" />
-            </div>
-            <Input
-              type="text"
-              placeholder="Search for anything"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-[48px] pl-12 pr-4 rounded-full border border-[#1c1d1f] bg-[#f7f9fa] border-none focus-visible:ring-1 focus-visible:ring-[#1c1d1f] focus:bg-white transition-all text-sm placeholder:text-gray-500"
-            />
-          </form>
-
-          {/* Right Section Nav Links - Desktop */}
-          <div className="hidden min-[1100px]:flex items-center gap-6 shrink-0">
-            <Link to="/about" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors whitespace-nowrap">
+            <Link 
+              to="/about" 
+              className={`text-xs font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${location.pathname === '/about' ? 'text-[#00aeef]' : 'text-[#1c1d1f] hover:text-[#00aeef]'}`}
+            >
               About Us
             </Link>
-            <Link to="/tutorials" className="text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors whitespace-nowrap">
+            <Link 
+              to="/tutorials" 
+              className={`text-xs font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${location.pathname.startsWith('/tutorials') ? 'text-[#00aeef]' : 'text-[#1c1d1f] hover:text-[#00aeef]'}`}
+            >
               Tutorials
+            </Link>
+            <Link 
+              to="/events" 
+              className={`text-xs font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${location.pathname.startsWith('/events') ? 'text-[#00aeef]' : 'text-[#1c1d1f] hover:text-[#00aeef]'}`}
+            >
+              Live Events
+            </Link>
+            <Link 
+              to="/faq" 
+              className={`text-xs font-medium uppercase tracking-wider transition-colors whitespace-nowrap ${location.pathname.startsWith('/faq') ? 'text-[#00aeef]' : 'text-[#1c1d1f] hover:text-[#00aeef]'}`}
+            >
+              FAQ
             </Link>
           </div>
 
           {/* Auth & Profile Section */}
           <div className="flex items-center gap-2 lg:gap-4 shrink-0">
             {isAuthenticated ? (
-              <div className="flex items-center gap-1 sm:gap-2">
-                <Link to="/dashboard" className="hidden sm:flex items-center px-3 h-10 text-sm font-normal text-[#1c1d1f] hover:text-[#00aeef] transition-colors">
+              <div className="hidden lg:flex items-center gap-1 sm:gap-2">
+                <Link to="/dashboard" className="hidden sm:flex items-center px-3 h-10 text-xs font-medium uppercase tracking-wider text-[#1c1d1f] hover:text-[#00aeef] transition-colors">
                   My Learning
                 </Link>
 
-                <Link to="/dashboard" className="p-2.5 text-[#1c1d1f] hover:text-[#00aeef] transition-colors relative">
+                <button onClick={() => setIsWishlistModalOpen(true)} className="p-2.5 text-[#1c1d1f] hover:text-[#00aeef] transition-colors relative">
                   <FontAwesomeIcon icon={faHeart} className="h-5 w-5" />
                   {wishlistCount > 0 && (
                     <span className="absolute top-1 right-1 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
                       {wishlistCount}
                     </span>
                   )}
-                </Link>
-
-                <button className="p-2.5 text-[#1c1d1f] hover:text-[#00aeef] transition-colors hidden sm:block">
-                  <FontAwesomeIcon icon={faBell} className="h-5 w-5" />
                 </button>
+
+
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -146,7 +140,7 @@ export const Navbar = () => {
                       {user?.name?.charAt(0) || 'U'}
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[280px] p-0 rounded-none border-[#d1d7dc] shadow-xl mt-1">
+                  <DropdownMenuContent align="end" className="w-[280px] p-0 bg-white rounded-none border-[#d1d7dc] shadow-xl mt-1">
                     <div className="flex items-center gap-3 p-4 bg-white hover:bg-gray-50 cursor-pointer border-b border-gray-100" onClick={() => navigate('/dashboard')}>
                       <div className="h-16 w-16 bg-[#1c1d1f] text-white rounded-full flex items-center justify-center font-bold text-2xl uppercase shrink-0">
                         {user?.name?.charAt(0) || 'U'}
@@ -162,30 +156,14 @@ export const Navbar = () => {
                           My Learning
                         </Link>
                       </DropdownMenuItem>
+
                       <DropdownMenuItem asChild className="px-4 py-2.5 cursor-pointer rounded-none hover:bg-gray-50 focus:bg-gray-50 transition-colors">
-                        <Link to="/dashboard" className="flex items-center w-full text-sm">
-                          My Cart
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="px-4 py-2.5 cursor-pointer rounded-none hover:bg-gray-50 focus:bg-gray-50 transition-colors">
-                        <Link to="/dashboard" className="flex items-center w-full text-sm">
+                        <button onClick={() => setIsWishlistModalOpen(true)} className="flex items-center w-full text-sm text-left">
                           Wishlist
-                        </Link>
+                        </button>
                       </DropdownMenuItem>
                     </div>
-                    <DropdownMenuSeparator className="m-0" />
-                    <div className="py-2">
-                      <DropdownMenuItem asChild className="px-4 py-2.5 cursor-pointer rounded-none hover:bg-gray-50 focus:bg-gray-50 transition-colors">
-                        <Link to="/contact" className="flex items-center w-full text-sm">
-                          Notifications
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem asChild className="px-4 py-2.5 cursor-pointer rounded-none hover:bg-gray-50 focus:bg-gray-50 transition-colors">
-                        <Link to="/contact" className="flex items-center w-full text-sm">
-                          Messages
-                        </Link>
-                      </DropdownMenuItem>
-                    </div>
+
                     <DropdownMenuSeparator className="m-0" />
                     <div className="py-2">
                       {user?.role === "admin" && (
@@ -195,11 +173,7 @@ export const Navbar = () => {
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      <DropdownMenuItem asChild className="px-4 py-2.5 cursor-pointer rounded-none hover:bg-gray-50 focus:bg-gray-50">
-                        <Link to="/dashboard" className="flex items-center w-full text-sm">
-                          Account settings
-                        </Link>
-                      </DropdownMenuItem>
+
                     </div>
                     <DropdownMenuSeparator className="m-0" />
                     <div className="py-2">
@@ -225,7 +199,7 @@ export const Navbar = () => {
                 </Link>
                 <Link to="/signup" className="hidden lg:block">
                   <Button
-                    className="h-10 px-5 rounded-none bg-[#1c1d1f] text-white hover:bg-[#1c1d1f]/90 font-bold text-sm shadow-none transition-all"
+                    className="h-10 px-5 rounded-none bg-[#00aeef] text-white hover:bg-[#008cc0] font-bold text-sm shadow-none transition-all"
                   >
                     Sign up
                   </Button>
@@ -235,6 +209,14 @@ export const Navbar = () => {
                 </button>
               </div>
             )}
+            
+            {/* Mobile Menu Trigger - Far Right */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 ml-2 text-[#1c1d1f] hover:bg-gray-100 transition-colors"
+            >
+              <FontAwesomeIcon icon={isOpen ? faTimes : faBars} className="h-6 w-6" />
+            </button>
           </div>
 
         </div>
@@ -247,9 +229,15 @@ export const Navbar = () => {
             className="fixed inset-0 bg-[#1c1d1f]/60 z-40 lg:hidden backdrop-blur-[1px]"
             onClick={() => setIsOpen(false)}
           />
-          <div className="fixed top-0 left-0 bottom-0 w-[280px] bg-white z-50 lg:hidden overflow-y-auto animate-slide-in-left shadow-2xl flex flex-col">
+          <div className="fixed top-0 left-0 bottom-0 w-full bg-white z-50 lg:hidden overflow-y-auto animate-slide-in-left shadow-2xl flex flex-col">
             {/* Drawer Header */}
-            <div className="p-6 bg-[#f7f9fa] border-b border-gray-200">
+            <div className="p-6 bg-[#f7f9fa] border-b border-gray-200 relative">
+              <button 
+                onClick={() => setIsOpen(false)} 
+                className="absolute top-4 right-4 p-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors flex items-center justify-center h-10 w-10"
+              >
+                <FontAwesomeIcon icon={faTimes} className="h-6 w-6" />
+              </button>
               {isAuthenticated ? (
                 <div className="flex items-center gap-4">
                   <div className="h-12 w-12 bg-[#1c1d1f] text-white rounded-full flex items-center justify-center font-bold text-xl uppercase shrink-0">
@@ -271,34 +259,53 @@ export const Navbar = () => {
             {/* Main Drawer Navigation */}
             <div className="flex-1 px-4 py-6 flex flex-col gap-8">
 
+              {isAuthenticated && (
+                <div>
+                  <h3 className="px-3 text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Account</h3>
+                  <div className="flex flex-col gap-1">
+                    <Link to="/dashboard" className="flex items-center gap-3 px-3 py-3 rounded-xl text-lg font-medium text-[#1c1d1f] hover:bg-gray-50 hover:text-[#00aeef] transition-all" onClick={() => setIsOpen(false)}>
+                      <FontAwesomeIcon icon={faGauge} className="w-5 text-gray-400" />
+                      <span>My Learning</span>
+                    </Link>
+                    <button onClick={() => { setIsWishlistModalOpen(true); setIsOpen(false); }} className="flex items-center gap-3 px-3 py-3 rounded-xl text-lg font-medium text-[#1c1d1f] hover:bg-gray-50 hover:text-[#00aeef] transition-all text-left">
+                      <FontAwesomeIcon icon={faHeart} className="w-5 text-gray-400" />
+                      <span>Wishlist</span>
+                    </button>
+                    {user?.role === "admin" && (
+                      <Link to="/admin" className="flex items-center gap-3 px-3 py-3 rounded-xl text-lg font-medium text-[#00aeef] hover:bg-blue-50 transition-all" onClick={() => setIsOpen(false)}>
+                        <FontAwesomeIcon icon={faUserShield} className="w-5" />
+                        <span>Admin Panel</span>
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div>
-                <h3 className="px-2 text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Most Popular</h3>
-                <div className="flex flex-col">
-                  <Link to="/courses" className="flex items-center justify-between px-2 py-3 text-lg text-[#1c1d1f] hover:text-[#00aeef]" onClick={() => setIsOpen(false)}>
-                    <span>Categories</span>
-                    <FontAwesomeIcon icon={faUser} className="h-3 w-3 text-gray-300" />
+                <h3 className="px-3 text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Explore</h3>
+                <div className="flex flex-col gap-1">
+                  <Link to="/courses" className="flex items-center gap-3 px-3 py-3 rounded-xl text-lg font-medium text-[#1c1d1f] hover:bg-gray-50 hover:text-[#00aeef] transition-all" onClick={() => setIsOpen(false)}>
+                    <FontAwesomeIcon icon={faSearch} className="w-5 text-gray-400" />
+                    <span>Courses</span>
+                  </Link>
+                  <Link to="/tutorials" className="flex items-center gap-3 px-3 py-3 rounded-xl text-lg font-medium text-[#1c1d1f] hover:bg-gray-50 hover:text-[#00aeef] transition-all" onClick={() => setIsOpen(false)}>
+                    <FontAwesomeIcon icon={faGlobe} className="w-5 text-gray-400" />
+                    <span>Tutorials</span>
                   </Link>
                 </div>
               </div>
 
-              <div>
-                <h3 className="px-2 text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Account</h3>
-                <div className="flex flex-col">
-                  <Link to="/dashboard" className="px-2 py-3 text-lg text-[#1c1d1f]" onClick={() => setIsOpen(false)}>My Learning</Link>
-                  <Link to="/dashboard" className="px-2 py-3 text-lg text-[#1c1d1f]" onClick={() => setIsOpen(false)}>Messages</Link>
-                  <Link to="/dashboard" className="px-2 py-3 text-lg text-[#1c1d1f]" onClick={() => setIsOpen(false)}>Account settings</Link>
-                </div>
-              </div>
-
-              <div className="mt-auto pt-8">
-                <Link to="/about" className="block px-2 py-3 text-[#1c1d1f]" onClick={() => setIsOpen(false)}>ZSE for Business</Link>
-                <Link to="/contact" className="block px-2 py-3 text-[#1c1d1f]" onClick={() => setIsOpen(false)}>Teach on ZSE Academy</Link>
+              <div className="mt-auto pt-6 border-t border-gray-100">
+                <Link to="/about" className="block px-3 py-2.5 text-base font-medium text-gray-600 hover:text-[#00aeef] transition-colors" onClick={() => setIsOpen(false)}>About Us</Link>
+                <Link to="/contact" className="block px-3 py-2.5 text-base font-medium text-gray-600 hover:text-[#00aeef] transition-colors" onClick={() => setIsOpen(false)}>Contact</Link>
+                
                 {isAuthenticated && (
                   <button
                     onClick={() => { handleLogout(); setIsOpen(false); }}
-                    className="px-2 py-3 text-lg font-bold text-red-600"
+                    className="flex items-center gap-3 mt-2 px-3 py-3 w-full rounded-xl text-lg font-bold text-red-600 hover:bg-red-50 transition-all text-left"
                   >
-                    Log out
+                    <FontAwesomeIcon icon={faRightFromBracket} className="w-5" />
+                    <span>Log out</span>
                   </button>
                 )}
               </div>
@@ -306,6 +313,36 @@ export const Navbar = () => {
           </div>
         </>
       )}
+      {/* Wishlist Modal */}
+      <Dialog open={isWishlistModalOpen} onOpenChange={setIsWishlistModalOpen}>
+        <DialogContent className="max-w-md bg-white">
+          <DialogHeader>
+            <DialogTitle>Your Wishlist</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+            {wishlistCourses.length === 0 ? (
+              <p className="text-gray-500 text-center py-8">Your wishlist is empty.</p>
+            ) : (
+              wishlistCourses.map((course: any) => (
+                <div key={course.id} className="flex gap-4 items-center border-b pb-4 last:border-0">
+                  <img
+                    src={course.thumbnail_url || "https://placehold.co/600x400/1e3a8a/FFFFFF/png?text=Course"}
+                    alt={course.title}
+                    className="w-20 h-14 object-cover rounded-md"
+                  />
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-sm line-clamp-2">{course.title}</h4>
+                    <p className="text-xs text-gray-500 mt-1">{course.instructor}</p>
+                  </div>
+                  <Link to={`/courses/${course.id}`} onClick={() => setIsWishlistModalOpen(false)}>
+                    <Button size="sm" variant="outline">View</Button>
+                  </Link>
+                </div>
+              ))
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </nav>
   );
 };

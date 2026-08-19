@@ -146,33 +146,33 @@ export const CourseContentModal = ({
     slideDirection === "right" ? "animate-slide-in-right" : "animate-slide-in-left";
 
   return (
-    <div className={`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 ${isFullscreen ? 'p-0' : 'p-4'}`}>
-      <div className={`bg-background relative flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen ? 'w-full h-full rounded-none' : 'w-full max-w-6xl aspect-video rounded-lg'}`}>
+    <div className={`fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 ${isFullscreen ? 'p-0' : 'p-0 md:p-4'}`}>
+      <div className={`bg-background relative flex flex-col overflow-hidden transition-all duration-300 ${isFullscreen ? 'w-full h-full rounded-none' : 'w-full h-full md:h-auto md:max-w-6xl md:aspect-video rounded-none md:rounded-lg'}`}>
         {/* HEADER */}
-        <div className="flex justify-between items-center p-4 border-b bg-background">
-          <div className="flex items-center space-x-4">
+        <div className="flex flex-col sm:flex-row justify-between sm:items-center p-2 sm:p-4 border-b bg-background gap-3 sm:gap-0">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <button
               onClick={() => setIsFullscreen(!isFullscreen)}
-              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted shrink-0"
               title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
             >
-              <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} className="h-5 w-5" />
+              <FontAwesomeIcon icon={isFullscreen ? faCompress : faExpand} className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
             <button
               onClick={onClose}
-              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted"
+              className="text-muted-foreground hover:text-foreground transition-colors p-2 rounded-lg hover:bg-muted shrink-0"
               title="Close"
             >
-              <FontAwesomeIcon icon={faXmark} className="h-5 w-5" />
+              <FontAwesomeIcon icon={faXmark} className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
 
-            <div>
-              <h3 className="font-semibold text-lg">{content.title}</h3>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                <Badge variant="outline" className="text-xs capitalize">
+            <div className="min-w-0">
+              <h3 className="font-semibold text-sm sm:text-lg truncate">{content.title}</h3>
+              <div className="flex items-center space-x-2 text-xs sm:text-sm text-muted-foreground">
+                <Badge variant="outline" className="text-[10px] sm:text-xs capitalize px-1 py-0 sm:px-2.5 sm:py-0.5">
                   {content.type}
                 </Badge>
-                <span>Module Content</span>
+                <span className="truncate">Module Content</span>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export const CourseContentModal = ({
           <select
             value={content.currentSlideIndex}
             onChange={(e) => handleNavigate(parseInt(e.target.value))}
-            className="text-sm border rounded px-2 py-1 bg-background"
+            className="text-xs sm:text-sm border rounded px-2 py-1.5 bg-background w-full sm:w-auto"
           >
             {content.slides.map((slide, index) => (
               <option key={index} value={index} disabled={slide.is_locked}>
@@ -223,10 +223,10 @@ export const CourseContentModal = ({
               size="sm"
               onClick={() => handleNavigate(content.currentSlideIndex - 1)}
               disabled={isFirstSlide}
-              className="h-8"
+              className="h-8 px-2 sm:px-3"
             >
-              <FontAwesomeIcon icon={faBackward} className="h-3 w-3 mr-1" />
-              Previous
+              <FontAwesomeIcon icon={faBackward} className="h-3 w-3 sm:mr-1" />
+              <span className="hidden sm:inline">Previous</span>
             </Button>
 
             <span className="text-sm text-muted-foreground">
@@ -266,10 +266,10 @@ export const CourseContentModal = ({
               <Button
                 onClick={() => handleNavigate(content.currentSlideIndex + 1)}
                 size="sm"
-                className="h-8"
+                className="h-8 px-2 sm:px-3"
               >
-                <FontAwesomeIcon icon={faForward} className="h-3 w-3 mr-1" />
-                Next
+                <span className="hidden sm:inline">Next</span>
+                <FontAwesomeIcon icon={faForward} className="h-3 w-3 sm:ml-1" />
               </Button>
             )}
           </div>

@@ -64,8 +64,10 @@ export const transformBlogPost = (post: any): any => {
     author: post.user ? { name: post.user.name, email: post.user.email } : { name: "Anonymous Author", email: "" },
     image: cleanImage || getFallbackImage(post.id),
     excerpt: generateExcerpt(cleanContent),
-    category: post.category || getRandomCategory(),
-    read_time: calculateReadTime(cleanContent),
+    category: post.category_data?.name || post.category?.name || post.category || getRandomCategory(),
+    read_time: post.estimated_reading_time_minutes ? `${post.estimated_reading_time_minutes} min read` : calculateReadTime(cleanContent),
     tags: generateTags(post.title),
+    views: post.views || 0,
+    language: post.language || "English"
   };
 };

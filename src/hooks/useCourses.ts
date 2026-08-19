@@ -25,9 +25,9 @@ export const useCourses = () => {
       const coursesData = await courseService.getAllCourses();
       return coursesData.map((course: any) => ({
         ...course,
-        instructor: course.instructor?.name || course.instructor?.username || "ZSE Expert Instructor",
-        duration: course.duration || `${Math.floor(Math.random() * 12) + 4} weeks`,
-        students: course.enrollments_count || course.students_count || Math.floor(Math.random() * 2000) + 500,
+        instructor: course.instructor?.name || course.instructor?.username || "ZSE Instructor",
+        duration: course.duration || "Self-paced",
+        students: course.enrollments_count || course.students_count || 0,
         rating: course.reviews_avg_rating !== null && course.reviews_avg_rating !== undefined
           ? parseFloat(course.reviews_avg_rating.toString())
           : null,

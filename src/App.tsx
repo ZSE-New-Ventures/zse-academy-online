@@ -21,6 +21,11 @@ import NotFound from "./pages/NotFound";
 import ResetPassword from "./ResetPassword";
 import ForgotPassword from "./ForgotPassword";
 import Tutorials from "./pages/Tutorials";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
+import FAQ from "./pages/FAQ";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +51,11 @@ const App = () => (
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/tutorials" element={<Tutorials />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<EventDetail />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<Privacy />} />
 
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin/courses/:courseId/content" element={<ManageCourseContent />} />

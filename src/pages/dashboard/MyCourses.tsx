@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { courseService } from "@/services/course.service";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -29,6 +30,7 @@ const CourseSkeleton = () => {
 const MyCourses = () => {
   const { user } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -153,6 +155,7 @@ const MyCourses = () => {
                   size="sm"
                   variant={course.status === "completed" ? "outline" : "default"}
                   className="min-w-24"
+                  onClick={() => navigate(`/courses/${course.id}`)}
                 >
                   <FontAwesomeIcon icon={faPlay} className="h-3 w-3 mr-2" />
                   {course.status === "completed" ? "Review" : "Continue"}

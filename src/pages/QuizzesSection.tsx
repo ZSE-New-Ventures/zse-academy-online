@@ -190,6 +190,18 @@ const QuizModal = ({
     }
   }, [quizState.timeRemaining]);
 
+  useEffect(() => {
+    if (quizState.showResults) {
+      const percentage = (quizState.score / quiz.questions.length) * 100;
+      if (percentage >= 99.9 && !document.querySelector('script[src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js"]')) {
+        const script = document.createElement('script');
+        script.src = 'https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.14/dist/dotlottie-wc.js';
+        script.type = 'module';
+        document.head.appendChild(script);
+      }
+    }
+  }, [quizState.showResults, quizState.score, quiz.questions.length]);
+
   const handleOptionSelect = (option: string) => {
     setQuizState(prev => ({
       ...prev,
@@ -250,23 +262,34 @@ const QuizModal = ({
   if (quizState.showResults) {
     const percentage = (quizState.score / quiz.questions.length) * 100;
     const passed = percentage >= 70;
+    const perfectScore = percentage >= 99.9;
 
     return (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="bg-white rounded-lg max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
           <div className="text-center">
-            <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
-              passed ? 'bg-green-100' : 'bg-red-100'
-            }`}>
-              <FontAwesomeIcon 
-                icon={passed ? faTrophy : faTimesCircle} 
-                className={`h-8 w-8 ${passed ? 'text-green-600' : 'text-red-600'}`} 
-              />
-            </div>
-            
-            <h2 className="text-2xl font-bold mt-4">
-              {passed ? 'Quiz Passed!' : 'Quiz Failed'}
-            </h2>
+            {perfectScore ? (
+               <div className="mb-6 bg-gradient-to-br from-[#00aeef]/10 to-blue-50 rounded-2xl p-4 border border-[#00aeef]/20 shadow-sm">
+                 <div dangerouslySetInnerHTML={{ __html: '<dotlottie-wc src="https://lottie.host/d8921b0b-a3eb-4607-a37e-087c73f6ea09/0dyt8eosVo.lottie" style="width: 250px; height: 250px; margin: 0 auto;" autoplay loop></dotlottie-wc>' }} />
+                 <h2 className="text-3xl font-bold mt-2 text-[#0f1729]">Perfect Score!</h2>
+                 <p className="text-[#00aeef] mt-1 font-bold">Outstanding! You mastered this topic!</p>
+               </div>
+            ) : (
+               <>
+                <div className={`mx-auto w-16 h-16 rounded-full flex items-center justify-center ${
+                  passed ? 'bg-green-100' : 'bg-red-100'
+                }`}>
+                  <FontAwesomeIcon 
+                    icon={passed ? faTrophy : faTimesCircle} 
+                    className={`h-8 w-8 ${passed ? 'text-green-600' : 'text-red-600'}`} 
+                  />
+                </div>
+                
+                <h2 className="text-2xl font-bold mt-4">
+                  {passed ? 'Quiz Passed!' : 'Quiz Failed'}
+                </h2>
+               </>
+            )}
             
             <div className="my-6">
               <div className="text-4xl font-bold mb-2">{quizState.score}/{quiz.questions.length}</div>
@@ -275,9 +298,11 @@ const QuizModal = ({
             </div>
             
             <p className="text-muted-foreground mb-6">
-              {passed 
-                ? 'Congratulations! You have successfully completed the quiz.'
-                : 'You need at least 70% to pass. Try again!'
+              {perfectScore 
+                ? 'Flawless victory! You got every question right.'
+                : passed 
+                  ? 'Congratulations! You have successfully completed the quiz.'
+                  : 'You need at least 70% to pass. Try again!'
               }
             </p>
             

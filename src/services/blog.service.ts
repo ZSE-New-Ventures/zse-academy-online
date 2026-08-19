@@ -20,6 +20,15 @@ export interface BlogPost {
   read_time?: string;
   tags?: string[];
   featured?: boolean;
+  views?: number;
+  estimated_reading_time_minutes?: number;
+  language?: string;
+  blog_category_id?: number;
+  category_data?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }
 
 export const blogService = {
@@ -40,6 +49,21 @@ export const blogService = {
 
   getPostById: async (id: string | number): Promise<BlogPost> => {
     const res = await apiClient.get(`/public/blogs/${id}`);
+    return res.data;
+  },
+
+  getCategories: async (): Promise<any[]> => {
+    const res = await apiClient.get("/public/blogs/categories");
+    return res.data;
+  },
+
+  getTrendingPosts: async (): Promise<BlogPost[]> => {
+    const res = await apiClient.get("/public/blogs/trending");
+    return res.data;
+  },
+
+  getRelatedPosts: async (id: string | number): Promise<BlogPost[]> => {
+    const res = await apiClient.get(`/public/blogs/${id}/related`);
     return res.data;
   },
 

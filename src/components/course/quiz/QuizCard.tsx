@@ -43,21 +43,21 @@ export const QuizCard = ({ quiz, onStartQuiz }: QuizCardProps) => {
       !quiz.can_take_quiz ? "opacity-75" : ""
     }`}>
       <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
-            <div className={`p-3 rounded-lg ${
+        <div className="flex flex-col sm:flex-row items-start justify-between mb-4 gap-3 sm:gap-0">
+          <div className="flex items-start sm:items-center space-x-3 w-full">
+            <div className={`p-3 rounded-lg shrink-0 ${
               quiz.can_take_quiz ? "bg-blue-100" : "bg-gray-100"
             }`}>
               <FontAwesomeIcon
                 icon={status.icon}
-                className={`h-6 w-6 ${
+                className={`h-5 w-5 sm:h-6 sm:w-6 ${
                   quiz.can_take_quiz ? "text-blue-600" : "text-gray-600"
                 }`}
               />
             </div>
-            <div>
-              <h3 className="font-semibold text-lg">{quiz.title}</h3>
-              <p className="text-sm text-muted-foreground">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-semibold text-base sm:text-lg truncate">{quiz.title}</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">
                 {quiz.description}
               </p>
             </div>

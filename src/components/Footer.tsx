@@ -7,11 +7,17 @@ const footerLinks = {
   company: [
     { name: "About Us", href: "/about" },
     { name: "Contact", href: "/contact" },
+    { name: "Live Events", href: "/events" },
+    { name: "FAQs", href: "/faq" },
+    { name: "Privacy Policy", href: "/privacy" },
+    { name: "Terms of Service", href: "/terms" },
   ],
   platforms: [
     { name: "ZSE Direct", href: "https://www.zsedirect.co.zw" },
     { name: "VFEX Direct", href: "https://www.vfexdirect.co.zw" },
     { name: "Data Direct", href: "https://datadirect.zse.co.zw" },
+    { name: "InvoiceX", href: "https://invoicex.zeex.co.zw/" },
+    { name: "ZEEX", href: "https://zeex.co.zw" },
   ],
 };
 
@@ -23,32 +29,29 @@ const socialLinks = [
 
 export const Footer = () => {
   return (
-    <footer className="bg-[#0f1729] text-gray-300 font-montserrat">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10">
-          {/* Brand / About */}
-          <div className="lg:col-span-2">
-            <Link to="/" className="inline-flex items-center space-x-2 mb-5">
+    <footer className="bg-[#0a0f1a] text-slate-400 font-montserrat border-t border-slate-800/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
+          <div className="lg:col-span-4 pr-4">
+            <Link to="/" className="inline-block mb-6 opacity-90 hover:opacity-100 transition-opacity">
               <img
                 src={ZSELogo}
                 alt="Zimbabwe Stock Exchange"
-                className="h-10 w-auto brightness-110"
+                className="h-9 w-auto"
               />
             </Link>
-            <p className="text-gray-400 mb-6 leading-relaxed max-w-md">
-              ZSE Training offers professional development courses tailored for
-              Zimbabwe’s financial markets. Learn from experts and earn
-              certifications recognized locally and regionally.
+            <p className="text-sm leading-relaxed max-w-sm text-slate-400">
+              Professional development courses tailored for Zimbabwe’s financial markets. Learn from experts and earn recognized certifications.
             </p>
           </div>
 
           {/* Links Sections */}
           {Object.entries(footerLinks).map(([title, links]) => (
-            <div key={title}>
-              <h3 className="text-lg font-semibold mb-4 text-white capitalize">
+            <div key={title} className="lg:col-span-3">
+              <h3 className="text-xs font-semibold mb-5 text-slate-200 uppercase tracking-wider">
                 {title}
               </h3>
-              <ul className="space-y-2 text-sm">
+              <ul className="space-y-3 text-sm">
                 {links.map((link) => (
                   <li key={link.name}>
                     {link.href.startsWith("http") ? (
@@ -56,14 +59,14 @@ export const Footer = () => {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="hover:text-[#00aeef] transition-colors"
+                        className="hover:text-white transition-colors"
                       >
                         {link.name}
                       </a>
                     ) : (
                       <Link
                         to={link.href}
-                        className="hover:text-[#00aeef] transition-colors"
+                        className="hover:text-white transition-colors"
                       >
                         {link.name}
                       </Link>
@@ -76,52 +79,49 @@ export const Footer = () => {
 
           {/* Contact / Address */}
           <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold mb-4 text-white capitalize">
+            <h3 className="text-xs font-semibold mb-5 text-slate-200 uppercase tracking-wider">
               Contact
             </h3>
-            <div className="text-gray-400 space-y-3 text-sm">
-              <p>
-                <strong className="text-white font-medium block mb-1">Address:</strong> 
-                44 Ridgeway North, Highlands, Harare, Zimbabwe
+            <div className="space-y-4 text-sm text-slate-400">
+              <p className="break-words leading-relaxed max-w-[250px]">
+                44 Ridgeway North, Highlands<br />
+                Harare, Zimbabwe
               </p>
-              <p>
-                <strong className="text-white font-medium block mb-1">Phone:</strong> 
+              <p className="leading-relaxed">
                 +263 242 886830-5<br />
                 +263 8677009115
               </p>
+              <p>
+                <a href="mailto:info@zse.co.zw" className="hover:text-white transition-colors">info@zse.co.zw</a>
+              </p>
             </div>
           </div>
+
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-gray-800 mt-12 pt-8">
-          <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
-            <div className="text-gray-400 text-sm text-center lg:text-left">
-              © {new Date().getFullYear()} Zimbabwe Stock Exchange Training. All
-              rights reserved.
-            </div>
-            <div className="flex flex-col sm:flex-row items-center gap-6 lg:gap-8">
-              <div className="text-gray-400 text-sm text-center sm:text-right">
-                <span className="text-white font-medium mr-2">Trading Hours:</span> 
-                Mon - Fri: 09:00 AM - 1:00 PM CAT
-              </div>
-              <div className="flex space-x-6">
+        <div className="border-t border-slate-800/50 mt-16 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="text-xs text-slate-500">
+            © {new Date().getFullYear()} ZSE Training. All rights reserved.
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="flex space-x-5">
               {socialLinks.map((social) => (
                 <a
                   key={social.name}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`${social.colorClass} hover:scale-110 hover:brightness-125 transition-all duration-200`}
+                  className="text-slate-500 hover:text-white hover:scale-110 transition-all duration-300"
                   aria-label={social.name}
                 >
-                  <FontAwesomeIcon icon={social.icon} className="h-6 w-6" />
+                  <FontAwesomeIcon icon={social.icon} className="h-4 w-4" />
                 </a>
               ))}
             </div>
           </div>
         </div>
-      </div>
       </div>
     </footer>
   );
