@@ -64,9 +64,33 @@ const Login = () => {
         });
         navigate(`/verify-otp?email=${encodeURIComponent(formData.email)}`);
       } else {
+        let errorMessage = "Please check your credentials and try again.";
+        
+        if (!error.response) {
+          errorMessage = "Unable to connect to the server. Please check your internet connection.";
+        } else if (error.response.status >= 500) {
+          errorMessage = "Our servers are experiencing a temporary issue. Please try again later.";
+        } else if (errorData) {
+          if (errorData.errors && typeof errorData.errors === 'object') {
+            const firstErrorKey = Object.keys(errorData.errors)[0];
+            errorMessage = errorData.errors[firstErrorKey][0];
+          } else if (errorData.message) {
+            errorMessage = errorData.message;
+          } else if (errorData.error) {
+            errorMessage = errorData.error;
+          } else if (typeof errorData === 'object') {
+            const firstKey = Object.keys(errorData)[0];
+            if (firstKey && Array.isArray(errorData[firstKey])) {
+              errorMessage = errorData[firstKey][0];
+            } else if (firstKey && typeof errorData[firstKey] === 'string') {
+              errorMessage = errorData[firstKey];
+            }
+          }
+        }
+
         toast({
           title: "Login Failed",
-          description: errorData?.error || "Please check your credentials and try again.",
+          description: errorMessage,
           variant: "destructive",
         });
       }

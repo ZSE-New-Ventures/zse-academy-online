@@ -3,8 +3,7 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons";
 import bentoImage from "@/assets/bento.jpg";
-import image2 from "@/assets/hero-image.jpg";
-import image3 from "@/assets/business-analyst-looking-into-statistics-reports-detect-any-obstacles.jpg";
+import investmentImage from "@/assets/investment.jpg";
 
 const centerCardContent = [
   {
@@ -16,15 +15,7 @@ const centerCardContent = [
     isExternal: true,
   },
   {
-    image: image2,
-    title: "ZEEX",
-    description: "A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.",
-    buttonText: "Explore ZEEX",
-    link: "https://zeex.co.zw",
-    isExternal: true,
-  },
-  {
-    image: image3,
+    image: investmentImage,
     title: "ZEEX",
     description: "A secure deal room for investment opportunities. Discover, evaluate, and participate in exclusive private market deals.",
     buttonText: "Explore ZEEX",
@@ -141,8 +132,8 @@ export const TrainingDepartments = () => {
                 key={index}
                 src={content.image}
                 alt={content.title}
-                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-all duration-1000 ${
-                  index === currentImageIndex ? "opacity-100 z-0" : "opacity-0 -z-10"
+                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-1000 ease-in-out ${
+                  index === currentImageIndex ? "opacity-100" : "opacity-0"
                 }`}
               />
             ))}

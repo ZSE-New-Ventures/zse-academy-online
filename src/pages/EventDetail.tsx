@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import { API_BASE_URL } from "@/constants/api";
+import webinarImage from "@/assets/webinar.jpg";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -78,10 +80,10 @@ const EventDetail = () => {
       <Navbar />
 
       {/* Hero Header with Image */}
-      <section className="relative py-20 md:py-32 w-full overflow-hidden bg-gray-900 flex flex-col justify-center min-h-[400px]">
+      <section className="relative py-12 md:py-16 w-full overflow-hidden bg-gray-900 flex flex-col justify-center min-h-[300px]">
         <div className="absolute inset-0">
           <img 
-            src={event.image_url || "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=1200&h=600&fit=crop"} 
+            src={event.image_url || webinarImage} 
             alt={event.title}
             className="w-full h-full object-cover"
           />
@@ -102,7 +104,7 @@ const EventDetail = () => {
             )}
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 tracking-tight max-w-5xl mx-auto leading-tight drop-shadow-md">
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-8 tracking-tight max-w-5xl mx-auto leading-tight drop-shadow-md truncate px-4">
             {event.title}
           </h1>
 

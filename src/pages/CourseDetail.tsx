@@ -1,7 +1,8 @@
 // ✨ FULL FIXED CourseDetail.tsx
 
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { Navbar } from "@/components/Navbar";
 import courseBg from "../assets/courseid.jpg";
 import { Footer } from "@/components/Footer";
@@ -83,6 +84,7 @@ interface CourseDetail extends CourseType {
 
 import { useCourse, useSimilarCourses, useEnrollMutation } from "@/hooks/useCourses";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -97,6 +99,8 @@ const CourseDetail = () => {
   const { data: similarCourses = [] } = useSimilarCourses(id);
   const enrollMutation = useEnrollMutation();
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [currentContent, setCurrentContent] = useState<{
     title: string;
@@ -116,6 +120,24 @@ const CourseDetail = () => {
   }, [id]);
 
   const handleEnrollNow = async () => {
+    if (!user) {
+      Swal.fire({
+        title: "Authentication Required",
+        text: "Please log in to enroll in this course",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#00aeef",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Log In",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
+      });
+      return;
+    }
+
     if (!course) return;
 
     try {

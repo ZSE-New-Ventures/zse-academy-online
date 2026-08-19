@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 import { courseService } from "@/services/course.service";
 import { Navbar } from "@/components/Navbar";
 import coursesBg from "../assets/courses.jpg";
@@ -58,14 +59,24 @@ const Courses = () => {
   const { user } = useAuth();
   const { data: myCourses = [] } = useMyCourses(!!user);
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [enrolling, setEnrolling] = useState<number | null>(null);
 
   const handleEnroll = async (courseId: number) => {
     if (!user) {
-      toast({
+      Swal.fire({
         title: "Authentication Required",
-        description: "Please log in to enroll in courses",
-        variant: "destructive",
+        text: "Please log in to enroll in courses",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#00aeef",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Log In",
+        cancelButtonText: "Cancel"
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate("/login");
+        }
       });
       return;
     }
