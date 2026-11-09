@@ -45,6 +45,22 @@ const BlogPostPage = () => {
     window.scrollTo(0, 0);
   }, [id]);
 
+  // Ensure any inline images inside the article content handle errors gracefully
+  useEffect(() => {
+    if (!post?.content) return;
+    const container = document.querySelector('.blog-content-view');
+    if (!container) return;
+
+    const images = container.querySelectorAll('img');
+    images.forEach((img, idx) => {
+      img.onerror = () => {
+        img.onerror = null; // Prevent loop
+        img.src = getFallbackImage((post.id * 7 + idx) % 4);
+        img.classList.add('rounded-lg', 'shadow-md');
+      };
+    });
+  }, [post?.content, post?.id]);
+
   const fetchRelatedPosts = async (currentPost: BlogPost) => {
     try {
       const data = await blogService.getRelatedPosts(currentPost.id);
@@ -151,17 +167,19 @@ const BlogPostPage = () => {
       <div className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="w-full">
           
-          {/* Featured Image */}
-          {post.image && (
-            <div className="aspect-video w-full overflow-hidden bg-gray-100 mb-10 border border-gray-200">
-              <img
-                src={post.image}
-                alt={post.title}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src = getFallbackImage(post.id);
-                }}
-              />
+          {/* Framed Featured Image - only displayed when article does not already contain inline images */}
+          {post.image && !Boolean(post.content && /<img[^>]+src=/i.test(post.content)) && (
+            <div className="max-w-3xl mx-auto mb-10 p-2 sm:p-3 bg-white border border-slate-200 rounded-2xl shadow-lg ring-1 ring-slate-100">
+              <div className="max-h-[460px] overflow-hidden rounded-xl bg-slate-50 flex items-center justify-center">
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="max-h-[460px] w-auto max-w-full object-contain mx-auto"
+                  onError={(e) => {
+                    e.currentTarget.src = getFallbackImage(post.id);
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -216,14 +234,23 @@ const BlogPostPage = () => {
                 color: #008cc0 !important;
               }
               .blog-content-view img {
-                width: 100% !important;
-                max-height: 400px !important;
-                object-fit: cover !important;
-                border-radius: 0.375rem !important;
-                margin-top: 1rem !important;
-                margin-bottom: 1rem !important;
-                border: 1px solid #f3f4f6 !important;
+                max-width: 100% !important;
+                height: auto !important;
+                width: auto !important;
+                max-height: 480px !important;
+                object-fit: contain !important;
+                margin: 2.5rem auto !important;
                 display: block !important;
+                padding: 10px !important;
+                background-color: #ffffff !important;
+                border: 1px solid #e2e8f0 !important;
+                border-radius: 14px !important;
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 174, 239, 0.15) !important;
+                transition: transform 0.25s ease, box-shadow 0.25s ease !important;
+              }
+              .blog-content-view img:hover {
+                transform: translateY(-2px) !important;
+                box-shadow: 0 16px 30px -6px rgba(0, 0, 0, 0.12), 0 0 0 2px rgba(0, 174, 239, 0.4) !important;
               }
             `}</style>
             <div
@@ -248,12 +275,16 @@ const BlogPostPage = () => {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {relatedPosts.map((relatedPost) => (
-                <div key={relatedPost.id} className="group cursor-pointer bg-white border border-gray-200 hover:border-gray-400 transition-all duration-300 flex flex-col h-full">
-                  <div className="aspect-video relative overflow-hidden bg-gray-100 shrink-0">
+                <Link
+                  key={relatedPost.id}
+                  to={`/blog/${relatedPost.id}`}
+                  className="group cursor-pointer bg-white border border-gray-200 hover:border-[#00aeef] hover:shadow-lg transition-all duration-300 flex flex-col h-full rounded-lg overflow-hidden"
+                >
+                  <div className="aspect-video relative overflow-hidden bg-slate-50 shrink-0 p-1 border-b border-gray-100">
                     <img
                       src={relatedPost.image || getFallbackImage(relatedPost.id)}
                       alt={relatedPost.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      className="w-full h-full object-cover object-top rounded group-hover:scale-105 transition-transform duration-300"
                       onError={(e) => {
                         e.currentTarget.src = getFallbackImage(relatedPost.id);
                       }}
@@ -265,10 +296,8 @@ const BlogPostPage = () => {
                       <span className="text-[10px] font-bold text-[#00aeef] uppercase tracking-wider block">
                         {relatedPost.category}
                       </span>
-                      <h3 className="font-extrabold text-base text-gray-900 leading-snug line-clamp-2 hover:text-black">
-                        <Link to={`/blog/${relatedPost.id}`}>
-                          {relatedPost.title}
-                        </Link>
+                      <h3 className="font-extrabold text-base text-gray-900 leading-snug line-clamp-2 group-hover:text-[#00aeef] transition-colors">
+                        {relatedPost.title}
                       </h3>
                     </div>
 
@@ -280,7 +309,7 @@ const BlogPostPage = () => {
                       </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

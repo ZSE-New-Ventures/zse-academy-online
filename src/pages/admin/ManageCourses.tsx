@@ -26,6 +26,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -125,6 +135,8 @@ const ManageCourses = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
+  const [isDeletingCourse, setIsDeletingCourse] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -312,11 +324,13 @@ const ManageCourses = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this course?")) return;
+  const confirmDeleteCourse = async () => {
+    if (!courseToDelete) return;
     try {
-      await courseService.deleteCourse(id);
-      toast({ title: "Deleted", description: "Course deleted successfully" });
+      setIsDeletingCourse(true);
+      await courseService.deleteCourse(courseToDelete);
+      toast({ title: "Deleted", description: "Course deleted successfully." });
+      setCourseToDelete(null);
       fetchCourses();
     } catch (error: any) {
       toast({
@@ -324,7 +338,13 @@ const ManageCourses = () => {
         description: error.response?.data?.message || "Failed to delete course",
         variant: "destructive",
       });
+    } finally {
+      setIsDeletingCourse(false);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setCourseToDelete(id);
   };
 
   const resetForm = () => {
@@ -710,6 +730,32 @@ const ManageCourses = () => {
           )}
         </CardContent>
       </Card>
+
+      {/* Styled Modern Delete Confirmation Dialog */}
+      <AlertDialog open={courseToDelete !== null} onOpenChange={(open) => !open && setCourseToDelete(null)}>
+        <AlertDialogContent className="max-w-md bg-white border border-gray-200 shadow-2xl rounded-2xl p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-gray-900">
+              Delete Course
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+              Are you sure you want to delete this course? All associated lectures, slide decks, and student enrollment records will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex items-center justify-end gap-3">
+            <AlertDialogCancel disabled={isDeletingCourse} className="text-xs font-semibold rounded-lg">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteCourse}
+              disabled={isDeletingCourse}
+              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm"
+            >
+              {isDeletingCourse ? "Deleting..." : "Yes, Delete Course"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

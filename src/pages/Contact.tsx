@@ -13,12 +13,14 @@ import {
   faPhone,
   faClock,
   faMapMarkerAlt,
-  faEnvelope
+  faEnvelope,
+  faBuildingColumns,
+  faHeadset,
+  faCircleQuestion,
+  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-
-// Main Accent Color
-const PRIMARY_HEX = "#4785FF";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -26,10 +28,11 @@ const Contact = () => {
     email: "",
     phone: "",
     subject: "",
-    inquiry: "",
+    inquiry: "course-info",
     message: ""
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
   const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
@@ -42,237 +45,258 @@ const Contact = () => {
 
     setTimeout(() => {
       setIsLoading(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        inquiry: "",
-        message: ""
-      });
+      setSubmitted(true);
       toast({
-        title: "Message Sent",
-        description: "We'll get back to you within 24 hours.",
+        title: "Inquiry Submitted Successfully",
+        description: "Our investor relations and support team will respond within 24 business hours.",
         variant: "default",
       });
-    }, 1500);
+    }, 1200);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-neutral-50 font-sans">
+    <div className="min-h-screen bg-white font-montserrat text-slate-900">
       <Navbar />
-      
-      {/* Main Content */}
-      <section className="py-16 md:py-24 lg:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-20">
-            
-            {/* Left Column: Contact Information */}
-            <div className="space-y-10 lg:pr-10">
-              {/* Header */}
-              <div className="space-y-4">
-                <div className="inline-flex items-center gap-2 text-sm text-primary font-medium mb-2">
-                  <div className="w-6 h-px bg-primary"></div>
-                  CONTACT US
-                </div>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-light tracking-tight">
-                  Let's <span className="font-semibold text-primary">talk</span>
-                </h1>
-                <p className="text-lg text-neutral-600 leading-relaxed max-w-lg">
-                  Get in touch with our team. We're here to help with any questions about our services, enrollment, or technical support.
-                </p>
-              </div>
 
-              {/* Contact Details */}
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FontAwesomeIcon icon={faPhone} className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-neutral-900">Phone</h3>
-                    <p className="text-lg font-semibold text-primary mt-1">+263 4 751 951</p>
-                    <p className="text-sm text-neutral-500 mt-1">Mon–Fri, 8:00 AM – 4:30 PM </p>
-                  </div>
-                </div>
+      {/* Hero Header */}
+      <section className="py-20 bg-[#0b1324] text-white relative overflow-hidden">
+        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#00aeef]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#00aeef]/10 text-[#00aeef] text-xs font-bold uppercase tracking-wider mb-4 border border-[#00aeef]/30">
+            <FontAwesomeIcon icon={faHeadset} />
+            <span>Support & Investor Relations</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black text-white tracking-tight">
+            We’re Here to Guide Your Trading Journey
+          </h1>
+          <p className="mt-4 text-base text-slate-300 leading-relaxed">
+            Have questions about course registration, certificate verification, or connecting with registered stockbrokers? Contact the official ZSE Academy support team.
+          </p>
 
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FontAwesomeIcon icon={faEnvelope} className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-neutral-900">Email</h3>
-                    <p className="text-lg font-semibold text-primary mt-1">info@zsetraining.co.zw</p>
-                    <p className="text-sm text-neutral-500 mt-1">Typically responds within 24 hours</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} className="h-4 w-4 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-medium text-neutral-900">Visit Us</h3>
-                    <p className="text-neutral-700 mt-1">44 Ridgeway North Highlands, Harare</p>
-                  </div>
-                </div>
-              </div>
-
-              
-            </div>
-
-            {/* Right Column: Contact Form */}
-            <div>
-              <Card className="bg-white p-8 md:p-10 rounded-2xl shadow-sm border border-neutral-100">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Name & Email */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-3">
-                      <Label htmlFor="name" className="text-sm font-medium text-neutral-700">
-                        Full Name
-                      </Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        placeholder="John Doe"
-                        className="h-11 bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20"
-                        required
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <Label htmlFor="email" className="text-sm font-medium text-neutral-700">
-                        Email Address
-                      </Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        placeholder="john@example.com"
-                        className="h-11 bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  {/* Phone & Inquiry */}
-                  <div className="grid sm:grid-cols-2 gap-5">
-                    <div className="space-y-3">
-                      <Label htmlFor="phone" className="text-sm font-medium text-neutral-700">
-                        Phone Number
-                      </Label>
-                      <Input
-                        id="phone"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                        placeholder="+263 xxx xxx xxx"
-                        className="h-11 bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20"
-                      />
-                    </div>
-                    <div className="space-y-3">
-                      <Label htmlFor="inquiry" className="text-sm font-medium text-neutral-700">
-                        Inquiry Type
-                      </Label>
-                      <Select 
-                        value={formData.inquiry} 
-                        onValueChange={(value) => handleInputChange("inquiry", value)}
-                      >
-                        <SelectTrigger className="h-11 bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20">
-                          <SelectValue placeholder="Select type" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white border-neutral-200">
-                          <SelectItem value="course-info">Course Information</SelectItem>
-                          <SelectItem value="enrollment">Enrollment Support</SelectItem>
-                          <SelectItem value="technical">Technical Support</SelectItem>
-                          <SelectItem value="corporate">Corporate Training</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* Subject */}
-                  <div className="space-y-3">
-                    <Label htmlFor="subject" className="text-sm font-medium text-neutral-700">
-                      Subject
-                    </Label>
-                    <Input
-                      id="subject"
-                      value={formData.subject}
-                      onChange={(e) => handleInputChange("subject", e.target.value)}
-                      placeholder="How can we help you?"
-                      className="h-11 bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20"
-                      required
-                    />
-                  </div>
-
-                  {/* Message */}
-                  <div className="space-y-3">
-                    <Label htmlFor="message" className="text-sm font-medium text-neutral-700">
-                      Message
-                    </Label>
-                    <Textarea
-                      id="message"
-                      value={formData.message}
-                      onChange={(e) => handleInputChange("message", e.target.value)}
-                      placeholder="Please share details about your inquiry..."
-                      rows={5}
-                      className="bg-white border-neutral-200 rounded-lg focus:border-primary focus:ring-primary/20 resize-none"
-                      required
-                    />
-                  </div>
-
-                  {/* Submit Button */}
-                  <div className="pt-2">
-                    <Button
-                      type="submit"
-                      className="w-full h-12 bg-primary hover:bg-primary/90 text-white font-medium rounded-lg transition-all duration-300 hover:shadow-lg hover:shadow-primary/20 group"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? (
-                        <div className="flex items-center justify-center gap-2">
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                          Sending...
-                        </div>
-                      ) : (
-                        <div className="flex items-center justify-center gap-2">
-                          Send Message
-                          <FontAwesomeIcon 
-                            icon={faArrowRight} 
-                            className="h-3 w-3 group-hover:translate-x-1 transition-transform" 
-                          />
-                        </div>
-                      )}
-                    </Button>
-                  </div>
-                </form>
-              </Card>
-            </div>
+          <div className="mt-6 flex items-center justify-center gap-4">
+            <Link
+              to="/faq"
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00aeef] bg-white/10 hover:bg-white/20 px-4 py-2 rounded-full border border-white/20 transition-colors"
+            >
+              <FontAwesomeIcon icon={faCircleQuestion} />
+              <span>Browse Help Center FAQs First</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* Office Hours Banner */}
-      <div className="border-t border-neutral-100 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6 text-center sm:text-left">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-primary" />
-              </div>
+      {/* Main Form & Location Section */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+            
+            {/* Left Column: Official Contact Channels */}
+            <div className="lg:col-span-5 space-y-8">
               <div>
-                <p className="text-sm text-neutral-600">Office Hours</p>
-                <p className="font-medium text-neutral-900">Monday - Friday: 8:00 AM - 4:30 PM</p>
+                <span className="text-xs font-bold uppercase tracking-wider text-[#00aeef] block mb-2">
+                  Exchange Secretariat
+                </span>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                  Zimbabwe Stock Exchange Limited
+                </h2>
+                <p className="mt-2 text-xs sm:text-sm text-slate-600 leading-relaxed">
+                  Our investor education officers are ready to assist you on business days between 8:00 AM and 4:30 PM CAT.
+                </p>
+              </div>
+
+              {/* Cards Grid */}
+              <div className="space-y-4">
+                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4 hover:border-[#00aeef]/40 transition-colors">
+                  <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#00aeef] flex items-center justify-center text-lg shrink-0">
+                    <FontAwesomeIcon icon={faMapMarkerAlt} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Physical Address</h3>
+                    <p className="text-sm font-bold text-slate-900 mt-1">
+                      44 Ridgeway North, Highlands
+                    </p>
+                    <p className="text-xs text-slate-500">Harare, Zimbabwe</p>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4 hover:border-[#00aeef]/40 transition-colors">
+                  <div className="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shrink-0">
+                    <FontAwesomeIcon icon={faPhone} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Telephone Lines</h3>
+                    <p className="text-sm font-bold text-slate-900 mt-1">
+                      +263 242 886830-5 / +263 8677000450
+                    </p>
+                    <p className="text-xs text-slate-500">Mon - Fri, 08:00 - 16:30 CAT</p>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4 hover:border-[#00aeef]/40 transition-colors">
+                  <div className="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shrink-0">
+                    <FontAwesomeIcon icon={faEnvelope} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Electronic Mail</h3>
+                    <p className="text-sm font-bold text-slate-900 mt-1">
+                      info@zse.co.zw
+                    </p>
+                    <p className="text-xs text-slate-500">support@zsedirect.co.zw</p>
+                  </div>
+                </div>
+
+                <div className="p-5 bg-white rounded-2xl border border-slate-200 shadow-sm flex items-start gap-4 hover:border-[#00aeef]/40 transition-colors">
+                  <div className="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg shrink-0">
+                    <FontAwesomeIcon icon={faBuildingColumns} />
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">Victoria Falls Office</h3>
+                    <p className="text-sm font-bold text-slate-900 mt-1">
+                      Victoria Falls Stock Exchange Limited
+                    </p>
+                    <p className="text-xs text-slate-500">Shop 1, Stand 661, Victoria Falls, Zimbabwe</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="hidden sm:block w-px h-8 bg-neutral-200"></div>
-            <p className="text-sm text-neutral-500">
-              We strive to respond to all inquiries within 24 hours during business days.
-            </p>
+
+            {/* Right Column: Contact Form */}
+            <div className="lg:col-span-7">
+              <div className="bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-slate-200">
+                {submitted ? (
+                  <div className="text-center py-12 space-y-4">
+                    <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-3xl mx-auto">
+                      <FontAwesomeIcon icon={faCheckCircle} />
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-900">Message Delivered</h3>
+                    <p className="text-sm text-slate-600 max-w-md mx-auto">
+                      Thank you for contacting ZSE Academy. A customer representative has received your ticket and will follow up shortly.
+                    </p>
+                    <Button
+                      onClick={() => setSubmitted(false)}
+                      className="mt-4 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-xs uppercase tracking-wider px-6 py-2.5 rounded-xl"
+                    >
+                      Send Another Message
+                    </Button>
+                  </div>
+                ) : (
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900">Send an Official Inquiry</h3>
+                      <p className="text-xs text-slate-500 mt-1">
+                        Please fill in your details and our team will get back to you promptly.
+                      </p>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="name" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Full Name *
+                        </Label>
+                        <Input
+                          id="name"
+                          value={formData.name}
+                          onChange={(e) => handleInputChange("name", e.target.value)}
+                          placeholder="e.g. Tendai Moyo"
+                          className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Email Address *
+                        </Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => handleInputChange("email", e.target.value)}
+                          placeholder="e.g. tendai@example.com"
+                          className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid sm:grid-cols-2 gap-5">
+                      <div className="space-y-2">
+                        <Label htmlFor="phone" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Phone Number
+                        </Label>
+                        <Input
+                          id="phone"
+                          value={formData.phone}
+                          onChange={(e) => handleInputChange("phone", e.target.value)}
+                          placeholder="+263 77 000 0000"
+                          className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="inquiry" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                          Inquiry Department *
+                        </Label>
+                        <Select 
+                          value={formData.inquiry} 
+                          onValueChange={(value) => handleInputChange("inquiry", value)}
+                        >
+                          <SelectTrigger className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]">
+                            <SelectValue placeholder="Select department" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-white border-slate-200">
+                            <SelectItem value="course-info">Course Registration & Curriculum</SelectItem>
+                            <SelectItem value="zse-direct">ZSE Direct / VFEX Direct Support</SelectItem>
+                            <SelectItem value="certificates">Certificate Verification</SelectItem>
+                            <SelectItem value="corporate">Corporate & Institutional Training</SelectItem>
+                            <SelectItem value="schools">National Investment Challenge (Schools)</SelectItem>
+                            <SelectItem value="general">Other General Inquiries</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="subject" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Subject Line *
+                      </Label>
+                      <Input
+                        id="subject"
+                        value={formData.subject}
+                        onChange={(e) => handleInputChange("subject", e.target.value)}
+                        placeholder="Summary of your inquiry"
+                        className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="message" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Your Detailed Message *
+                      </Label>
+                      <Textarea
+                        id="message"
+                        value={formData.message}
+                        onChange={(e) => handleInputChange("message", e.target.value)}
+                        placeholder="Please include any relevant course names, transaction IDs, or questions..."
+                        rows={5}
+                        className="bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef] resize-none"
+                        required
+                      />
+                    </div>
+
+                    <Button
+                      type="submit"
+                      className="w-full h-12 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#00aeef]/20"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Submitting Inquiry..." : "Transmit Message to Secretariat"}
+                    </Button>
+                  </form>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
 
       <Footer />
     </div>

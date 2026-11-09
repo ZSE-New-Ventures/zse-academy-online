@@ -78,7 +78,7 @@ export const quizService = {
         parseOptions(quiz);
         // Only set false if missing, do not overwrite true
         if (quiz.can_take_quiz === undefined || quiz.can_take_quiz === null) {
-          quiz.can_take_quiz = false;
+          quiz.can_take_quiz = true;
         }
       });
     }
@@ -112,7 +112,7 @@ export const quizService = {
     if (data.quizzes) {
       data.quizzes.forEach(parseOptions);
       data.quizzes.forEach((quiz) => {
-        if (quiz.can_take_quiz === undefined) quiz.can_take_quiz = false;
+        if (quiz.can_take_quiz === undefined) quiz.can_take_quiz = true;
       });
     }
 
@@ -140,7 +140,7 @@ export const quizService = {
     if (data.quiz) {
       parseOptions(data.quiz);
       if (data.quiz.can_take_quiz === undefined)
-        data.quiz.can_take_quiz = false;
+        data.quiz.can_take_quiz = true;
     }
 
     return data;

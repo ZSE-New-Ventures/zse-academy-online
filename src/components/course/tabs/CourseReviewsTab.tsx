@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 interface Props {
   courseId: string;
@@ -130,8 +131,14 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
   }, [courseId]);
 
   const handleSubmit = async () => {
-    if (!comment.trim()) return alert("Please write a comment before submitting.");
-    if (!token) return alert("You must be logged in to submit a review.");
+    if (!comment.trim()) {
+      toast.warning("Please write a comment before submitting.");
+      return;
+    }
+    if (!token) {
+      toast.error("You must be logged in to submit a review.");
+      return;
+    }
 
     try {
       setSubmitting(true);
@@ -141,23 +148,34 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
       );
 
-      alert("Review submitted successfully!");
+      toast.success("Review submitted successfully!");
       setComment("");
       setRating(5);
       fetchReviews();
     } catch (error: any) {
       console.error(error);
-      if (!error.response) return alert("Network error.");
-      if (error.response.status === 422) {
-        const errors = error.response.data.errors;
-        let msg = "Validation Errors:\n";
-        for (const key in errors) msg += `• ${errors[key][0]}\n`;
-        alert(msg);
+      if (!error.response) {
+        toast.error("Network error. Please try again.");
         return;
       }
-      if (error.response.status === 401) return alert("Session expired.");
-      if (error.response.status === 403) alert(error.response.data.message);
-      else alert("Something went wrong.");
+      if (error.response.status === 422) {
+        const errors = error.response.data.errors;
+        let msg = "Validation Error: ";
+        for (const key in errors) {
+          msg += errors[key][0] + " ";
+        }
+        toast.error(msg.trim());
+        return;
+      }
+      if (error.response.status === 401) {
+        toast.error("Your session has expired. Please log in again.");
+        return;
+      }
+      if (error.response.status === 403) {
+        toast.error(error.response.data.message || "You are not authorized to review this course.");
+      } else {
+        toast.error("Something went wrong while submitting your review.");
+      }
     } finally {
       setSubmitting(false);
     }

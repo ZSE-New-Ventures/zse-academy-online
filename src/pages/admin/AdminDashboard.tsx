@@ -7,6 +7,7 @@ import ViewQuizzes from "./ViewQuizzes";
 import ManageBlog from "./ManageBlog";
 import AdminConfigurations from "./AdminConfigurations";
 import InstructorManagement from "./InstructoManagement";
+import ManageCertificateSettings from "./ManageCertificateSettings";
 import QuizForm from "./QuizManagement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -174,7 +175,7 @@ const defaultStats: AdminStats = {
 const sidebarItems = [
   { icon: faHome, label: "Dashboard", key: "dashboard" },
   { icon: faBook, label: "Courses", key: "courses" },
-  { icon: faUsers, label: "Students", key: "users" },
+  { icon: faUsers, label: "Users", key: "users" },
   { icon: faBookAtlas, label: "Blog", key: "Blog" },
   { icon: faQuestionCircle, label: "Quizzes", key: "quizzes" },
   { icon: faChartLine, label: "Analytics", key: "analytics" },
@@ -481,7 +482,7 @@ const WeeklyActivityChart = ({ data }: { data: Array<{ date: string; active_user
 };
 
 const AdminDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
@@ -495,10 +496,14 @@ const AdminDashboard = () => {
   const theme = useTheme();
 
   useEffect(() => {
-    if (!user || user.role !== "admin") {
-      navigate("/dashboard");
+    if (!authLoading) {
+      if (!user) {
+        navigate("/admin/login");
+      } else if (user.role !== "admin") {
+        navigate("/dashboard");
+      }
     }
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   useEffect(() => {
     if (activeSection === "dashboard") {
@@ -776,18 +781,7 @@ const AdminDashboard = () => {
       case "categories":
         return <AdminConfigurations />;
       case "certifications":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Certification Management</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Manage course certifications, requirements, and issuance.
-              </p>
-            </CardContent>
-          </Card>
-        );
+        return <ManageCertificateSettings />;
       case "instructors":
         return (
           <Card>

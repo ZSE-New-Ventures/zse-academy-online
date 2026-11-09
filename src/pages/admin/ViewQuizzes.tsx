@@ -3,6 +3,17 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { toast } from "sonner";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faEdit,
@@ -23,6 +34,7 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [quizToDelete, setQuizToDelete] = useState<number | null>(null);
 
   useEffect(() => {
     fetchQuizzes();
@@ -64,8 +76,6 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure you want to delete this quiz?")) return;
-
     try {
       const token = localStorage.getItem("zse_training_token");
 
@@ -78,8 +88,11 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
 
       setQuizzes((q) => q.filter((item) => item.id !== id));
       setFilteredQuizzes((q) => q.filter((item) => item.id !== id));
+      toast.success("Quiz deleted successfully");
     } catch (err: any) {
-      alert(err.message || "Failed to delete quiz");
+      toast.error(err.message || "Failed to delete quiz");
+    } finally {
+      setQuizToDelete(null);
     }
   };
 
@@ -140,7 +153,7 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
                     <td className="px-4 py-3 flex items-center gap-3">
                       <img
                         src={quiz.course?.thumbnail_url}
-                        className="w-12 h-12 rounded-md object-cover border"
+                        className="w-12 h-12 rounded-md object-cover object-top border"
                       />
                       <div>
                         <p className="font-medium">{quiz.title}</p>
@@ -193,7 +206,7 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() => handleDelete(quiz.id)}
+                          onClick={() => setQuizToDelete(quiz.id)}
                           className="flex items-center gap-1"
                         >
                           <FontAwesomeIcon icon={faTrash} />
@@ -209,6 +222,31 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
           </div>
         )}
       </CardContent>
+
+      {/* Delete Confirmation Alert Dialog */}
+      <AlertDialog open={quizToDelete !== null} onOpenChange={(open) => !open && setQuizToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the quiz and all associated questions and student submissions.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => {
+                if (quizToDelete !== null) {
+                  handleDelete(quizToDelete);
+                }
+              }}
+            >
+              Delete Quiz
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 };

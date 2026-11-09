@@ -12,15 +12,19 @@ import {
   faMoneyBillTransfer,
   faChartLine,
   faMobileAlt,
-  faDownload,
-  faUpload,
   faCoins,
+  faGlobe,
+  faArrowRight,
+  faGraduationCap,
+  faArrowTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import tutorialsBg from "../assets/tutorials.jpg";
+import courseDirect from "@/assets/course-direct.jpg";
+import courseMarket from "@/assets/course-market-analysis.jpg";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { API_BASE_URL } from "@/constants/api";
 
@@ -38,23 +42,192 @@ interface Tutorial {
   icon: IconDefinition;
   gradient: string;
   iframecode?: string;
+  embedUrl?: string;
 }
 
-const bgGradients = [
-  "from-blue-500 to-cyan-500",
-  "from-green-500 to-emerald-500",
-  "from-purple-500 to-pink-500",
-  "from-orange-500 to-red-500",
-  "from-indigo-500 to-purple-500",
-  "from-teal-500 to-green-500",
+const defaultTutorials: Tutorial[] = [
+  {
+    id: "1",
+    title: "Introduction to ZSE Direct",
+    description: "Comprehensive walkthrough introducing the ZSE Direct trading platform, retail features, and real-time market interface.",
+    category: "zse",
+    duration: "4 min",
+    completed: true,
+    order: 1,
+    icon: faDesktop,
+    gradient: "from-blue-600 to-cyan-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/D21mo9winrY" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "2",
+    title: "How to Register an Account on ZSE Direct",
+    description: "Interactive step-by-step simulation and guide for creating your ZSE Direct account and submitting KYC documents.",
+    category: "zse",
+    duration: "3 min",
+    completed: true,
+    order: 2,
+    icon: faUserPlus,
+    gradient: "from-emerald-600 to-teal-500",
+    iframecode: '<iframe src="https://app.guideflow.com/embed/qp7o047ijr" width="100%" height="600" style="border:none;border-radius:8px;" allow="clipboard-read; clipboard-write" allowfullscreen></iframe>',
+  },
+  {
+    id: "3",
+    title: "ZSE Direct Wallet Top-Up & Funding",
+    description: "Learn how to deposit funds into your ZSE Direct trading wallet using local banking, Paynow, and mobile money.",
+    category: "zse",
+    duration: "3 min",
+    completed: false,
+    order: 3,
+    icon: faWallet,
+    gradient: "from-amber-600 to-orange-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/-hLBS4pIFEk" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "4",
+    title: "How to Place a Buy Order on ZSE Direct",
+    description: "Step-by-step instructions on selecting listed counters, specifying volume and price limits, and executing buy orders.",
+    category: "zse",
+    duration: "3 min",
+    completed: false,
+    order: 4,
+    icon: faCoins,
+    gradient: "from-sky-600 to-indigo-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/NO41T3N6Mjk" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "5",
+    title: "How to Place a Sell Order on ZSE Direct",
+    description: "Detailed walkthrough on liquidating shares from your active portfolio and placing market or limit sell orders.",
+    category: "zse",
+    duration: "3 min",
+    completed: false,
+    order: 5,
+    icon: faMoneyBillTransfer,
+    gradient: "from-violet-600 to-purple-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/Y0LL0rIaTn8" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "6",
+    title: "Market Depth Feature & Time in Force",
+    description: "Master order book depth, bid and ask queues, and how to utilize Day vs Good-Till-Cancelled (GTC) order validity.",
+    category: "zse",
+    duration: "4 min",
+    completed: false,
+    order: 6,
+    icon: faChartLine,
+    gradient: "from-blue-700 to-indigo-600",
+    iframecode: '<iframe src="https://www.youtube.com/embed/71E1Ogck2mQ" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "7",
+    title: "ZSE Direct Withdrawal Process",
+    description: "Official guide detailing the secure withdrawal of dividends and realized capital gains back to your verified bank account.",
+    category: "zse",
+    duration: "2 min",
+    completed: false,
+    order: 7,
+    icon: faWallet,
+    gradient: "from-rose-600 to-pink-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/g2NXNdMSDYw" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "8",
+    title: "Introduction to the Victoria Falls Stock Exchange (VFEX)",
+    description: "Learn the fundamentals of the US Dollar-denominated Victoria Falls Stock Exchange and its offshore incentives.",
+    category: "vfex",
+    duration: "4 min",
+    completed: false,
+    order: 8,
+    icon: faGlobe,
+    gradient: "from-teal-600 to-emerald-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/wCPzrIiZdc4" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "9",
+    title: "How to Get Started on VFEX Direct",
+    description: "Setting up your VFEX Direct web & mobile application, selecting your custodian broker, and configuring your USD FCA wallet.",
+    category: "vfex",
+    duration: "4 min",
+    completed: false,
+    order: 9,
+    icon: faMobileAlt,
+    gradient: "from-indigo-600 to-blue-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/rE5wi7S1Qoo" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "10",
+    title: "How to Buy Securities on the VFEX",
+    description: "Live demonstration showing how to browse USD-listed securities, evaluate prices, and execute equity trades on VFEX.",
+    category: "vfex",
+    duration: "3 min",
+    completed: false,
+    order: 10,
+    icon: faArrowTrendUp,
+    gradient: "from-amber-500 to-red-500",
+    iframecode: '<iframe src="https://www.youtube.com/embed/TNlGIqM_cug" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
+  {
+    id: "11",
+    title: "VFEX Listing Process & Market Framework",
+    description: "Official webinar session exploring VFEX listing procedures, compliance, foreign exchange exemptions, and capital raising.",
+    category: "vfex",
+    duration: "15 min",
+    completed: false,
+    order: 11,
+    icon: faGraduationCap,
+    gradient: "from-slate-700 to-slate-900",
+    iframecode: '<iframe src="https://www.youtube.com/embed/sMjZg3kYiag" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+  },
 ];
 
-const iconsList = [
-  faUserPlus, faWallet, faMoneyBillTransfer, faChartLine, faMobileAlt, faDownload, faUpload, faCoins
+const iconsMap: Record<string, IconDefinition> = {
+  "1": faDesktop,
+  "2": faUserPlus,
+  "3": faWallet,
+  "4": faCoins,
+  "5": faMoneyBillTransfer,
+  "6": faChartLine,
+  "7": faWallet,
+  "8": faGlobe,
+  "9": faMobileAlt,
+  "10": faArrowTrendUp,
+  "11": faGraduationCap,
+};
+
+const gradientsList = [
+  "from-blue-600 to-cyan-500",
+  "from-emerald-600 to-teal-500",
+  "from-amber-600 to-orange-500",
+  "from-sky-600 to-indigo-500",
+  "from-violet-600 to-purple-500",
+  "from-blue-700 to-indigo-600",
+  "from-rose-600 to-pink-500",
+  "from-teal-600 to-emerald-500",
+  "from-indigo-600 to-blue-500",
+  "from-amber-500 to-red-500",
+  "from-slate-700 to-slate-900",
 ];
+
+// Helper to extract YouTube video ID from URL or embed code
+const getYouTubeId = (urlOrIframe?: string) => {
+  if (!urlOrIframe) return null;
+  const match = urlOrIframe.match(/(?:embed\/|v=|vi\/|youtu\.be\/|\/v\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : null;
+};
+
+const getTutorialPreview = (tutorial: Tutorial): string => {
+  const ytId = getYouTubeId(tutorial.iframecode || tutorial.embedUrl);
+  if (ytId) {
+    return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
+  }
+  if (tutorial.category === "zse") {
+    return courseDirect;
+  }
+  return tutorialsBg;
+};
 
 // -------------------------
-// Tutorial Card Component (Udemy-inspired)
+// Tutorial Card Component
 // -------------------------
 const TutorialCard = ({
   tutorial,
@@ -63,86 +236,85 @@ const TutorialCard = ({
   tutorial: Tutorial;
   onSelect: () => void;
 }) => {
+  const isSimulation = tutorial.iframecode?.includes("guideflow");
+  const previewImg = getTutorialPreview(tutorial);
+
   return (
-    <div className="group cursor-pointer" onClick={onSelect}>
-      <div className="bg-card rounded-lg overflow-hidden border border-border hover:shadow-lg transition-all duration-300">
-        {/* Custom Designed Thumbnail */}
-        <div className="relative aspect-video w-full overflow-hidden">
-          <div className={`absolute inset-0 bg-gradient-to-br ${tutorial.gradient}`}>
-            {/* Grid Pattern */}
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-                                linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-                backgroundSize: "20px 20px",
-              }}
+    <div
+      onClick={onSelect}
+      className="group relative rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#00aeef]/60 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
+    >
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
+        <img
+          src={previewImg}
+          alt={tutorial.title}
+          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+          onError={(e) => {
+            e.currentTarget.src = courseDirect;
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-black/30 group-hover:opacity-85 transition-opacity" />
+
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-13 h-13 rounded-full bg-black/50 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#00aeef] group-hover:border-transparent transition-all duration-300 shadow-xl">
+            <FontAwesomeIcon
+              icon={faPlay}
+              className="h-5 w-5 text-white ml-0.5 drop-shadow"
             />
-            
-            {/* Main Icon */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-300">
-                <FontAwesomeIcon
-                  icon={tutorial.icon}
-                  className="h-8 w-8 text-white"
-                />
-              </div>
-              <span className="text-white font-semibold text-sm px-3 py-1 bg-black/20 rounded-full backdrop-blur-sm">
-                {tutorial.title}
-              </span>
-            </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute top-3 left-3 w-8 h-8 border-2 border-white/20 rounded-full" />
-            <div className="absolute bottom-3 right-3 w-6 h-6 border-2 border-white/20 rounded" />
-            <div className="absolute top-1/2 right-4 w-1 h-8 bg-white/10 rounded-full" />
           </div>
-
-          {/* Play Button Overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="h-14 w-14 rounded-full bg-white flex items-center justify-center shadow-lg">
-              <FontAwesomeIcon
-                icon={faPlay}
-                className="h-5 w-5 text-foreground ml-1"
-              />
-            </div>
-          </div>
-
-          {/* Duration Badge */}
-          <div className="absolute bottom-2 right-2">
-            <span className="bg-black/80 text-white px-2 py-1 rounded text-xs font-medium">
-              {tutorial.duration}
-            </span>
-          </div>
-
-          {/* Completed Badge */}
-          {tutorial.completed && (
-            <div className="absolute top-2 left-2">
-              <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center gap-1">
-                <FontAwesomeIcon icon={faCheckCircle} className="h-3 w-3" />
-                Completed
-              </span>
-            </div>
-          )}
         </div>
 
-        {/* Content */}
-        <div className="p-4">
-          <h3 className="font-bold text-foreground text-base mb-1 group-hover:text-primary transition-colors line-clamp-2">
+        <div className="absolute top-3 left-3">
+          <div className="w-8 h-8 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center">
+            <FontAwesomeIcon
+              icon={tutorial.icon || faDesktop}
+              className="h-3.5 w-3.5 text-white"
+            />
+          </div>
+        </div>
+
+        <div className="absolute top-3 right-3">
+          <Badge
+            variant="secondary"
+            className="bg-black/60 text-white border border-white/20 backdrop-blur-md text-[10px] uppercase font-bold tracking-wider px-2.5 py-0.5"
+          >
+            {tutorial.category === "zse" ? "ZSE Direct" : "VFEX Direct"}
+          </Badge>
+        </div>
+
+        <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white text-xs">
+          <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full text-[11px] font-medium">
+            <FontAwesomeIcon icon={faClock} className="h-3 w-3 text-[#00aeef]" />
+            <span>{tutorial.duration}</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-black/60 backdrop-blur-md border border-white/10 px-2.5 py-1 rounded-full text-[11px] font-semibold">
+            {isSimulation ? (
+              <span className="text-cyan-300">Interactive</span>
+            ) : (
+              <span className="text-sky-300">Video Guide</span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 className="font-bold text-foreground text-base mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
             {tutorial.title}
           </h3>
-          <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
+          <p className="text-muted-foreground text-xs line-clamp-3 leading-relaxed">
             {tutorial.description}
           </p>
+        </div>
 
-          <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground font-medium">
-              Step {tutorial.order} of 4
-            </span>
-            <span className="text-xs bg-muted px-2 py-1 rounded font-medium text-muted-foreground">
-              {tutorial.category === "zse" ? "ZSE" : "VFEX"}
-            </span>
-          </div>
+        <div className="mt-4 pt-3 border-t border-border/50 flex items-center justify-between text-xs text-muted-foreground">
+          <span className="font-semibold text-primary">
+            {isSimulation ? "Interactive Simulation" : "Video Walkthrough"}
+          </span>
+          <span className="font-medium bg-muted px-2 py-0.5 rounded text-[11px]">
+            {tutorial.category === "zse" ? "ZSE" : "VFEX"}
+          </span>
         </div>
       </div>
     </div>
@@ -152,14 +324,12 @@ const TutorialCard = ({
 // -------------------------
 // Tutorial Viewer
 // -------------------------
-const TutorialViewer = ({ url, iframecode }: { url?: string; iframecode?: string }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const TutorialViewer = ({ iframecode }: { iframecode?: string }) => {
   const iframecodeContainerRef = useRef<HTMLDivElement>(null);
 
-  // Manually execute scripts found in the injected HTML
   useEffect(() => {
     if (!iframecode || !iframecodeContainerRef.current) return;
-    
+
     const scripts = iframecodeContainerRef.current.querySelectorAll("script");
     scripts.forEach((oldScript) => {
       const newScript = document.createElement("script");
@@ -172,53 +342,34 @@ const TutorialViewer = ({ url, iframecode }: { url?: string; iframecode?: string
       oldScript.parentNode?.replaceChild(newScript, oldScript);
     });
   }, [iframecode]);
-  
-  useEffect(() => {
-    if (!url || !containerRef.current) return;
-    const idMatch = url.match(/(?:embed|player)\/([a-zA-Z0-9]+)/);
-    const id = idMatch ? idMatch[1] : null;
-    
-    if (id && !document.querySelector(`script[data-iframe-id="${id}"]`)) {
-      const script = document.createElement("script");
-      script.src = "https://app.guideflow.com/assets/opt.js";
-      script.setAttribute("data-iframe-id", id);
-      script.async = true;
-      containerRef.current.appendChild(script);
-    }
-  }, [url]);
+
+  const isGuideflow = iframecode?.includes("guideflow");
 
   if (iframecode) {
     return (
-      <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden w-full">
-        <div 
-          ref={iframecodeContainerRef}
-          dangerouslySetInnerHTML={{ __html: iframecode }}
-          className="w-full flex justify-center bg-black/5"
-        />
+      <div className="rounded-xl border border-border bg-card shadow-lg overflow-hidden w-full">
+        {isGuideflow ? (
+          <div
+            ref={iframecodeContainerRef}
+            dangerouslySetInnerHTML={{ __html: iframecode }}
+            className="w-full min-h-[580px] md:min-h-[640px] flex justify-center bg-black/5"
+          />
+        ) : (
+          <div className="relative aspect-video w-full bg-black">
+            <div
+              ref={iframecodeContainerRef}
+              dangerouslySetInnerHTML={{ __html: iframecode.replace(/height="\d+"/, 'height="100%"').replace(/width="\d+"/, 'width="100%"') }}
+              className="absolute inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+            />
+          </div>
+        )}
       </div>
     );
   }
 
-  const idMatch = url?.match(/(?:embed|player)\/([a-zA-Z0-9]+)/);
-  const id = idMatch ? idMatch[1] : "zkj6z3diwp";
-
   return (
-    <div className="rounded-lg border border-border bg-card shadow-sm overflow-hidden w-full">
-      <div 
-        ref={containerRef}
-        style={{ position: "relative", paddingBottom: "calc(47.4609375% + 47px)", height: 0 }}
-      >
-        <iframe
-          id={id}
-          src={`https://app.guideflow.com/embed/${id}`}
-          width="100%"
-          height="100%"
-          style={{ overflow: "hidden", position: "absolute", border: "none" }}
-          scrolling="no"
-          allow="clipboard-read; clipboard-write"
-          allowFullScreen
-        ></iframe>
-      </div>
+    <div className="rounded-xl border border-border bg-card shadow-lg overflow-hidden w-full aspect-video bg-black flex items-center justify-center text-white">
+      <p>No preview available for this tutorial.</p>
     </div>
   );
 };
@@ -229,118 +380,144 @@ const TutorialViewer = ({ url, iframecode }: { url?: string; iframecode?: string
 export default function TutorialsDashboard() {
   const [selectedTutorial, setSelectedTutorial] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<"all" | "zse" | "vfex">("all");
-  const [tutorials, setTutorials] = useState<Tutorial[]>([]);
+  const [tutorials, setTutorials] = useState<Tutorial[]>(defaultTutorials);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchTutorials = async () => {
       try {
+        setLoading(true);
         const token = localStorage.getItem("zse_training_token");
-        const response = await fetch(`${API_BASE_URL}/tutorials`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          if (response.status === 401 || response.status === 403) {
-            throw new Error("You do not have permission to view tutorials. Please ensure you are logged in as an admin.");
-          }
-          throw new Error("Failed to fetch tutorials");
+        const headers: Record<string, string> = {
+          Accept: "application/json",
+        };
+        if (token && token !== "null" && token !== "undefined") {
+          headers["Authorization"] = `Bearer ${token}`;
         }
 
-        const data = await response.json();
-        console.log("Tutorials API Response:", data);
+        const response = await fetch(`${API_BASE_URL}/tutorials`, { headers });
+        if (response.ok) {
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            const mappedData: Tutorial[] = data.map((t: any, index: number) => {
+              const strId = t.id?.toString() || String(index + 1);
+              const fallback = defaultTutorials.find((d) => d.id === strId) || defaultTutorials[index % defaultTutorials.length];
 
-        // Safely map the data, falling back to safe defaults if fields are missing
-        const mappedData: Tutorial[] = data.map((t: any, index: number) => ({
-          id: t.id?.toString() || String(index),
-          title: t.name || "Untitled Tutorial",
-          description: `Interactive tutorial on ${t.name || "this topic"}`,
-          category: t.exchange?.toLowerCase() === "vfex" ? "vfex" : "zse",
-          duration: "3 min",
-          completed: false,
-          order: index + 1,
-          icon: iconsList[index % iconsList.length],
-          gradient: bgGradients[index % bgGradients.length],
-          iframecode: t.iframecode
-        }));
-        
-        setTutorials(mappedData);
-      } catch (err: any) {
-        console.error("Tutorials fetch error:", err);
-        setError(err.message || "An unknown error occurred while fetching tutorials.");
+              return {
+                id: strId,
+                title: t.name || fallback.title,
+                description: t.description || fallback.description,
+                category: t.exchange?.toLowerCase() === "vfex" ? "vfex" : "zse",
+                duration: t.duration || fallback.duration,
+                completed: index < 2,
+                order: index + 1,
+                icon: iconsMap[strId] || fallback.icon || faDesktop,
+                gradient: gradientsList[index % gradientsList.length],
+                iframecode: t.iframecode || fallback.iframecode,
+              };
+            });
+            setTutorials(mappedData);
+          }
+        }
+      } catch (err) {
+        console.warn("Could not fetch remote tutorials, using authentic defaults:", err);
       } finally {
         setLoading(false);
       }
     };
-    
+
     fetchTutorials();
   }, []);
 
-  const filteredTutorials = tutorials
-    .filter((t) =>
-      activeCategory === "all" ? true : t.category === activeCategory
-    )
-    .sort((a, b) => a.order - b.order);
+  const filteredTutorials = tutorials.filter((t) =>
+    activeCategory === "all" ? true : t.category === activeCategory
+  );
+
+  const zseCount = tutorials.filter((t) => t.category === "zse").length;
+  const vfexCount = tutorials.filter((t) => t.category === "vfex").length;
 
   // -------------------------
-  // Tutorial Details Page
+  // Tutorial Details View
   // -------------------------
   if (selectedTutorial) {
-    const tutorial = tutorials.find((t) => t.id === selectedTutorial);
-
-    if (!tutorial) return null;
+    const currentIndex = tutorials.findIndex((t) => t.id === selectedTutorial);
+    const tutorial = tutorials[currentIndex] || tutorials[0];
+    const prevTutorial = currentIndex > 0 ? tutorials[currentIndex - 1] : null;
+    const nextTutorial = currentIndex < tutorials.length - 1 ? tutorials[currentIndex + 1] : null;
 
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background font-montserrat">
         <Navbar />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Button
-            variant="ghost"
-            onClick={() => setSelectedTutorial(null)}
-            className="mb-6 hover:bg-muted"
-          >
-            <FontAwesomeIcon icon={faArrowLeft} className="mr-2 h-4 w-4" />
-            Back to Tutorials
-          </Button>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedTutorial(null)}
+              className="hover:bg-muted"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="mr-2 h-4 w-4" />
+              Back to All Tutorials
+            </Button>
 
-          <div className="rounded-lg border border-border bg-card p-6 shadow-sm mb-6">
+            <div className="flex items-center gap-2">
+              {prevTutorial && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedTutorial(prevTutorial.id)}
+                  className="text-xs"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} className="mr-1.5 h-3 w-3" />
+                  Previous
+                </Button>
+              )}
+              {nextTutorial && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedTutorial(nextTutorial.id)}
+                  className="text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  Next
+                  <FontAwesomeIcon icon={faArrowRight} className="ml-1.5 h-3 w-3" />
+                </Button>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm mb-6">
             <div className="flex items-start justify-between flex-wrap gap-4">
               <div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">
-                  {tutorial.title}
-                </h1>
-                <p className="text-muted-foreground">{tutorial.description}</p>
-              </div>
-
-              <div className="flex gap-3 text-sm">
-                <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
-                  <FontAwesomeIcon
-                    icon={faClock}
-                    className="h-4 w-4 text-muted-foreground"
-                  />
-                  <span className="font-medium">{tutorial.duration}</span>
-                </div>
-                <div className="flex items-center gap-2 bg-muted px-3 py-2 rounded-lg">
-                  <span className="font-medium">
-                    Step {tutorial.order} of 4
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge className="bg-[#00aeef] text-white uppercase text-[10px] tracking-wider font-semibold">
+                    {tutorial.category === "zse" ? "ZSE Direct" : "VFEX Direct"}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground font-medium">
+                    {tutorial.iframecode?.includes("guideflow") ? "Interactive Simulation" : "Official Walkthrough"}
                   </span>
                 </div>
-                {tutorial.completed && (
-                  <div className="flex items-center gap-2 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-3 py-2 rounded-lg">
-                    <FontAwesomeIcon icon={faCheckCircle} className="h-4 w-4" />
-                    <span className="font-medium">Completed</span>
-                  </div>
-                )}
+                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                  {tutorial.title}
+                </h1>
+                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed">
+                  {tutorial.description}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm">
+                <div className="flex items-center gap-2 bg-muted px-3.5 py-2 rounded-lg text-xs font-semibold">
+                  <FontAwesomeIcon icon={faClock} className="h-3.5 w-3.5 text-muted-foreground" />
+                  <span>{tutorial.duration}</span>
+                </div>
+                <div className="flex items-center gap-2 bg-muted px-3.5 py-2 rounded-lg text-xs font-semibold">
+                  <span>Step {tutorial.order} of {tutorials.length}</span>
+                </div>
               </div>
             </div>
           </div>
 
-          <TutorialViewer url={tutorial.embedUrl} iframecode={tutorial.iframecode} />
+          <TutorialViewer iframecode={tutorial.iframecode} />
         </div>
 
         <Footer />
@@ -349,152 +526,67 @@ export default function TutorialsDashboard() {
   }
 
   // -------------------------
-  // Tutorial List Page
+  // Tutorial Catalog List
   // -------------------------
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background font-montserrat">
       <Navbar />
 
-      {/* Hero Section - Trading Themed */}
-      <div 
+      {/* Hero Section */}
+      <div
         className="relative bg-cover bg-center border-b border-border overflow-hidden"
         style={{ backgroundImage: `url(${tutorialsBg})` }}
       >
-        <div className="absolute inset-0 bg-black/60 z-0" />
-        {/* Animated Grid Background */}
-        <div className="absolute inset-0 opacity-20">
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage: `linear-gradient(rgba(59, 130, 246, 0.3) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(59, 130, 246, 0.3) 1px, transparent 1px)`,
-              backgroundSize: "40px 40px",
-            }}
-          />
-        </div>
+        <div className="absolute inset-0 bg-black/70 z-0" />
 
-        {/* Floating Chart Elements */}
-        <div className="absolute top-8 right-8 opacity-20 hidden lg:block">
-          <svg
-            width="200"
-            height="100"
-            viewBox="0 0 200 100"
-            className="text-green-400"
-          >
-            <polyline
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              points="0,80 30,70 60,75 90,40 120,50 150,20 180,30 200,10"
-            />
-            <circle cx="90" cy="40" r="4" fill="currentColor" />
-            <circle cx="150" cy="20" r="4" fill="currentColor" />
-          </svg>
-        </div>
-
-        <div className="absolute bottom-8 left-8 opacity-20 hidden lg:block">
-          <svg
-            width="150"
-            height="80"
-            viewBox="0 0 150 80"
-            className="text-blue-400"
-          >
-            <polyline
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              points="0,60 25,50 50,55 75,30 100,40 125,15 150,25"
-            />
-          </svg>
-        </div>
-
-        {/* Candlestick Pattern */}
-        <div className="absolute top-1/2 right-20 -translate-y-1/2 opacity-10 hidden xl:flex gap-2">
-          {[60, 40, 70, 30, 55, 45, 65].map((height, i) => (
-            <div key={i} className="flex flex-col items-center gap-1">
-              <div
-                className={`w-1 ${i % 2 === 0 ? "bg-green-400" : "bg-red-400"}`}
-                style={{ height: `${height}px` }}
-              />
-              <div
-                className={`w-3 ${
-                  i % 2 === 0 ? "bg-green-400" : "bg-red-400"
-                } rounded-sm`}
-                style={{ height: `${height * 0.6}px` }}
-              />
-              <div
-                className={`w-1 ${i % 2 === 0 ? "bg-green-400" : "bg-red-400"}`}
-                style={{ height: `${height * 0.4}px` }}
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* Glowing Orbs */}
-        <div className="absolute top-20 left-1/4 w-32 h-32 bg-blue-500/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 right-1/3 w-40 h-40 bg-green-500/10 rounded-full blur-3xl" />
-
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32 text-center">
-          <Badge className="bg-[#00aeef] hover:bg-[#00aeef] text-white border-0 mb-6 px-4 py-1 uppercase tracking-widest text-xs drop-shadow-md">
-            Interactive Demos
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+          <Badge className="bg-[#00aeef] text-white border-0 mb-4 px-4 py-1 uppercase tracking-widest text-xs drop-shadow-md font-semibold">
+            Interactive Simulations & Video Guides
           </Badge>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 tracking-tight drop-shadow-md text-white">
-            Interactive Trading Tutorials
+          <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-md">
+            Master Trading with Hands-On Tutorials
           </h1>
-          <p className="text-lg md:text-xl text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md">
-            Step-by-step guided demos to help you navigate deposits,
-            withdrawals, and trading like a pro. Learn at your own pace.
+          <p className="text-gray-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed drop-shadow-md">
+            Authentic, step-by-step walkthroughs guiding you through account setup, wallet deposits, order placement, and market depth on ZSE Direct and VFEX Direct.
           </p>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Categories */}
-        <div className="flex gap-2 mb-8 border-b border-border pb-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {/* Category Tabs */}
+        <div className="flex gap-2 mb-8 border-b border-border pb-4 flex-wrap">
           <Button
             variant={activeCategory === "all" ? "default" : "outline"}
             onClick={() => setActiveCategory("all")}
             size="sm"
+            className={activeCategory === "all" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
           >
-            All Tutorials
+            All Tutorials ({tutorials.length})
           </Button>
 
           <Button
             variant={activeCategory === "zse" ? "default" : "outline"}
             onClick={() => setActiveCategory("zse")}
             size="sm"
+            className={activeCategory === "zse" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
           >
-            <FontAwesomeIcon icon={faDesktop} className="mr-2 h-4 w-4" />
-            ZSE
+            <FontAwesomeIcon icon={faDesktop} className="mr-2 h-3.5 w-3.5" />
+            ZSE Direct ({zseCount})
           </Button>
 
           <Button
             variant={activeCategory === "vfex" ? "default" : "outline"}
             onClick={() => setActiveCategory("vfex")}
             size="sm"
+            className={activeCategory === "vfex" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
           >
-            <FontAwesomeIcon icon={faMobileScreen} className="mr-2 h-4 w-4" />
-            VFEX
+            <FontAwesomeIcon icon={faMobileScreen} className="mr-2 h-3.5 w-3.5" />
+            VFEX Direct ({vfexCount})
           </Button>
         </div>
 
-        {/* Results count */}
-        {loading ? (
-          <p className="text-sm text-muted-foreground mb-6">Loading tutorials...</p>
-        ) : error ? (
-          <div className="bg-red-50 text-red-600 p-4 rounded-md mb-6 border border-red-200">
-            {error}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground mb-6">
-            {filteredTutorials.length} tutorial
-            {filteredTutorials.length !== 1 ? "s" : ""} available
-          </p>
-        )}
-
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {/* Tutorial Grid */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {filteredTutorials.map((tutorial) => (
             <TutorialCard
               key={tutorial.id}

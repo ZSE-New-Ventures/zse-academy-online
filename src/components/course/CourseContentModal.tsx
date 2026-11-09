@@ -12,6 +12,7 @@ import {
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
 import { YouTubePlayer } from "./YouTubePlayer";
 
 interface Slide {
@@ -19,6 +20,7 @@ interface Slide {
   title: string;
   type: string;
   url: string;
+  content?: string;
   file_path: string | null;
   position: number;
   is_locked?: boolean;
@@ -29,6 +31,7 @@ interface CourseContentModalProps {
     title: string;
     type: string;
     url: string;
+    content?: string;
     youtubeId?: string;
     currentSlideIndex: number;
     totalSlides: number;
@@ -100,7 +103,7 @@ export const CourseContentModal = ({
   const handleNavigate = (newIndex: number) => {
     const targetSlide = content.slides[newIndex];
     if (targetSlide?.is_locked) {
-      alert("This slide is locked. Please log in or enroll to unlock premium lessons.");
+      toast.warning("This slide is locked. Please log in or enroll to unlock premium lessons.");
       return;
     }
     setSlideDirection(newIndex > content.currentSlideIndex ? "right" : "left");
@@ -110,7 +113,10 @@ export const CourseContentModal = ({
   // Finish Module
   const handleFinishModule = async () => {
     try {
-      if (!token) return alert("No auth token found.");
+      if (!token) {
+        toast.error("Please sign in to save your module progress.");
+        return;
+      }
       setLoadingFinish(true);
 
       await axios.post(
@@ -126,15 +132,20 @@ export const CourseContentModal = ({
 
       setIsModuleCompleted(true); // update state
       setLoadingFinish(false);
+      toast.success("Module completed successfully!");
       onFinish();
     } catch (error) {
       console.error("Finish module error:", error);
       setLoadingFinish(false);
-      alert("Failed to complete module");
+      toast.error("Failed to complete module. Please try again.");
     }
   };
 
   const getPowerPointEmbedUrl = (url: string): string => {
+    if (!url) return "";
+    if (url.includes("docs.google.com/presentation")) {
+      return url;
+    }
     if (url.includes("drive.google.com")) {
       const fileId = url.match(/\/d\/([^\/]+)/)?.[1];
       if (fileId) return `https://drive.google.com/file/d/${fileId}/preview`;
@@ -184,7 +195,7 @@ export const CourseContentModal = ({
           >
             {content.slides.map((slide, index) => (
               <option key={index} value={index} disabled={slide.is_locked}>
-                Slide {index + 1}: {slide.title} {slide.is_locked ? "🔒" : ""}
+                Slide {index + 1}: {slide.title} {slide.is_locked ? " (Locked)" : ""}
               </option>
             ))}
           </select>
@@ -193,7 +204,14 @@ export const CourseContentModal = ({
         {/* MAIN CONTENT */}
         <div className="flex-1 relative bg-muted min-h-0">
           <div className={`w-full h-full ${slideAnimationClass} flex items-center justify-center`}>
-            {content.type === "video" ? (
+            {content.content ? (
+              <div className="w-full h-full p-6 sm:p-10 overflow-y-auto bg-white text-gray-800 leading-relaxed">
+                <div
+                  className="prose prose-sm sm:prose-base max-w-none [&_img]:rounded-xl [&_img]:my-4 [&_img]:max-h-96 [&_img]:object-contain [&_table]:w-full [&_table]:border [&_th]:border [&_td]:border [&_th]:p-2 [&_td]:p-2 [&_p]:mb-4"
+                  dangerouslySetInnerHTML={{ __html: content.content }}
+                />
+              </div>
+            ) : content.type === "video" ? (
               <video
                 className="w-full h-full bg-black object-contain"
                 controls
@@ -205,13 +223,19 @@ export const CourseContentModal = ({
                 <source src={content.url} type="video/mp4" />
                 Your browser does not support videos.
               </video>
-            ) : content.type === "ppt" || content.type === "powerpoint" || content.type === "pdf" ? (
+            ) : (content.type === "ppt" || content.type === "powerpoint" || content.type === "pdf") && content.url ? (
               <iframe
                 src={getPowerPointEmbedUrl(content.url)}
-                className="w-full h-full"
+                className="w-full h-full border-0"
                 title={content.title}
+                allowFullScreen
               />
-            ) : null}
+            ) : (
+              <div className="text-center p-8 text-muted-foreground">
+                <p className="text-base font-semibold mb-1">{content.title}</p>
+                <p className="text-xs">No media preview available for this lecture.</p>
+              </div>
+            )}
           </div>
         </div>
 

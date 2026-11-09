@@ -56,6 +56,16 @@ export const courseService = {
     return response.data.data || response.data;
   },
 
+  getCourseAiSummary: async (courseId: string | number, refresh: boolean = false) => {
+    const response = await apiClient.get(`/courses/${courseId}/ai-summary${refresh ? '?refresh=1' : ''}`);
+    return response.data?.data || response.data;
+  },
+
+  askCourseAi: async (courseId: string | number, question: string) => {
+    const response = await apiClient.post(`/courses/${courseId}/ai-ask`, { question });
+    return response.data;
+  },
+
   // Admin functions
   createCourse: async (courseData: Partial<Course>) => {
     const response = await apiClient.post(API_ENDPOINTS.ADMIN_CREATE_COURSE, courseData);

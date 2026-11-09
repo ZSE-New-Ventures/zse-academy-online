@@ -7,6 +7,7 @@ import {
   faArrowTrendUp,
   faDownload,
   faAward,
+  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 
 interface CourseSidebarCardProps {
@@ -23,6 +24,7 @@ interface CourseSidebarCardProps {
   onEnrollClick?: () => void;
   onWishlistClick?: () => void;
   onShareClick?: () => void;
+  onAiSummaryClick?: () => void;
 }
 
 export const CourseSidebarCard = ({
@@ -38,6 +40,7 @@ export const CourseSidebarCard = ({
   onEnrollClick,
   onWishlistClick,
   onShareClick,
+  onAiSummaryClick,
 }: CourseSidebarCardProps) => {
 
   return (
@@ -46,7 +49,7 @@ export const CourseSidebarCard = ({
         <img
           src={thumbnailUrl}
           alt={title}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+          className="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <div className="h-14 w-14 rounded-full bg-white flex items-center justify-center">
@@ -93,6 +96,15 @@ export const CourseSidebarCard = ({
                 Share
               </Button>
             </div>
+
+            <Button
+              variant="outline"
+              onClick={onAiSummaryClick}
+              className="w-full rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-200 text-[#00aeef] hover:text-[#008cc0] font-bold text-xs h-10 flex items-center justify-center gap-2 shadow-xs group/ai transition-all"
+            >
+              <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs transition-transform group-hover/ai:rotate-12" />
+              <span>Summarise with AI</span>
+            </Button>
           </div>
         </div>
 

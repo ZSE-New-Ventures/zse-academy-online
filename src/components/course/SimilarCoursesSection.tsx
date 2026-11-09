@@ -25,7 +25,7 @@ export const SimilarCoursesSection = ({ courses }: SimilarCoursesSectionProps) =
                 <img
                   src={(course as any).presigned_url || course.thumbnail_url || course.thumbnail || "/placeholder.svg"}
                   alt={course.title}
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />
               </div>
               <div className="p-4 flex flex-col flex-1 justify-between">

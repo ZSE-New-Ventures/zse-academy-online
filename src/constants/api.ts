@@ -1,5 +1,6 @@
 // Centralized API configuration
-export const API_BASE_URL = "http://127.0.0.1:8000/api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api";
+export const API_ORIGIN = API_BASE_URL.replace(/\/api\/?$/, "");
 
 export const API_ENDPOINTS = {
   // Auth endpoints
@@ -20,6 +21,7 @@ export const API_ENDPOINTS = {
   // Course endpoints
   COURSES: "/courses",
   MY_COURSES: "/my/courses",
+  MY_CERTIFICATES: "/my/certificates",
   COURSE_DETAIL: (id: string | number) => `/courses/${id}`,
   ENROLL_COURSE: (id: string | number) => `/courses/${id}/enroll`,
   SIMILAR_COURSES: (id: string | number) => `/courses/${id}/similar`,

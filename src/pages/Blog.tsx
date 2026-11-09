@@ -202,11 +202,11 @@ const Blog = () => {
             {featuredPost && activeFilter === "All" && searchTerm === "" && (
               <div className="mb-12 group block">
                 <Link to={`/blog/${featuredPost.id}`}>
-                  <div className="relative h-80 md:h-[450px] w-full mb-6 bg-gray-100 overflow-hidden">
+                  <div className="relative h-80 md:h-[450px] w-full mb-6 bg-slate-50 overflow-hidden rounded-2xl p-1.5 border border-slate-200/80 shadow-sm">
                     <img
                       src={featuredPost.image || getFallbackImage(featuredPost.id)}
                       alt={featuredPost.title}
-                      className="w-full h-full object-cover transition duration-300 group-hover:opacity-90 grayscale-0 hover:grayscale-0"
+                      className="w-full h-full object-cover object-top rounded-xl transition duration-300 group-hover:scale-[1.01]"
                       onError={(e) => {
                         e.currentTarget.src = getFallbackImage(featuredPost.id);
                       }}
@@ -267,11 +267,11 @@ const Blog = () => {
                     {/* Image on left for list view */}
                     <div className="w-full md:w-2/5 flex-shrink-0">
                       <Link to={`/blog/${post.id}`}>
-                        <div className="h-48 md:h-full min-h-[160px] bg-gray-100 overflow-hidden relative border border-gray-100">
+                        <div className="h-52 md:h-full min-h-[180px] bg-slate-50 overflow-hidden relative rounded-xl p-1 border border-slate-200/80 shadow-sm">
                           <img
                             src={post.image || getFallbackImage(post.id)}
                             alt={post.title}
-                            className="w-full h-full object-cover group-hover:opacity-90 transition-opacity"
+                            className="w-full h-full object-cover object-top rounded-lg group-hover:scale-[1.02] transition-transform duration-300"
                             onError={(e) => {
                               e.currentTarget.src = getFallbackImage(post.id);
                             }}

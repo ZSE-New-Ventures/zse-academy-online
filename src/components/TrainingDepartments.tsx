@@ -77,7 +77,7 @@ export const TrainingDepartments = () => {
 
               <div className="pt-6">
                 <a
-                  href="https://www.zsedirect.co.zw"
+                  href="https://zsedirect.co.zw/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-[#00aeef] hover:underline"
@@ -132,7 +132,7 @@ export const TrainingDepartments = () => {
                 key={index}
                 src={content.image}
                 alt={content.title}
-                className={`absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-opacity duration-1000 ease-in-out ${
+                className={`absolute inset-0 w-full h-full object-cover object-top group-hover:scale-105 transition-opacity duration-1000 ease-in-out ${
                   index === currentImageIndex ? "opacity-100" : "opacity-0"
                 }`}
               />

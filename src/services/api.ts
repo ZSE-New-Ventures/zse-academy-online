@@ -27,7 +27,10 @@ apiClient.interceptors.request.use(
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    // Only redirect if an expired session token failed on an internal authenticated page.
+    // NEVER redirect if the user is already on /login or if the login request itself returned 401!
+    const isAuthEndpoint = error.config?.url?.includes("/login") || error.config?.url?.includes("/register");
+    if (error.response?.status === 401 && !isAuthEndpoint && window.location.pathname !== "/login") {
       localStorage.removeItem("zse_training_token");
       window.location.href = "/login";
     }

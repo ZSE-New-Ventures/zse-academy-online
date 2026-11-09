@@ -5,6 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -18,6 +28,8 @@ const ManageBlog = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -61,17 +73,24 @@ const ManageBlog = () => {
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to delete this post?")) {
-      try {
-        await blogService.deletePost(id);
-        toast.success("Blog post deleted successfully");
-        fetchPosts();
-      } catch (error) {
-        toast.error("Failed to delete post");
-        console.error(error);
-      }
+  const confirmDelete = async () => {
+    if (!deleteTargetId) return;
+    try {
+      setIsDeleting(true);
+      await blogService.deletePost(deleteTargetId);
+      toast.success("Blog post deleted successfully");
+      setDeleteTargetId(null);
+      fetchPosts();
+    } catch (error) {
+      toast.error("Failed to delete post");
+      console.error(error);
+    } finally {
+      setIsDeleting(false);
     }
+  };
+
+  const handleDelete = (id: number) => {
+    setDeleteTargetId(id);
   };
 
   const handleEdit = (post: BlogPost) => {
@@ -251,7 +270,7 @@ const ManageBlog = () => {
                 <img
                   src={post.image}
                   alt={post.title}
-                  className="rounded-md mb-3 max-h-40 object-cover w-full"
+                  className="rounded-md mb-3 max-h-48 object-cover object-top w-full border border-slate-200"
                 />
               )}
               {/* Render HTML content safely */}
@@ -275,6 +294,32 @@ const ManageBlog = () => {
           </Card>
         )}
       </div>
+
+      {/* Styled Modern Delete Confirmation Dialog */}
+      <AlertDialog open={deleteTargetId !== null} onOpenChange={(open) => !open && setDeleteTargetId(null)}>
+        <AlertDialogContent className="max-w-md bg-white border border-gray-200 shadow-2xl rounded-2xl p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-gray-900">
+              Delete Article
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+              Are you sure you want to permanently delete this article? This action cannot be undone and will remove it from the public academy blog.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex items-center justify-end gap-3">
+            <AlertDialogCancel disabled={isDeleting} className="text-xs font-semibold rounded-lg">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              disabled={isDeleting}
+              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm"
+            >
+              {isDeleting ? "Deleting..." : "Yes, Delete Article"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -46,16 +46,33 @@ export const formatDate = (dateString: string): string => {
   }
 };
 
+const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/api\/?$/, '');
+
 export const transformBlogPost = (post: any): any => {
   let cleanContent = post.content || '';
   // Fix escaped forward slashes which might break HTML rendering or URLs
   if (typeof cleanContent === 'string') {
     cleanContent = cleanContent.replace(/\\\//g, '/');
+
+    // Rewrite any WordPress legacy upload paths or localhost paths to relative /storage/uploads
+    cleanContent = cleanContent
+      .replace(/https?:\/\/zsetraining\.co\.zw\/(?:demo404\/)?wp-content\/uploads\//gi, '/storage/uploads/')
+      .replace(/https?:\/\/localhost\/inst\/wp-content\/uploads\//gi, '/storage/uploads/')
+      .replace(/https?:\/\/(?:127\.0\.0\.1|localhost):8000\/storage\//gi, '/storage/')
+      // Ensure missing/re-indexed 2020 assets resolve to their valid uploads location
+      .replace(/\/storage\/uploads\/2020\/02\/trade3-300x245\.jpg/gi, '/storage/uploads/2020/08/zse-1-300x169.jpg')
+      .replace(/\/storage\/uploads\/2020\/02\/trade4-300x245\.jpg/gi, '/storage/uploads/2020/08/ats.jpg')
+      .replace(/\/storage\/uploads\/2020\/02\/trade1-300x245\.jpg/gi, '/storage/uploads/2020/08/trade1-300x245.jpg');
   }
 
   let cleanImage = post.image || '';
   if (typeof cleanImage === 'string') {
     cleanImage = cleanImage.replace(/\\\//g, '/');
+
+    cleanImage = cleanImage
+      .replace(/https?:\/\/zsetraining\.co\.zw\/(?:demo404\/)?wp-content\/uploads\//gi, '/storage/uploads/')
+      .replace(/https?:\/\/localhost\/inst\/wp-content\/uploads\//gi, '/storage/uploads/')
+      .replace(/https?:\/\/(?:127\.0\.0\.1|localhost):8000\/storage\//gi, '/storage/');
   }
 
   return {

@@ -45,6 +45,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.png";
 
@@ -96,6 +106,11 @@ const ManageCourseContent = () => {
   const [resourceYoutubeUrl, setResourceYoutubeUrl] = useState("");
   const [selectedContentForResource, setSelectedContentForResource] =
     useState<CourseContent | null>(null);
+
+  // Styled alert dialog states
+  const [deleteContentId, setDeleteContentId] = useState<number | null>(null);
+  const [deleteResourceData, setDeleteResourceData] = useState<{ contentId: number; resourceId: number } | null>(null);
+  const [isDeletingItem, setIsDeletingItem] = useState(false);
 
   // State to hold the token value retrieved from local storage
   const [tokenValue, setTokenValue] = useState<string | null>(null);
@@ -292,19 +307,12 @@ const ManageCourseContent = () => {
   };
 
   // --- DELETE CONTENT ---
-  const handleDelete = async (contentId: number) => {
-    if (!courseId || !tokenValue) return;
-    if (
-      !confirm(
-        "Are you absolutely sure you want to delete this content? This cannot be undone."
-      )
-    )
-      return;
-
+  const confirmDeleteContent = async () => {
+    if (!courseId || !tokenValue || !deleteContentId) return;
     try {
-      // AUTHENTICATED CALL: Delete content
+      setIsDeletingItem(true);
       await axios.delete(
-        `${BASE_API_URL}/courses/${courseId}/contents/${contentId}`,
+        `${BASE_API_URL}/courses/${courseId}/contents/${deleteContentId}`,
         getAuthHeaderConfig()
       );
 
@@ -313,6 +321,7 @@ const ManageCourseContent = () => {
         description: "Content deleted successfully.",
         className: "bg-green-50 text-green-900 border-green-200",
       });
+      setDeleteContentId(null);
       fetchContents();
     } catch (error: any) {
       console.error("Error deleting content:", error);
@@ -322,19 +331,22 @@ const ManageCourseContent = () => {
           error.response?.data?.message || "Failed to delete content.",
         variant: "destructive",
       });
+    } finally {
+      setIsDeletingItem(false);
     }
   };
 
+  const handleDelete = (contentId: number) => {
+    setDeleteContentId(contentId);
+  };
+
   // --- DELETE RESOURCE (SLIDE) ---
-  const handleDeleteResource = async (
-    contentId: number,
-    resourceId: number
-  ) => {
-    if (!courseId || !tokenValue) return;
-    if (!confirm("Are you sure you want to remove this resource?")) return;
+  const confirmDeleteResource = async () => {
+    if (!courseId || !tokenValue || !deleteResourceData) return;
+    const { contentId, resourceId } = deleteResourceData;
 
     try {
-      // AUTHENTICATED CALL: Delete resource/slide
+      setIsDeletingItem(true);
       await axios.delete(
         `${BASE_API_URL}/contents/${contentId}/slides/${resourceId}`,
         getAuthHeaderConfig()
@@ -346,31 +358,36 @@ const ManageCourseContent = () => {
         className: "bg-green-50 text-green-900 border-green-200",
       });
 
-      // OPTIMISTICALLY update state to avoid full refetch delay
       setContents((prevContents) =>
-        prevContents.map((content) =>
-          content.id === contentId
-            ? {
-              ...content,
-              resources: content.resources?.filter(
-                (res) => res.id !== resourceId
-              ),
-            }
-            : content
-        )
+        prevContents.map((c) => {
+          if (c.id === contentId) {
+            return {
+              ...c,
+              resources: c.resources.filter((r) => r.id !== resourceId),
+            };
+          }
+          return c;
+        })
       );
+      setDeleteResourceData(null);
     } catch (error: any) {
       console.error("Error deleting resource:", error);
       toast({
         title: "Error",
         description:
-          error.response?.data?.message ||
-          "Failed to remove resource. Please check the network tab.",
+          error.response?.data?.message || "Failed to remove resource.",
         variant: "destructive",
       });
-      // Fallback: If optimistic update failed, force a refresh
-      fetchContents();
+    } finally {
+      setIsDeletingItem(false);
     }
+  };
+
+  const handleDeleteResource = (
+    contentId: number,
+    resourceId: number
+  ) => {
+    setDeleteResourceData({ contentId, resourceId });
   };
 
   // --- RESOURCE ATTACHMENT LOGIC (URL ONLY) ---
@@ -1157,6 +1174,58 @@ const ManageCourseContent = () => {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Styled Modern Delete Content Confirmation Dialog */}
+      <AlertDialog open={deleteContentId !== null} onOpenChange={(open) => !open && setDeleteContentId(null)}>
+        <AlertDialogContent className="max-w-md bg-white border border-gray-200 shadow-2xl rounded-2xl p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-gray-900">
+              Delete Course Module
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+              Are you sure you want to delete this module? All attached lectures, interactive slides, and student progress for this module will be permanently removed.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex items-center justify-end gap-3">
+            <AlertDialogCancel disabled={isDeletingItem} className="text-xs font-semibold rounded-lg">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteContent}
+              disabled={isDeletingItem}
+              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm"
+            >
+              {isDeletingItem ? "Deleting..." : "Yes, Delete Module"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Styled Modern Remove Resource Confirmation Dialog */}
+      <AlertDialog open={deleteResourceData !== null} onOpenChange={(open) => !open && setDeleteResourceData(null)}>
+        <AlertDialogContent className="max-w-md bg-white border border-gray-200 shadow-2xl rounded-2xl p-6">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-lg font-bold text-gray-900">
+              Remove Learning Resource
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-gray-600 mt-2">
+              Are you sure you want to remove this slide/resource from the curriculum?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex items-center justify-end gap-3">
+            <AlertDialogCancel disabled={isDeletingItem} className="text-xs font-semibold rounded-lg">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteResource}
+              disabled={isDeletingItem}
+              className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-lg shadow-sm"
+            >
+              {isDeletingItem ? "Removing..." : "Yes, Remove"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

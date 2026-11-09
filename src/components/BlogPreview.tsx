@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCalendar, faUser, faArrowRight, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, faUser, faArrowRight, faSpinner, faNewspaper, faClock } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import { blogService, BlogPost } from "@/services/blog.service";
 import { transformBlogPost, formatDate, getFallbackImage } from "@/utils/blogHelpers";
@@ -24,7 +23,7 @@ export const BlogPreview = () => {
         setBlogPosts(transformedPosts);
       } catch (err) {
         console.error('Error fetching latest blogs:', err);
-        setError('Failed to load latest blog posts. Please try again later.');
+        setError('Failed to load latest market insights. Please try again later.');
         setBlogPosts([]);
       } finally {
         setLoading(false);
@@ -35,24 +34,24 @@ export const BlogPreview = () => {
 
   if (loading) {
     return (
-      <section className="section-padding bg-muted/30 font-montserrat">
+      <section className="py-20 bg-slate-50 font-montserrat">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8 text-left">
-            <h2 className="text-3xl sm:text-4xl font-bold text-secondary mb-2">
-              Latest Marketing Insights
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-2">
+              Capital Market Insights & Analysis
             </h2>
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl">
-              Over 35 years of combined experience delivering measurable results for B2B clients of all types and sizes.
+            <p className="text-base text-slate-600 max-w-2xl">
+              Stay ahead with authoritative commentary, listing updates, and investor education directly from the Zimbabwe Stock Exchange.
             </p>
           </div>
 
-          <div className="flex items-center justify-center py-12">
+          <div className="flex items-center justify-center py-16">
             <div className="text-center">
               <FontAwesomeIcon
                 icon={faSpinner}
-                className="h-8 w-8 text-primary animate-spin mb-4"
+                className="h-8 w-8 text-[#00aeef] animate-spin mb-4"
               />
-              <p className="text-muted-foreground">Loading latest insights...</p>
+              <p className="text-slate-500 font-medium">Loading latest market insights...</p>
             </div>
           </div>
         </div>
@@ -61,78 +60,94 @@ export const BlogPreview = () => {
   }
 
   return (
-    <section className="section-padding bg-muted/30 font-montserrat">
+    <section className="py-20 bg-slate-50 font-montserrat border-t border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 text-left w-full">
-          <h2 className="text-3xl font-bold text-[#1c1d1f] mb-2 tracking-tight">
-            Latest Marketing Insights
-          </h2>
-          <p className="text-lg text-[#1c1d1f] max-w-3xl">
-            Over 35 years of combined experience delivering measurable results for B2B clients of all types and sizes.
-          </p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+          <div className="text-left max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00aeef]/10 text-[#00aeef] text-xs font-bold uppercase tracking-wider mb-3 border border-[#00aeef]/20">
+              <FontAwesomeIcon icon={faNewspaper} />
+              <span>ZSE Market Intelligence</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+              Capital Market Insights & Analysis
+            </h2>
+            <p className="text-base text-slate-600 mt-2">
+              Authoritative commentary, regulatory updates, and investor education directly from the Zimbabwe Stock Exchange.
+            </p>
+          </div>
+
+          <Link
+            to="/blog"
+            className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00aeef] hover:text-[#008cc0] transition-colors shrink-0"
+          >
+            <span>View All Articles</span>
+            <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
+          </Link>
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-yellow-800 text-sm">
-              <strong>Note:</strong> {error}
+          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+            <p className="text-amber-800 text-sm">
+              <strong>Notice:</strong> {error}
             </p>
           </div>
         )}
 
         {blogPosts.length === 0 && !loading ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No blog posts available at the moment.</p>
+          <div className="text-center py-12 bg-white rounded-2xl border border-slate-200">
+            <p className="text-slate-500">No blog posts available at the moment.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {blogPosts.map((post, index) => (
-              <div key={post.id} className="group bg-white overflow-hidden flex flex-col border border-gray-200">
-                <Link to={`/blog/${post.id}`} className="block block">
-                  <div className="aspect-video relative overflow-hidden bg-gray-100">
-                    <img
-                      src={post.image || getFallbackImage(post.id)}
-                      alt={post.title}
-                      className="w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-90"
-                      onError={(e) => {
-                        e.currentTarget.src = getFallbackImage(post.id);
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+            {blogPosts.map((post) => (
+              <div
+                key={post.id}
+                className="group bg-white rounded-2xl overflow-hidden flex flex-col border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300"
+              >
+                <Link to={`/blog/${post.id}`} className="block relative overflow-hidden aspect-video bg-slate-100">
+                  <img
+                    src={post.image || getFallbackImage(post.id)}
+                    alt={post.title}
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                    onError={(e) => {
+                      e.currentTarget.src = getFallbackImage(post.id);
+                    }}
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider bg-white/95 backdrop-blur-md text-[#008cc0] shadow-sm">
+                      {post.category || "Markets"}
+                    </span>
                   </div>
                 </Link>
 
-                <div className="pt-2 pb-4 px-4 flex flex-col flex-grow text-left">
-                  <div className="flex items-center justify-between mb-2 mt-2">
-                    <span className="text-xs font-bold text-[#b4690e]">
-                      {post.category}
-                    </span>
-                    <span className="text-xs text-gray-500">{post.read_time}</span>
+                <div className="p-5 flex flex-col flex-grow text-left">
+                  <div className="flex items-center gap-2 text-[11px] text-slate-500 mb-2">
+                    <FontAwesomeIcon icon={faClock} className="text-slate-400 text-[10px]" />
+                    <span>{post.read_time || "4 min read"}</span>
+                    <span>•</span>
+                    <span>{formatDate(post.created_at)}</span>
                   </div>
 
                   <Link to={`/blog/${post.id}`}>
-                    <h3 className="font-bold text-base text-[#1c1d1f] leading-tight mb-2 line-clamp-2 min-h-[2.5rem] group-hover:text-black hover:underline cursor-pointer">
+                    <h3 className="font-bold text-base text-slate-900 leading-snug mb-2 line-clamp-2 group-hover:text-[#00aeef] transition-colors">
                       {post.title}
                     </h3>
                   </Link>
 
-                  <p className="text-xs text-[#6a6f73] mb-3 line-clamp-2">
+                  <p className="text-xs text-slate-600 mb-4 line-clamp-2 leading-relaxed">
                     {post.excerpt}
                   </p>
 
-                  <div className="mt-auto">
-                    <div className="flex items-center space-x-4 text-xs text-gray-500 mb-3">
-                      <div className="flex items-center space-x-1">
-                        <span>{post.author?.name}</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <span>{formatDate(post.created_at)}</span>
-                      </div>
-                    </div>
-                    <Link to={`/blog/${post.id}`}>
-                      <Button className="w-full bg-[#00aeef] hover:bg-[#0077a3] text-white font-semibold py-2 rounded-sm text-sm transition-all duration-200">
-                        Read More
-                      </Button>
+                  <div className="mt-auto pt-3 border-t border-slate-100 flex items-center justify-between">
+                    <span className="text-xs font-medium text-slate-500 truncate max-w-[140px]">
+                      {post.author?.name || "ZSE Research"}
+                    </span>
+                    <Link
+                      to={`/blog/${post.id}`}
+                      className="text-xs font-bold text-[#00aeef] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1"
+                    >
+                      <span>Read</span>
+                      <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
                     </Link>
                   </div>
                 </div>
@@ -140,20 +155,6 @@ export const BlogPreview = () => {
             ))}
           </div>
         )}
-
-        {/* View All Blogs Link */}
-        <div className="text-left mt-8">
-          <Link
-            to="/blog"
-            className="inline-flex items-center text-[#0095cc] rounded-sm hover:text-[#0077a3] transition-all group font-semibold text-lg border border-[#0095cc] hover:border-[#0077a3] px-6 py-2"
-          >
-            View All Blog Posts
-            <FontAwesomeIcon
-              icon={faArrowRight}
-              className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1"
-            />
-          </Link>
-        </div>
       </div>
     </section>
   );
