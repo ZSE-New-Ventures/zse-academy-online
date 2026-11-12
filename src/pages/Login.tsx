@@ -86,14 +86,28 @@ const Login = () => {
         title: "Welcome back!",
         description: "Successfully logged in.",
       });
-      if (loggedUser && (loggedUser as any).role === "admin") {
+      if (loggedUser && loggedUser.role === "admin") {
         navigate("/admin");
       } else {
         navigate(redirectPath || "/dashboard");
       }
-    } catch (error: any) {
-      const errorData = error.response?.data;
-      if (error.response?.status === 403 && errorData?.not_verified) {
+    } catch (error: unknown) {
+      const err = error as {
+        response?: {
+          status?: number;
+          data?: {
+            not_verified?: boolean;
+            error?: string;
+            message?: string;
+            errors?: Record<string, string[]>;
+            user_not_found?: boolean;
+            incorrect_password?: boolean;
+            account_locked?: boolean;
+          };
+        };
+      };
+      const errorData = err.response?.data;
+      if (err.response?.status === 403 && errorData?.not_verified) {
         toast({
           title: "Account Not Verified",
           description: "Please verify your email to continue.",
@@ -102,9 +116,9 @@ const Login = () => {
       } else {
         let errorMessage = "Please check your credentials and try again.";
         
-        if (!error.response) {
+        if (!err.response) {
           errorMessage = "Unable to connect to the server. Please check your internet connection or verify the API is running.";
-        } else if (error.response.status >= 500) {
+        } else if ((err.response.status ?? 0) >= 500) {
           errorMessage = "Our servers are experiencing a temporary issue. Please try again later.";
         } else if (errorData) {
           if (errorData.error) {
@@ -117,9 +131,9 @@ const Login = () => {
           }
         }
 
-        const isUserNotFound = error.response?.status === 404 || errorData?.user_not_found;
-        const isIncorrectPassword = error.response?.status === 401 || errorData?.incorrect_password;
-        const isLocked = error.response?.status === 403 && (errorData?.account_locked || errorMessage.toLowerCase().includes("locked"));
+        const isUserNotFound = err.response?.status === 404 || errorData?.user_not_found;
+        const isIncorrectPassword = err.response?.status === 401 || errorData?.incorrect_password;
+        const isLocked = err.response?.status === 403 && (errorData?.account_locked || errorMessage.toLowerCase().includes("locked"));
 
         setErrorDetails({
           message: errorMessage,

@@ -57,9 +57,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import logo from "@/assets/logo.png";
+import { API_BASE_URL } from "@/constants/api";
 
 // --- Configuration Constants ---
-const BASE_API_URL = "http://127.0.0.1:8000/api";
+const BASE_API_URL = API_BASE_URL;
 const LOCAL_STORAGE_TOKEN_KEY = "zse_training_token";
 // -------------------------------
 
@@ -176,9 +177,28 @@ const ManageCourseContent = () => {
         getAuthHeaderConfig()
       );
 
-      // Assume backend returns an array of content, where each content item
-      // has an array of 'slides' which we map to 'resources'.
-      const contentArray = (response.data.data || response.data) as any[];
+      interface ApiSlide {
+        id: number;
+        title?: string;
+        file_path?: string;
+        type: string;
+        file_size?: number;
+        url?: string;
+        created_at: string;
+      }
+      interface ApiContent {
+        id: number;
+        title: string;
+        description: string;
+        type: string;
+        url?: string;
+        duration?: string;
+        position: number;
+        slides?: ApiSlide[];
+        created_at: string;
+        updated_at: string;
+      }
+      const contentArray = (response.data.data || response.data) as ApiContent[];
 
       // Map the backend structure to our frontend interface (Crucial step)
       const mappedContents: CourseContent[] = contentArray.map((content) => ({
@@ -190,16 +210,16 @@ const ManageCourseContent = () => {
         duration: content.duration,
         position: content.position,
         resources: content.slides
-          ? content.slides.map((slide: any) => ({
+          ? content.slides.map((slide: ApiSlide) => ({
             id: slide.id,
             name:
               slide.title ||
               (slide.file_path
-                ? slide.file_path.split("/").pop()
+                ? slide.file_path.split("/").pop() || "Resource"
                 : "Resource"), // Use title or infer name from path
             file_type: slide.type, // 'video' or file extension
             file_size: slide.file_size || 0, // Default to 0 if not provided (e.g., for YouTube)
-            url: slide.url || slide.file_path, // The actual download/view link
+            url: slide.url || slide.file_path || "", // The actual download/view link
             uploaded_at: slide.created_at,
           }))
           : [],
@@ -294,12 +314,13 @@ const ManageCourseContent = () => {
       fetchContents();
       setIsDialogOpen(false);
       resetForm();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Error saving content:", error);
       toast({
         title: "Error",
         description:
-          error.response?.data?.message ||
+          err.response?.data?.message ||
           "Failed to save content. Is the API endpoint correct?",
         variant: "destructive",
       });
@@ -323,12 +344,13 @@ const ManageCourseContent = () => {
       });
       setDeleteContentId(null);
       fetchContents();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Error deleting content:", error);
       toast({
         title: "Error",
         description:
-          error.response?.data?.message || "Failed to delete content.",
+          err.response?.data?.message || "Failed to delete content.",
         variant: "destructive",
       });
     } finally {
@@ -370,12 +392,13 @@ const ManageCourseContent = () => {
         })
       );
       setDeleteResourceData(null);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Error deleting resource:", error);
       toast({
         title: "Error",
         description:
-          error.response?.data?.message || "Failed to remove resource.",
+          err.response?.data?.message || "Failed to remove resource.",
         variant: "destructive",
       });
     } finally {
@@ -438,8 +461,7 @@ const ManageCourseContent = () => {
 
     setUploadingResource(true);
     try {
-      // Since we're only submitting URLs, use JSON instead of FormData
-      const requestData: any = {
+      const requestData: Record<string, string | number> = {
         type: resourceType,
         position: 1,
       };
@@ -481,13 +503,14 @@ const ManageCourseContent = () => {
 
       // Re-fetch all content to update the resource lists correctly
       fetchContents();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: { message?: string; errors?: Record<string, string[] | string> } } };
       console.error("Error attaching resource:", error);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error response status:", error.response?.status);
+      console.error("Error response data:", err.response?.data);
+      console.error("Error response status:", err.response?.status);
 
       // Display more specific error message from backend if available
-      const backendError = error.response?.data;
+      const backendError = err.response?.data;
       let errorMessage = "Failed to attach resource.";
 
       if (backendError?.errors) {
@@ -495,7 +518,7 @@ const ManageCourseContent = () => {
         const firstError = Object.values(backendError.errors)[0];
         errorMessage = Array.isArray(firstError) ? firstError[0] : firstError;
       } else if (backendError?.message) {
-
+        errorMessage = backendError.message;
       }
 
       toast({

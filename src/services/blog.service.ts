@@ -52,7 +52,7 @@ export const blogService = {
     return res.data;
   },
 
-  getCategories: async (): Promise<any[]> => {
+  getCategories: async (): Promise<Array<{ id: number; name: string; slug?: string }>> => {
     const res = await apiClient.get("/public/blogs/categories");
     return res.data;
   },

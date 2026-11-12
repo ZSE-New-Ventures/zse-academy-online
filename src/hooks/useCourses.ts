@@ -23,16 +23,18 @@ export const useCourses = () => {
     queryKey: COURSE_KEYS.lists(),
     queryFn: async () => {
       const coursesData = await courseService.getAllCourses();
-      return coursesData.map((course: any) => ({
+      return coursesData.map((course) => ({
         ...course,
-        instructor: course.instructor?.name || course.instructor?.username || "ZSE Instructor",
+        instructor: typeof course.instructor === "object"
+          ? (course.instructor?.name || course.instructor?.username || "ZSE Instructor")
+          : (course.instructor || "ZSE Instructor"),
         duration: course.duration || "Self-paced",
         students: course.enrollments_count || course.students_count || 0,
         rating: course.reviews_avg_rating !== null && course.reviews_avg_rating !== undefined
           ? parseFloat(course.reviews_avg_rating.toString())
           : null,
         reviews_count: course.reviews_count || 0,
-        category: course.category?.name || course.category || "General",
+        category: typeof course.category === "object" ? (course.category?.name || "General") : (course.category || "General"),
         level: course.level || "Beginner",
         thumbnail_url: course.thumbnail_url || course.thumbnail || "",
         is_published: course.is_published !== undefined ? Boolean(course.is_published) : true,

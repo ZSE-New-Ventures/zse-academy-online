@@ -75,7 +75,7 @@ const MyCourses = () => {
       try {
         const data = await courseService.getMyCourses();
 
-        const formatted: CourseItem[] = data.map((course: any) => {
+        const formatted: CourseItem[] = data.map((course: { id: number; title: string; description?: string; progress?: number; level?: string; category?: string | { name?: string }; duration?: string; thumbnail_url?: string; thumbnail?: string; instructor?: string | { name?: string }; updated_at?: string; pivot?: { updated_at?: string } }) => {
           const rawProgress = Number(course.progress ?? 0);
           const progress = Math.min(100, Math.max(0, Math.round(rawProgress)));
 

@@ -7,18 +7,29 @@ export interface Course {
   description: string;
   duration: string;
   level: string;
-  category?: {
+  category?: string | {
     id: number;
     name: string;
   };
   category_id?: number;
-  instructor?: {
+  instructor?: string | {
     id: number;
     name: string;
+    username?: string;
   };
   instructor_id?: number;
-  contents?: any[];
+  contents?: Array<{
+    id: number;
+    title: string;
+    slides?: unknown[];
+    [key: string]: unknown;
+  }>;
   thumbnail?: string;
+  presigned_url?: string;
+  enrollments_count?: number;
+  students_count?: number;
+  reviews_avg_rating?: number | string | null;
+  reviews_count?: number;
   is_enrolled?: boolean;
   progress?: number;
   thumbnail_url?: string;
@@ -46,7 +57,7 @@ export const courseService = {
     return response.data;
   },
 
-  enrollInCourse: async (courseId: string | number): Promise<any> => {
+  enrollInCourse: async (courseId: string | number): Promise<Record<string, unknown>> => {
     const response = await apiClient.post(API_ENDPOINTS.ENROLL_COURSE(courseId));
     return response.data;
   },
@@ -93,12 +104,12 @@ export const courseService = {
     return response.data;
   },
 
-  createCourseContent: async (courseId: string | number, contentData: any) => {
+  createCourseContent: async (courseId: string | number, contentData: Record<string, unknown>) => {
     const response = await apiClient.post(API_ENDPOINTS.ADMIN_CREATE_CONTENT(courseId), contentData);
     return response.data;
   },
 
-  updateCourseContent: async (courseId: string | number, contentId: string | number, contentData: any) => {
+  updateCourseContent: async (courseId: string | number, contentId: string | number, contentData: Record<string, unknown>) => {
     const response = await apiClient.put(API_ENDPOINTS.ADMIN_UPDATE_CONTENT(courseId, contentId), contentData);
     return response.data;
   },

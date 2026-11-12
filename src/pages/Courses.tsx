@@ -99,10 +99,10 @@ const Courses = () => {
         title: "Successfully Enrolled!",
         description: "Course added to your learning dashboard.",
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast({
         title: "Enrollment Issue",
-        description: "Could not enroll at this time. Please try again.",
+        description: err instanceof Error ? err.message : "Could not enroll at this time. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -110,7 +110,7 @@ const Courses = () => {
     }
   };
 
-  const enrolledCourseIds = useMemo(() => new Set(myCourses.map((mc: any) => mc.id)), [myCourses]);
+  const enrolledCourseIds = useMemo(() => new Set(myCourses.map((mc: { id: number }) => mc.id)), [myCourses]);
 
   const categories = useMemo(() => {
     return Array.from(new Set(courses.map((c: Course) => c.category).filter(Boolean)));

@@ -80,7 +80,7 @@ export const StudentTestimonials: React.FC = () => {
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {
-            const mapped = json.data.map((item: any) => ({
+            const mapped = json.data.map((item: { id: number; user?: { name?: string }; course?: { title?: string }; rating?: number; comment: string; created_at: string }) => ({
               id: item.id,
               student_name: item.user?.name || "ZSE Academy Student",
               course_title: item.course?.title || "Investment Course",

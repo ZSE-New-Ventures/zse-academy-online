@@ -54,7 +54,7 @@ const Blog = () => {
           blogService.getTrendingPosts(),
         ]);
 
-        const transformedPosts = postsData.map((post: any, index: number) => ({
+        const transformedPosts = postsData.map((post, index: number) => ({
           ...transformBlogPost(post),
           featured: index === 0,
         }));
@@ -64,7 +64,7 @@ const Blog = () => {
           setCategories([{id: 0, name: "All", slug: "all"}, ...catsData]);
         }
         if (trendingData && trendingData.length > 0) {
-          setTrendingPosts(trendingData.map((p: any) => transformBlogPost(p)));
+          setTrendingPosts(trendingData.map((p) => transformBlogPost(p)));
         }
       } catch (err) {
         console.error("Error fetching blog data:", err);

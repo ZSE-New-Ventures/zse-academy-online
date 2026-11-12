@@ -112,7 +112,7 @@ export const QuizModal = ({ quiz, onClose, onQuizComplete }: QuizModalProps) => 
     ? quiz.questions[quizState.currentQuestionIndex]
     : null;
 
-  const getOptions = (question: any): string[] => {
+  const getOptions = (question: { options?: string | string[]; answer?: string } | null): string[] => {
     if (!question) return [];
     let opts = question.options;
     if (typeof opts === "string") {
@@ -191,7 +191,9 @@ export const QuizModal = ({ quiz, onClose, onQuizComplete }: QuizModalProps) => 
       // Clear draft on submission
       try {
         localStorage.removeItem(`zse_quiz_draft_${quiz.id}`);
-      } catch {}
+      } catch {
+        // Ignore storage errors
+      }
 
       setQuizState((prev) => ({
         ...prev,
@@ -220,7 +222,9 @@ export const QuizModal = ({ quiz, onClose, onQuizComplete }: QuizModalProps) => 
 
       try {
         localStorage.removeItem(`zse_quiz_draft_${quiz.id}`);
-      } catch {}
+      } catch {
+        // Ignore storage errors
+      }
 
       setQuizState((prev) => ({
         ...prev,

@@ -86,8 +86,9 @@ const AdminLogin = () => {
         description: "Welcome to the ZSE Academy Management Portal.",
       });
       navigate("/admin");
-    } catch (error: any) {
-      const errorData = error.response?.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string; message?: string } } };
+      const errorData = err.response?.data;
       let msg = "Invalid administrative credentials. Please verify your email and password.";
       if (errorData?.error) msg = errorData.error;
       else if (errorData?.message) msg = errorData.message;

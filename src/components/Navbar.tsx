@@ -67,7 +67,7 @@ export const Navbar = () => {
     return () => window.removeEventListener("wishlist-updated", updateWishlist);
   }, []);
 
-  const wishlistCourses = courses.filter((c: any) => wishlistIds.includes(c.id));
+  const wishlistCourses = courses.filter((c) => wishlistIds.includes(c.id));
 
   const handleLogout = () => {
     logout();
@@ -655,7 +655,7 @@ export const Navbar = () => {
             {wishlistCourses.length === 0 ? (
               <p className="text-slate-500 text-sm text-center py-8">Your wishlist is currently empty.</p>
             ) : (
-              wishlistCourses.map((course: any) => (
+              wishlistCourses.map((course) => (
                 <div key={course.id} className="flex gap-3 items-center p-3 rounded-2xl border border-slate-100 hover:border-slate-200 transition-colors">
                   <img
                     src={course.thumbnail_url || "https://placehold.co/600x400/0b1324/FFFFFF/png?text=Course"}
@@ -664,7 +664,7 @@ export const Navbar = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-xs text-slate-900 line-clamp-1">{course.title}</h4>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{course.instructor || "ZSE Academy"}</p>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{typeof course.instructor === "object" ? course.instructor?.name : (course.instructor || "ZSE Academy")}</p>
                   </div>
                   <Link to={`/courses/${course.id}`} onClick={() => setIsWishlistModalOpen(false)}>
                     <Button size="sm" className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-lg h-8 px-3">

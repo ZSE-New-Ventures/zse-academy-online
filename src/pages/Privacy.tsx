@@ -60,7 +60,7 @@ const Privacy = () => {
         if (data && data.length > 0) {
           setPolicy(data[0]);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Privacy fetch error:", err);
       } finally {
         setLoading(false);

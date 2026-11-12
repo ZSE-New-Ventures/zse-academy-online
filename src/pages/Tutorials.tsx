@@ -399,7 +399,7 @@ export default function TutorialsDashboard() {
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data) && data.length > 0) {
-            const mappedData: Tutorial[] = data.map((t: any, index: number) => {
+            const mappedData: Tutorial[] = data.map((t: { id?: number | string; name?: string; description?: string; exchange?: string; duration?: string }, index: number) => {
               const strId = t.id?.toString() || String(index + 1);
               const fallback = defaultTutorials.find((d) => d.id === strId) || defaultTutorials[index % defaultTutorials.length];
 

@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/constants/api";
 
 interface Props {
   courseId: string;
@@ -107,7 +108,7 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `http://127.0.0.1:8000/api/courses/${courseId}/reviews`,
+        `${API_BASE_URL}/courses/${courseId}/reviews`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -143,7 +144,7 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
     try {
       setSubmitting(true);
       await axios.post(
-        "http://127.0.0.1:8000/api/reviews",
+        `${API_BASE_URL}/reviews`,
         { course_id: Number(courseId), rating, comment },
         { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } }
       );
@@ -152,14 +153,15 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
       setComment("");
       setRating(5);
       fetchReviews();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      if (!error.response) {
+      const axiosErr = error as { response?: { status?: number; data?: { errors?: Record<string, string[]>; message?: string } } };
+      if (!axiosErr.response) {
         toast.error("Network error. Please try again.");
         return;
       }
-      if (error.response.status === 422) {
-        const errors = error.response.data.errors;
+      if (axiosErr.response.status === 422) {
+        const errors = axiosErr.response.data?.errors || {};
         let msg = "Validation Error: ";
         for (const key in errors) {
           msg += errors[key][0] + " ";
@@ -167,12 +169,12 @@ export const CourseReviewsTab = ({ courseId }: Props) => {
         toast.error(msg.trim());
         return;
       }
-      if (error.response.status === 401) {
+      if (axiosErr.response.status === 401) {
         toast.error("Your session has expired. Please log in again.");
         return;
       }
-      if (error.response.status === 403) {
-        toast.error(error.response.data.message || "You are not authorized to review this course.");
+      if (axiosErr.response.status === 403) {
+        toast.error(axiosErr.response.data?.message || "You are not authorized to review this course.");
       } else {
         toast.error("Something went wrong while submitting your review.");
       }

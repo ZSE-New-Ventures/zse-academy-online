@@ -48,7 +48,7 @@ export const formatDate = (dateString: string): string => {
 
 const API_ORIGIN = (import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000').replace(/\/api\/?$/, '');
 
-export const transformBlogPost = (post: any): any => {
+export const transformBlogPost = <T extends { content?: string; image?: string }>(post: T): T => {
   let cleanContent = post.content || '';
   // Fix escaped forward slashes which might break HTML rendering or URLs
   if (typeof cleanContent === 'string') {

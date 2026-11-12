@@ -40,7 +40,16 @@ interface CertificateModalProps {
     user?: {
       name: string;
     };
-    metadata?: any;
+    course_id?: number;
+    metadata?: {
+      signatory?: {
+        name?: string;
+        title?: string;
+        organization?: string;
+        signature?: string;
+      };
+      [key: string]: unknown;
+    };
     signatory?: {
       name?: string;
       title?: string;
@@ -79,8 +88,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
   useEffect(() => {
     if (!certificate) return;
 
-    const certObj = certificate as any;
-    const certSignatory = certObj?.signatory || certObj?.metadata?.signatory;
+    const certSignatory = certificate.signatory || certificate.metadata?.signatory;
     if (certSignatory?.name) {
       setActiveSignatory({
         name: certSignatory.name,
@@ -92,7 +100,7 @@ export const CertificateModal: React.FC<CertificateModalProps> = ({
     }
 
     // Recall course-specific facilitator signer if course id is available
-    const courseId = certObj?.course?.id || certObj?.course_id;
+    const courseId = certificate.course?.id || certificate.course_id;
     if (courseId) {
       fetch(`${API_BASE_URL}/courses/${courseId}/signer`)
         .then((res) => res.json())

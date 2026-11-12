@@ -9,6 +9,7 @@ import { useToast } from "@/hooks/use-toast";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { API_BASE_URL } from "@/constants/api";
 
 interface Instructor {
   id: number;
@@ -32,7 +33,7 @@ function InstructorManagement() {
 
   const { toast } = useToast();
 
-  const API_URL = "http://127.0.0.1:8000/api/instructors";
+  const API_URL = `${API_BASE_URL}/instructors`;
   const token = localStorage.getItem("zse_training_token");
 
   const authHeaders = {

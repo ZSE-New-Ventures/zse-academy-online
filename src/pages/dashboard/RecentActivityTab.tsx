@@ -46,9 +46,9 @@ const RecentActivityTab = () => {
         
         const data = await response.json();
         setActivity(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Error fetching activity:", err);
-        setError(err.message || "Failed to load recent activity");
+        setError(err instanceof Error ? err.message : "Failed to load recent activity");
       } finally {
         setLoading(false);
       }

@@ -21,16 +21,24 @@ import {
   faMagnifyingGlass,
   faBookOpen,
 } from "@fortawesome/free-solid-svg-icons";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import { API_BASE_URL } from "@/constants/api";
 
 interface ViewQuizzesProps {
   onEdit?: (id: number) => void; // <-- enable edit navigation
 }
 
+interface QuizSummary {
+  id: number;
+  title: string;
+  description?: string;
+  course?: { title: string };
+  questions?: unknown[];
+  created_at?: string;
+}
+
 const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
-  const [quizzes, setQuizzes] = useState<any[]>([]);
-  const [filteredQuizzes, setFilteredQuizzes] = useState<any[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizSummary[]>([]);
+  const [filteredQuizzes, setFilteredQuizzes] = useState<QuizSummary[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,8 +76,8 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
       const data = await res.json();
       setQuizzes(data.quizzes);
       setFilteredQuizzes(data.quizzes);
-    } catch (err: any) {
-      setError(err.message || "Something went wrong");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -89,8 +97,8 @@ const ViewQuizzes = ({ onEdit }: ViewQuizzesProps) => {
       setQuizzes((q) => q.filter((item) => item.id !== id));
       setFilteredQuizzes((q) => q.filter((item) => item.id !== id));
       toast.success("Quiz deleted successfully");
-    } catch (err: any) {
-      toast.error(err.message || "Failed to delete quiz");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Failed to delete quiz");
     } finally {
       setQuizToDelete(null);
     }

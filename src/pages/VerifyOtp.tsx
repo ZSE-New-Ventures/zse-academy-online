@@ -88,10 +88,11 @@ const VerifyOtp = () => {
         description: "Your email has been verified. Please log in to continue.",
       });
       navigate("/login");
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
       toast({
         title: "Verification Failed",
-        description: error.response?.data?.error || "Invalid verification code.",
+        description: err.response?.data?.error || "Invalid verification code.",
         variant: "destructive",
       });
     } finally {

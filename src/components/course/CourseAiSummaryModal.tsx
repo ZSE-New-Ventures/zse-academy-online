@@ -99,9 +99,10 @@ export const CourseAiSummaryModal = ({
       const res = await courseService.getCourseAiSummary(courseId, refresh);
       const summaryPayload = (res && typeof res === 'object' && 'data' in res && res.data) ? res.data : res;
       setData(summaryPayload);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("AI summary fetch error:", err);
-      const msg = err.response?.data?.message || err.message || "Unable to retrieve AI summary at this moment.";
+      const axiosErr = err as { response?: { data?: { message?: string } }; message?: string };
+      const msg = axiosErr.response?.data?.message || axiosErr.message || "Unable to retrieve AI summary at this moment.";
       setFetchError(msg);
       toast({
         title: "AI Analysis",

@@ -23,7 +23,7 @@ export const SimilarCoursesSection = ({ courses }: SimilarCoursesSectionProps) =
             <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 border border-gray-150 rounded-none bg-white hover:-translate-y-1 flex flex-col w-full">
               <div className="aspect-video relative overflow-hidden">
                 <img
-                  src={(course as any).presigned_url || course.thumbnail_url || course.thumbnail || "/placeholder.svg"}
+                  src={course.presigned_url || course.thumbnail_url || course.thumbnail || "/placeholder.svg"}
                   alt={course.title}
                   className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                 />

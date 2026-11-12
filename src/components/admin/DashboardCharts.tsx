@@ -14,7 +14,7 @@ import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 
 interface MaterialBarChartProps {
-  data: Array<{ label: string; value: number; growth?: number; [key: string]: any }>;
+  data: Array<{ label: string; value: number; growth?: number; [key: string]: string | number | undefined }>;
   title: string;
   subtitle?: string;
   height?: number;
@@ -39,7 +39,7 @@ export const MaterialBarChart = ({
     ...item,
   }));
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; payload: { growth?: number } }>; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <Paper
@@ -186,7 +186,7 @@ export const WeeklyActivityChart = ({ data }: WeeklyActivityChartProps) => {
               border: "1px solid #e5e7eb",
               borderRadius: "8px",
             }}
-            formatter={(value: any, name: string) => {
+            formatter={(value: number | string, name: string) => {
               if (name === "activeUsers") return [value, "Active Users"];
               if (name === "newSignups") return [value, "New Signups"];
               return [value, name];

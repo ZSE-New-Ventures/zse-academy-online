@@ -18,6 +18,7 @@ import {
   faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import courseInvesting101 from "@/assets/course-investing-101.png";
 import courseEtf from "@/assets/course-etf.jpg";
 import courseReits from "@/assets/course-reits.png";
@@ -35,7 +36,7 @@ interface Pathway {
   courseDuration: string;
   liveMetric: string;
   image: string;
-  icon: any;
+  icon: IconDefinition;
   bulletPoints: string[];
   ctaText: string;
   ctaLink: string;

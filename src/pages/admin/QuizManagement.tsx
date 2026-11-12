@@ -27,6 +27,7 @@ import {
   faQuestion,
   faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
+import { API_BASE_URL } from "@/constants/api";
 
 interface Course {
   id: number;
@@ -50,7 +51,7 @@ function QuizForm() {
 
   const { toast } = useToast();
   const token = localStorage.getItem("zse_training_token");
-  const API_URL = "http://127.0.0.1:8000/api/quizzes";
+  const API_URL = `${API_BASE_URL}/quizzes`;
 
   const authHeaders = {
     "Content-Type": "application/json",
@@ -58,7 +59,7 @@ function QuizForm() {
   };
 
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/courses", { headers: authHeaders })
+    fetch(`${API_BASE_URL}/courses`, { headers: authHeaders })
       .then((res) => res.json())
       .then((data) => setCourses(data.data || []))
       .catch(() =>

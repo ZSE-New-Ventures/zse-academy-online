@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { YouTubePlayer } from "./YouTubePlayer";
+import { API_BASE_URL } from "@/constants/api";
 
 interface Slide {
   id: number;
@@ -85,7 +86,7 @@ export const CourseContentModal = ({
   const loadModuleProgress = async () => {
     try {
       const res = await axios.get<CourseProgressResponse>(
-        `http://127.0.0.1:8000/api/courses/${content.courseId}/progress`,
+        `${API_BASE_URL}/courses/${content.courseId}/progress`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -120,7 +121,7 @@ export const CourseContentModal = ({
       setLoadingFinish(true);
 
       await axios.post(
-        `http://127.0.0.1:8000/api/courses/${content.courseId}/modules/${content.moduleId}/finish`,
+        `${API_BASE_URL}/courses/${content.courseId}/modules/${content.moduleId}/finish`,
         {},
         {
           headers: {
@@ -147,7 +148,7 @@ export const CourseContentModal = ({
       return url;
     }
     if (url.includes("drive.google.com")) {
-      const fileId = url.match(/\/d\/([^\/]+)/)?.[1];
+      const fileId = url.match(/\/d\/([^/]+)/)?.[1];
       if (fileId) return `https://drive.google.com/file/d/${fileId}/preview`;
     }
     return `https://docs.google.com/gview?url=${encodeURIComponent(url)}&embedded=true`;

@@ -160,6 +160,14 @@ interface CourseDetail extends CourseType {
 
   category_id: number;
 
+  reviews_avg_rating?: number;
+
+  reviews_count?: number;
+
+  is_completed?: boolean;
+
+  rating?: number;
+
   created_at: string;
 
   updated_at: string;
@@ -568,11 +576,11 @@ const CourseDetail = () => {
 
     const patterns = [
 
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
+      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
 
-      /youtube\.com\/watch\?v=([^"&?\/\s]{11})/,
+      /youtube\.com\/watch\?v=([^"&?/\s]{11})/,
 
-      /youtu\.be\/([^"&?\/\s]{11})/,
+      /youtu\.be\/([^"&?/\s]{11})/,
 
     ];
 
@@ -802,7 +810,7 @@ const CourseDetail = () => {
 
                   <span className="font-bold text-[#f3ca8c]">
 
-                    {((course as any).reviews_avg_rating || course.rating || 0).toFixed(1)}
+                    {(course.reviews_avg_rating || course.rating || 0).toFixed(1)}
 
                   </span>
 
@@ -810,7 +818,7 @@ const CourseDetail = () => {
 
                     {[...Array(5)].map((_, i) => {
 
-                      const ratingVal = (course as any).reviews_avg_rating || course.rating || 0;
+                      const ratingVal = course.reviews_avg_rating || course.rating || 0;
 
                       return (
 
@@ -836,7 +844,7 @@ const CourseDetail = () => {
 
                   <span className="text-[#cec0fc] hover:underline cursor-pointer" onClick={() => setActiveTab("reviews")}>
 
-                    ({(course as any).reviews_count ?? 0} {(course as any).reviews_count === 1 ? "rating" : "ratings"})
+                    ({course.reviews_count ?? 0} {course.reviews_count === 1 ? "rating" : "ratings"})
 
                   </span>
 
@@ -899,7 +907,7 @@ const CourseDetail = () => {
 
               <div className="flex flex-col gap-3">
 
-                {course.progress === 100 || (course as any).is_completed ? (
+                {course.progress === 100 || course.is_completed ? (
 
                   <Button className="w-full rounded-none h-12 bg-green-700 hover:bg-green-700 text-white font-bold cursor-default">
 
@@ -1069,7 +1077,7 @@ const CourseDetail = () => {
 
                   isEnrolled={course.is_enrolled}
 
-                  isCompleted={course.progress === 100 || (course as any).is_completed}
+                  isCompleted={course.progress === 100 || course.is_completed}
 
                   totalLessons={totalLessons}
 

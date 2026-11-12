@@ -24,9 +24,9 @@ export const YouTubePlayer = ({ content }: YouTubePlayerProps) => {
       .split("&")[0];
 
     const patterns = [
-      /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/,
-      /youtube\.com\/watch\?v=([^"&?\/\s]{11})/,
-      /youtu\.be\/([^"&?\/\s]{11})/,
+      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/,
+      /youtube\.com\/watch\?v=([^"&?/\s]{11})/,
+      /youtu\.be\/([^"&?/\s]{11})/,
     ];
 
     for (const pattern of patterns) {

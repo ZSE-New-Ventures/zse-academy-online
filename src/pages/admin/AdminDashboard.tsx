@@ -19,6 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faUsers,
   faBook,
@@ -71,8 +72,7 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import PeopleIcon from '@mui/icons-material/People';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import { API_BASE_URL } from "@/constants/api";
 
 interface TopCourse {
   id: number;
@@ -246,7 +246,7 @@ const StatCard = ({
   title: string; 
   value: number; 
   growth: number; 
-  icon: any;
+  icon: IconDefinition;
   color?: "blue" | "green" | "purple" | "orange";
   format?: "number";
 }) => {
@@ -298,7 +298,7 @@ const MaterialBarChart = ({
   showGrid = true,
   color = '#3b82f6'
 }: { 
-  data: Array<{ label: string; value: number; growth?: number; [key: string]: any }>;
+  data: Array<{ label: string; value: number; growth?: number; [key: string]: string | number | undefined }>;
   title: string;
   subtitle?: string;
   height?: number;
@@ -316,7 +316,7 @@ const MaterialBarChart = ({
   }));
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ value: number; payload: { growth?: number } }>; label?: string }) => {
     if (active && payload && payload.length) {
       return (
         <Paper elevation={3} sx={{ p: 2, backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
@@ -454,7 +454,7 @@ const WeeklyActivityChart = ({ data }: { data: Array<{ date: string; active_user
               border: '1px solid #e5e7eb',
               borderRadius: '8px'
             }}
-            formatter={(value: any, name: string) => {
+            formatter={(value: number | string, name: string) => {
               if (name === 'activeUsers') return [value, 'Active Users'];
               if (name === 'newSignups') return [value, 'New Signups'];
               return [value, name];
@@ -531,7 +531,7 @@ const AdminDashboard = () => {
       // Handle different response formats
       if (Array.isArray(data)) {
         // If API returns an array of daily data
-        return data.map((item: any) => {
+        return data.map((item: { date?: string; created_at?: string; daily_active_users?: number; active_users?: number; new_signups?: number }) => {
           const date = new Date(item.date || item.created_at);
           const dayOfWeek = date.toLocaleDateString('en-US', { weekday: 'short' });
           
@@ -605,7 +605,7 @@ const AdminDashboard = () => {
       if (Array.isArray(data)) {
         // Process the daily data - show days of current month
         const dailyData = data
-          .map((item: any, index: number, array: any[]) => {
+          .map((item: { day?: string; date?: string; dau?: number }, index: number, array: Array<{ dau?: number }>) => {
             // Extract day from date (e.g., "2025-12-01" -> "1")
             const date = new Date(item.day || item.date);
             const dayOfMonth = date.getDate();
@@ -736,9 +736,9 @@ const AdminDashboard = () => {
       };
       
       setStats(mergedData);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching admin stats:", err);
-      setError(err.message || "Failed to load dashboard statistics");
+      setError(err instanceof Error ? err.message : "Failed to load dashboard statistics");
       // Set default stats when API fails
       setStats(defaultStats);
     } finally {

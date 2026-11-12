@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 
 interface StatCardProps {
   title: string;
   value: number;
   growth: number;
-  icon: any;
+  icon: IconDefinition;
   color?: "blue" | "green" | "purple" | "orange";
 }
 

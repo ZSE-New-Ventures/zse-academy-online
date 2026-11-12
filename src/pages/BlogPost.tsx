@@ -168,7 +168,7 @@ const BlogPostPage = () => {
         <div className="w-full">
           
           {/* Framed Featured Image - only displayed when article does not already contain inline images */}
-          {post.image && !Boolean(post.content && /<img[^>]+src=/i.test(post.content)) && (
+          {post.image && !(post.content && /<img[^>]+src=/i.test(post.content)) && (
             <div className="max-w-3xl mx-auto mb-10 p-2 sm:p-3 bg-white border border-slate-200 rounded-2xl shadow-lg ring-1 ring-slate-100">
               <div className="max-h-[460px] overflow-hidden rounded-xl bg-slate-50 flex items-center justify-center">
                 <img

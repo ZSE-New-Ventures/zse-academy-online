@@ -25,7 +25,7 @@ interface Course {
   id: number;
   title: string;
   description: string;
-  instructor?: any;
+  instructor?: string | { name?: string };
   category: string | Category;
   duration?: string;
   level: string;

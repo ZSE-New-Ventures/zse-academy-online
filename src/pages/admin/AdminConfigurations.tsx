@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { API_BASE_URL } from "@/constants/api";
 
 interface Category {
   id: number;
@@ -31,8 +32,7 @@ function AdminConfigurations() {
 
   const { toast } = useToast();
 
-  // HARD CODED API URL
-  const API_URL = "http://127.0.0.1:8000/api/categories";
+  const API_URL = `${API_BASE_URL}/categories`;
 
   // TOKEN
   const token = localStorage.getItem("zse_training_token");

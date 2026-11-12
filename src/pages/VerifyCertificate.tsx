@@ -67,8 +67,9 @@ const VerifyCertificate = () => {
       } else {
         setError("Certificate identifier not found in the official registry. Please check the spelling or contact support.");
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "Certificate record could not be located. Please verify the code on your physical or digital certificate.");
+    } catch (err: unknown) {
+      const axiosErr = err as { response?: { data?: { message?: string } } };
+      setError(axiosErr.response?.data?.message || "Certificate record could not be located. Please verify the code on your physical or digital certificate.");
     } finally {
       setLoading(false);
     }

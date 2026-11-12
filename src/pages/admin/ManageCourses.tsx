@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { courseService, Course } from "@/services/course.service";
+import { API_BASE_URL } from "@/constants/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
   faPlus,
   faEdit,
@@ -90,7 +92,7 @@ const CourseSkeleton = () => (
 
 const InputWrapper: React.FC<{
   children: React.ReactNode;
-  icon?: any;
+  icon?: IconDefinition;
   label?: string;
 }> = ({ children, icon, label }) => (
   <div className="space-y-1">
@@ -109,7 +111,7 @@ const InputWrapper: React.FC<{
 
 // Create axios instance with auth headers
 const api = axios.create({
-  baseURL: "http://127.0.0.1:8000/api",
+  baseURL: API_BASE_URL,
 });
 
 // Add request interceptor to include token
@@ -256,11 +258,12 @@ const ManageCourses = () => {
       
       setInstructors(Array.isArray(instructorsData) ? instructorsData : []);
       console.log("Parsed instructors:", instructorsData); // Debug log
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { status?: number; data?: { message?: string } } };
       console.error("Error fetching instructors:", error);
       
       // Handle 401 unauthorized
-      if (error.response?.status === 401) {
+      if (err.response?.status === 401) {
         toast({
           title: "Session Expired",
           description: "Your session has expired. Please log in again.",
@@ -271,7 +274,7 @@ const ManageCourses = () => {
       } else {
         toast({
           title: "Error",
-          description: error.response?.data?.message || "Failed to fetch instructors.",
+          description: err.response?.data?.message || "Failed to fetch instructors.",
           variant: "destructive",
         });
       }
@@ -281,7 +284,7 @@ const ManageCourses = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const courseData: any = {
+      const courseData: Record<string, string | number | boolean | null> = {
         title: formData.title,
         description: formData.description,
         level: formData.level,
@@ -314,11 +317,12 @@ const ManageCourses = () => {
       await fetchCourses();
       setIsDialogOpen(false);
       resetForm();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       console.error("Error saving course:", error);
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to save course",
+        description: err.response?.data?.message || "Failed to save course",
         variant: "destructive",
       });
     }
@@ -332,10 +336,11 @@ const ManageCourses = () => {
       toast({ title: "Deleted", description: "Course deleted successfully." });
       setCourseToDelete(null);
       fetchCourses();
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete course",
+        description: err.response?.data?.message || "Failed to delete course",
         variant: "destructive",
       });
     } finally {

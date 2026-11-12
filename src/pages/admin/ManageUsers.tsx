@@ -95,7 +95,7 @@ const ManageUsers = () => {
   const fetchUsers = async (page = 1, search?: string) => {
     try {
       setUsersLoading(true);
-      const params: any = { page, per_page: 25 };
+      const params: Record<string, string | number> = { page, per_page: 25 };
       if (roleFilter !== "all") params.role = roleFilter;
       const term = search !== undefined ? search : userSearchTerm;
       if (term.trim()) {
@@ -168,10 +168,11 @@ const ManageUsers = () => {
         title: "Role Updated",
         description: `User role has been successfully changed to ${newRole.toUpperCase()}.`,
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
       toast({
         title: "Update Failed",
-        description: error.response?.data?.message || "Could not update user role.",
+        description: err.response?.data?.message || "Could not update user role.",
         variant: "destructive",
       });
     } finally {
@@ -201,8 +202,9 @@ const ManageUsers = () => {
       setIsCreateModalOpen(false);
       setNewUser({ name: "", email: "", password: "", role: "admin" });
       fetchUsers();
-    } catch (error: any) {
-      const err = error.response?.data?.errors?.email?.[0] || error.response?.data?.message || "Failed to create user.";
+    } catch (error: unknown) {
+      const errObj = error as { response?: { data?: { message?: string; errors?: { email?: string[] } } } };
+      const err = errObj.response?.data?.errors?.email?.[0] || errObj.response?.data?.message || "Failed to create user.";
       toast({
         title: "Creation Failed",
         description: err,

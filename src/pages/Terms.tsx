@@ -62,7 +62,7 @@ const Terms = () => {
         if (data && data.length > 0) {
           setTerms(data[0]);
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error("Terms fetch error:", err);
       } finally {
         setLoading(false);

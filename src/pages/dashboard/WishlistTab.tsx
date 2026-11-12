@@ -40,7 +40,7 @@ const WishlistTab = () => {
     window.dispatchEvent(new Event("wishlist-updated"));
   };
 
-  const wishlistedCourses = courses.filter((c: any) => wishlistIds.includes(c.id));
+  const wishlistedCourses = courses.filter((c) => wishlistIds.includes(c.id));
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">
@@ -63,7 +63,7 @@ const WishlistTab = () => {
           </div>
         ) : wishlistedCourses.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {wishlistedCourses.map((course: any) => (
+            {wishlistedCourses.map((course) => (
               <div 
                 key={course.id} 
                 className="group flex flex-col bg-white rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all overflow-hidden relative"

@@ -48,7 +48,7 @@ export interface EventItem {
 
 const getYouTubeThumbnail = (url?: string): string | null => {
   if (!url) return null;
-  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_\-]+)/);
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
   return ytMatch ? `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg` : null;
 };
 
@@ -58,11 +58,11 @@ const getEmbedUrl = (url?: string): string | null => {
     const srcMatch = url.match(/src="([^"]+)"/);
     if (srcMatch) return srcMatch[1];
   }
-  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_\-]+)/);
+  const ytMatch = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|live\/)|youtu\.be\/)([a-zA-Z0-9_-]+)/);
   if (ytMatch) {
     return `https://www.youtube.com/embed/${ytMatch[1]}`;
   }
-  const vimeoMatch = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|)(\d+)/);
+  const vimeoMatch = url.match(/vimeo\.com\/(?:channels\/(?:\w+\/)?|groups\/(?:[^/]*)\/videos\/|album\/(?:\d+)\/video\/|)(\d+)/);
   if (vimeoMatch) {
     return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
   }
@@ -134,7 +134,7 @@ const Events = () => {
         headers,
         body: JSON.stringify({
           ...form,
-          image_url: "/assets/webinar.jpg",
+          image_url: webinarBg,
           location: form.status === "recorded" ? "Recorded Broadcast" : "Online Live Webinar",
         }),
       });
@@ -162,7 +162,7 @@ const Events = () => {
         const newEv: EventItem = {
           id: Date.now(),
           ...form,
-          image_url: "/assets/webinar.jpg",
+          image_url: webinarBg,
         };
         setEvents([newEv, ...events]);
         setIsModalOpen(false);

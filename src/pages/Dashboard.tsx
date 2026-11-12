@@ -175,9 +175,9 @@ const Dashboard = () => {
         console.error("Error fetching continue learning:", e);
       }
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Error fetching user stats:", err);
-      setError(err.message || "Failed to load user statistics");
+      setError(err instanceof Error ? err.message : "Failed to load user statistics");
     } finally {
       setLoading(false);
     }

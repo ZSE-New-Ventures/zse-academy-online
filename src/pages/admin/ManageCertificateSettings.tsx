@@ -313,7 +313,7 @@ export const ManageCertificateSettings: React.FC = () => {
 
     setSaving(true);
     try {
-      const payload: any = {
+      const payload = {
         signatory_user_id: selectedUserId ? parseInt(selectedUserId) : null,
         signatory_name: signatoryName.trim(),
         signatory_title: signatoryTitle.trim(),
@@ -340,7 +340,7 @@ export const ManageCertificateSettings: React.FC = () => {
         description: `Default course facilitator assigned to ${signatoryName}.`,
       });
       recallAllCourseSigners();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error(err);
       toast({
         title: "Saved Locally",

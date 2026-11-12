@@ -153,8 +153,9 @@ const Signup = () => {
         description: "A verification code has been sent to your email.",
       });
       navigate(`/verify-otp?email=${encodeURIComponent(sanitizedEmail)}`);
-    } catch (error: any) {
-      const errorData = error.response?.data;
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string; errors?: { email?: string[] } } } };
+      const errorData = err.response?.data;
       let errorMessage = "Registration failed. Please try again.";
 
       if (errorData?.errors?.email) {
