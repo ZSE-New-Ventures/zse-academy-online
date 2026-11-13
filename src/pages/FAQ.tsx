@@ -92,7 +92,7 @@ const FAQ = () => {
             Frequently Asked Questions
           </h1>
           <p className="text-base md:text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md mb-8">
-            Find answers to commonly asked questions about ZSE Academy courses, trading on ZSE Direct, VFEX USD equities, examinations, and certificates.
+            Find answers to commonly asked questions about ZSE Training Institute courses, trading on ZSE Direct, VFEX USD equities, examinations, and certificates.
           </p>
 
           {/* Search Bar */}

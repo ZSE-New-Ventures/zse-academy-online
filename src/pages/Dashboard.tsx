@@ -774,7 +774,7 @@ const Dashboard = () => {
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <h3 className="font-bold text-slate-900 mb-0.5">Recent Activity</h3>
-                        <p className="text-xs text-slate-500">Your latest actions across the academy</p>
+                        <p className="text-xs text-slate-500">Your latest actions across the training institute</p>
                       </div>
                       <Button
                         variant="ghost"

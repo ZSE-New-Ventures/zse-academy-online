@@ -149,7 +149,7 @@ export const PopularTopics = () => {
               <span>Official Exchange Courses</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-              Featured Academy Courses
+              Featured Training Institute Courses
             </h2>
             <p className="mt-2 text-base text-slate-600">
               Comprehensive stock market courses built by exchange professionals. Complete modules, test your knowledge, and earn your certification.

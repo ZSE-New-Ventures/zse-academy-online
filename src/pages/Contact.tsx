@@ -70,7 +70,7 @@ const Contact = () => {
             We’re Here to Guide Your Trading Journey
           </h1>
           <p className="mt-4 text-base text-slate-300 leading-relaxed">
-            Have questions about course registration, certificate verification, or connecting with registered stockbrokers? Contact the official ZSE Academy support team.
+            Have questions about course registration, certificate verification, or connecting with registered stockbrokers? Contact the official ZSE Training Institute support team.
           </p>
 
           <div className="mt-6 flex items-center justify-center gap-4">
@@ -170,7 +170,7 @@ const Contact = () => {
                     </div>
                     <h3 className="text-2xl font-black text-slate-900">Message Delivered</h3>
                     <p className="text-sm text-slate-600 max-w-md mx-auto">
-                      Thank you for contacting ZSE Academy. A customer representative has received your ticket and will follow up shortly.
+                      Thank you for contacting ZSE Training Institute. A customer representative has received your ticket and will follow up shortly.
                     </p>
                     <Button
                       onClick={() => setSubmitted(false)}

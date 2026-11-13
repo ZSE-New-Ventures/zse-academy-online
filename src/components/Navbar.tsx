@@ -28,7 +28,6 @@ import {
   faLaptopCode,
   faVideo,
   faCircleQuestion,
-  faBuildingColumns,
   faExternalLinkAlt,
   faFire,
 } from "@fortawesome/free-solid-svg-icons";
@@ -89,7 +88,7 @@ export const Navbar = () => {
             <Link to="/" className="flex items-center group">
               <img
                 src={logo}
-                alt="Zimbabwe Stock Exchange Academy"
+                alt="Zimbabwe Stock Exchange Training Institute"
                 className="h-9 md:h-11 w-auto object-contain transition-transform duration-200 group-hover:scale-105"
               />
             </Link>
@@ -217,19 +216,6 @@ export const Navbar = () => {
                 </div>
               )}
             </div>
-
-            {/* About Us */}
-            <Link
-              to="/about"
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
-                isLinkActive("/about")
-                  ? "text-[#00aeef] bg-[#00aeef]/10"
-                  : "text-slate-700 hover:text-[#00aeef] hover:bg-slate-50"
-              }`}
-            >
-              <FontAwesomeIcon icon={faBuildingColumns} className="text-xs" />
-              <span>About Us</span>
-            </Link>
 
             {/* Tutorials with Live Badge */}
             <Link
@@ -513,7 +499,7 @@ export const Navbar = () => {
                 <FontAwesomeIcon icon={faTimes} className="h-5 w-5" />
               </button>
 
-              <img src={logo} alt="ZSE Academy" className="h-8 w-auto mb-4" />
+              <img src={logo} alt="ZSE Training Institute" className="h-8 w-auto mb-4" />
 
               {isAuthenticated ? (
                 <div className="flex items-center gap-3">
@@ -561,14 +547,6 @@ export const Navbar = () => {
                   >
                     <FontAwesomeIcon icon={faGraduationCap} className="text-[#00aeef]" />
                     <span>Courses</span>
-                  </Link>
-                  <Link
-                    to="/about"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
-                  >
-                    <FontAwesomeIcon icon={faBuildingColumns} className="text-[#00aeef]" />
-                    <span>About Us</span>
                   </Link>
                   <Link
                     to="/tutorials"
@@ -664,7 +642,7 @@ export const Navbar = () => {
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-bold text-xs text-slate-900 line-clamp-1">{course.title}</h4>
-                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{typeof course.instructor === "object" ? course.instructor?.name : (course.instructor || "ZSE Academy")}</p>
+                    <p className="text-[11px] text-slate-500 truncate mt-0.5">{typeof course.instructor === "object" ? course.instructor?.name : (course.instructor || "ZSE Training Institute")}</p>
                   </div>
                   <Link to={`/courses/${course.id}`} onClick={() => setIsWishlistModalOpen(false)}>
                     <Button size="sm" className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-lg h-8 px-3">

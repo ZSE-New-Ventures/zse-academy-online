@@ -858,7 +858,7 @@ const CourseDetail = () => {
 
                 <div>
 
-                  Created by <span className="text-[#cec0fc] hover:underline cursor-pointer">{course.instructor?.name || "ZSE Academy"}</span>
+                  Created by <span className="text-[#cec0fc] hover:underline cursor-pointer">{course.instructor?.name || "ZSE Training Institute"}</span>
 
                 </div>
 

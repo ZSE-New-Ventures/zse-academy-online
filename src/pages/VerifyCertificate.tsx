@@ -93,7 +93,7 @@ const VerifyCertificate = () => {
             <span>Official Registry Validation</span>
           </div>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            Verify Academy Credentials
+            Verify Training Institute Credentials
           </h1>
           <p className="mt-3 text-sm sm:text-base text-slate-300 max-w-xl mx-auto leading-relaxed">
             Validate the authentic issuance of certificates and qualifications awarded by the Zimbabwe Stock Exchange.

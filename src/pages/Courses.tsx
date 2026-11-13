@@ -389,7 +389,7 @@ const Courses = () => {
                       </Link>
 
                       <p className="text-xs text-slate-500 line-clamp-1 mb-2 font-medium">
-                        {course.instructor || "ZSE Academy"}
+                        {course.instructor || "ZSE Training Institute"}
                       </p>
 
                       {renderRating(course)}

@@ -156,7 +156,7 @@ const Privacy = () => {
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">1. Scope of Policy</h3>
                   <p>
-                    This Privacy Policy applies to personal information collected by Zimbabwe Stock Exchange Limited through the ZSE Academy portal. We adhere strictly to national data protection regulations and international best practices.
+                    This Privacy Policy applies to personal information collected by Zimbabwe Stock Exchange Limited through the ZSE Training Institute portal. We adhere strictly to national data protection regulations and international best practices.
                   </p>
                 </div>
 

@@ -221,7 +221,7 @@ const Login = () => {
                     {errorDetails.isUserNotFound && (
                       <div className="mt-3 pt-2 border-t border-rose-200">
                         <Link to="/signup" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#00aeef] hover:underline">
-                          Create a new account on ZSE Academy →
+                          Create a new account on ZSE Training Institute →
                         </Link>
                       </div>
                     )}

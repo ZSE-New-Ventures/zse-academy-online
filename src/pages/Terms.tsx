@@ -24,7 +24,7 @@ interface Term {
 const DEFAULT_TERMS_SUMMARY = [
   {
     title: "1. Educational Scope",
-    summary: "Course content, webinars, and tutorials provided on ZSE Academy are strictly for educational and informational purposes. They do not constitute formal investment advice or solicitations.",
+    summary: "Course content, webinars, and tutorials provided on ZSE Training Institute are strictly for educational and informational purposes. They do not constitute formal investment advice or solicitations.",
   },
   {
     title: "2. Account & Security",
@@ -36,7 +36,7 @@ const DEFAULT_TERMS_SUMMARY = [
   },
   {
     title: "4. Certification Authenticity",
-    summary: "ZSE Academy digital certificates are issued only upon legitimate completion of course assessments. Unauthorized fabrication or forgery is legally actionable under Zimbabwean law.",
+    summary: "ZSE Training Institute digital certificates are issued only upon legitimate completion of course assessments. Unauthorized fabrication or forgery is legally actionable under Zimbabwean law.",
   },
 ];
 
@@ -89,7 +89,7 @@ const Terms = () => {
             Terms & Conditions of Service
           </h1>
           <p className="mt-3 text-slate-300 text-sm md:text-base max-w-xl mx-auto leading-relaxed">
-            Please read these terms carefully before accessing courses, tutorials, or certification examinations on ZSE Academy.
+            Please read these terms carefully before accessing courses, tutorials, or certification examinations on ZSE Training Institute.
           </p>
         </div>
       </section>
@@ -158,7 +158,7 @@ const Terms = () => {
                 <div>
                   <h3 className="text-lg font-bold text-slate-900 mb-2">1. Acceptance of Terms</h3>
                   <p>
-                    By creating an account or accessing learning materials on the Zimbabwe Stock Exchange Academy portal, you agree to be bound by these terms, as well as the rules and directives established by the Securities and Exchange Commission of Zimbabwe (SECZim).
+                    By creating an account or accessing learning materials on the Zimbabwe Stock Exchange Training Institute portal, you agree to be bound by these terms, as well as the rules and directives established by the Securities and Exchange Commission of Zimbabwe (SECZim).
                   </p>
                 </div>
 

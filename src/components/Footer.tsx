@@ -20,7 +20,6 @@ const footerSections = [
     title: "Company & Legal",
     span: "lg:col-span-2",
     links: [
-      { name: "About Us", href: "/about" },
       { name: "Contact Us", href: "/contact" },
       { name: "Privacy Policy", href: "/privacy" },
       { name: "Terms of Service", href: "/terms" },

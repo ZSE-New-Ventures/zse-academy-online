@@ -82,7 +82,7 @@ export const StudentTestimonials: React.FC = () => {
           if (json.data && json.data.length > 0) {
             const mapped = json.data.map((item: { id: number; user?: { name?: string }; course?: { title?: string }; rating?: number; comment: string; created_at: string }) => ({
               id: item.id,
-              student_name: item.user?.name || "ZSE Academy Student",
+              student_name: item.user?.name || "ZSE Training Institute Student",
               course_title: item.course?.title || "Investment Course",
               rating: item.rating || 5,
               comment: item.comment,
@@ -115,7 +115,7 @@ export const StudentTestimonials: React.FC = () => {
             Trusted by Thousands of Zimbabwean Investors
           </h2>
           <p className="mt-4 text-base sm:text-lg text-slate-300">
-            Read authentic reviews from students who learned the capital markets and started trading through ZSE Academy.
+            Read authentic reviews from students who learned the capital markets and started trading through ZSE Training Institute.
           </p>
 
           {/* Aggregate Stats Bar */}
