@@ -11,6 +11,7 @@ import {
   faCompass,
   faGraduationCap,
   faPlay,
+  faLaptopCode,
   faBolt,
   faFire,
   faCircle,
@@ -20,6 +21,7 @@ import {
 
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import courseInvesting101 from "@/assets/course-investing-101.png";
+import courseDirect from "@/assets/course-direct.jpg";
 import courseEtf from "@/assets/course-etf.jpg";
 import courseReits from "@/assets/course-reits.png";
 import courseVfexDirect from "@/assets/course-vfex-direct.png";
@@ -59,8 +61,8 @@ const PATHWAYS: Pathway[] = [
     icon: faUserGraduate,
     bulletPoints: [
       "Master core concepts: Shares, Portfolios, Risk & Return",
-      "Learn how to open a CSD account with a registered stockbroker",
-      "Understand fee structures, dividends, and settlement cycles",
+      "Learn how company ownership and dividend payments work",
+      "Understand fee structures, terminology, and settlement cycles",
     ],
     ctaText: "Enroll in Investment 101",
     ctaLink: "/courses/11485",
@@ -68,65 +70,65 @@ const PATHWAYS: Pathway[] = [
     tagColor: "bg-sky-50 text-sky-700 border-sky-200",
   },
   {
-    id: "etfs-course",
-    badge: "Index & Baskets",
-    statusBadge: "Active Retail Trading • ZSE Top-10",
-    title: "Understanding ETFs",
-    targetAudience: "Passive index investors & diversified portfolio builders",
-    description: "Master the mechanics of Exchange Traded Funds listed on the ZSE, index tracking algorithms, market makers, and low-cost portfolio diversification.",
+    id: "zse-direct-course",
+    badge: "Practical Trading",
+    statusBadge: "Step-by-Step • Retail Platform",
+    title: "Getting Started with ZSE Direct",
+    targetAudience: "Beginners opening their first digital trading account",
+    description: "A complete practical walkthrough of the ZSE Direct platform. Learn how to register, upload your KYC, fund your wallet via EcoCash or bank, and place your first trade.",
     courseSnippet: "Course ID: 28111 • 3 Modules",
     courseDuration: "Self-Paced • 100% Free",
-    liveMetric: "Top-10 & Commodity Exposure",
-    image: courseEtf,
-    icon: faChartLine,
+    liveMetric: "Instant Mobile & Web Access",
+    image: courseDirect,
+    icon: faLaptopCode,
     bulletPoints: [
-      "Asset-backed index funds and top-10 ETF baskets",
-      "Secondary market execution, liquidity, and bid/ask spreads",
-      "Net Asset Value (NAV) and creation/redemption units",
+      "Creating your CSD account and selecting your stockbroker",
+      "Funding your wallet with EcoCash, InnBucks, or ZimSwitch",
+      "Placing your first buy and sell orders with zero hassle",
     ],
-    ctaText: "Enroll in ETFs Course",
+    ctaText: "Enroll in ZSE Direct Guide",
     ctaLink: "/courses/28111",
     themeColor: "#008cc0",
     tagColor: "bg-blue-50 text-[#008cc0] border-blue-200",
   },
   {
-    id: "reits-course",
-    badge: "Property Yields",
-    statusBadge: "Asset-Backed • Tax-Exempt Yield",
-    title: "Understanding REITs",
-    targetAudience: "Yield seekers & commercial property investors",
-    description: "Deep dive into Real Estate Investment Trusts on the ZSE, income distributions, property asset backing, and tax efficiencies for retail and institutional investors.",
+    id: "etfs-course",
+    badge: "Low-Risk Starter Basket",
+    statusBadge: "Active Retail Trading • ZSE Top-10",
+    title: "Understanding ETFs",
+    targetAudience: "Beginners seeking simple, diversified market exposure",
+    description: "Discover why Exchange Traded Funds are the safest first purchase for a new investor. Buy one single asset and own a diversified slice of Zimbabwe's top 10 companies.",
     courseSnippet: "Course ID: 37088 • 3 Modules",
     courseDuration: "Self-Paced • 100% Free",
-    liveMetric: "80%+ Rental Income Distribution",
-    image: courseReits,
-    icon: faBuilding,
+    liveMetric: "Top-10 & Commodity Exposure",
+    image: courseEtf,
+    icon: faChartLine,
     bulletPoints: [
-      "Mechanics of asset-backed REIT units traded on the exchange",
-      "80%+ mandatory rental income distribution model",
-      "Commercial, retail, and industrial property portfolio valuation",
+      "How index-tracking ETF baskets minimize individual company risk",
+      "Buying and selling ETF units directly on your mobile device",
+      "Low management fees and automated dividend distribution",
     ],
-    ctaText: "Enroll in REITs Course",
+    ctaText: "Enroll in ETFs Course",
     ctaLink: "/courses/37088",
     themeColor: "#00aeef",
     tagColor: "bg-sky-50 text-sky-700 border-sky-200",
   },
   {
     id: "vfex-course",
-    badge: "USD Hard Currency",
-    statusBadge: "Official Exchange Qualification",
-    title: "VFEX Sponsor Exam",
-    targetAudience: "Offshore advisors, dealers & USD investors",
-    description: "Official qualification curriculum covering Victoria Falls Stock Exchange regulations, 0% capital gains tax incentives, and offshore USD capital raising.",
-    courseSnippet: "Course ID: 88725 • 5 Modules",
-    courseDuration: "Professional Exam Syllabus",
+    badge: "USD Beginner Trading",
+    statusBadge: "Hard Currency • 0% Capital Gains",
+    title: "Introduction to VFEX (USD Trading)",
+    targetAudience: "Beginners & diaspora investors wanting to trade in US Dollars",
+    description: "The complete beginner's guide to trading US Dollar equities on the Victoria Falls Stock Exchange, using VFEX Direct, and enjoying 0% capital gains tax incentives.",
+    courseSnippet: "Course ID: 88725 • 4 Modules",
+    courseDuration: "Self-Paced • 100% Free",
     liveMetric: "0% Capital Gains Withholding Tax",
     image: courseVfexDirect,
     icon: faCoins,
     bulletPoints: [
-      "VFEX Listing Rules, continuing obligations, and sponsor duties",
-      "USD clearing, FCA Nostro settlements, and zero conversion risk",
-      "Cross-border corporate governance and regulatory disclosures",
+      "How the VFEX operates as Zimbabwe's offshore USD exchange",
+      "Opening your USD trading account and funding via FCA Nostro",
+      "Tax incentives: 0% capital gains tax and USD dividend receipts",
     ],
     ctaText: "Enroll in VFEX Course",
     ctaLink: "/courses/88725",
@@ -170,10 +172,10 @@ export const LearningPathways: React.FC = () => {
           </div>
 
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-            Explore Our Flagship Market Courses
+            Introductory Courses for Beginners
           </h2>
           <p className="mt-3 text-base sm:text-lg text-slate-600">
-            From foundational equity basics to exchange-traded funds, property trusts, and offshore USD listings, master the capital markets with comprehensive ZSE curriculum.
+            The ideal starting point for anyone learning to invest. Master foundational concepts, set up your digital trading account, and start investing on the ZSE & VFEX step by step.
           </p>
 
           {/* Interactive Live Pathway Tabs (Navigation Pills) */}
