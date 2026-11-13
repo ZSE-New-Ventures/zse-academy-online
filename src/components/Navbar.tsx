@@ -229,9 +229,6 @@ export const Navbar = () => {
             >
               <FontAwesomeIcon icon={faRoute} className="text-xs text-[#00aeef]" />
               <span>Learning Journey</span>
-              <span className="bg-emerald-100 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
-                Roadmap
-              </span>
             </Link>
 
             {/* Tutorials with Live Badge */}
@@ -568,15 +565,10 @@ export const Navbar = () => {
                   <Link
                     to="/learning-journey"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <FontAwesomeIcon icon={faRoute} className="text-[#00aeef]" />
-                      <span>Learning Journey</span>
-                    </div>
-                    <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">
-                      Roadmap
-                    </span>
+                    <FontAwesomeIcon icon={faRoute} className="text-[#00aeef]" />
+                    <span>Learning Journey</span>
                   </Link>
                   <Link
                     to="/tutorials"
