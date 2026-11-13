@@ -166,17 +166,31 @@ export const HeroSection = () => {
             </span>
           </div>
 
-          <div className="hero-buttons flex flex-col sm:flex-row gap-3 mt-6">
+          <div className="hero-buttons flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mt-7">
             <Link
               to="/learning-journey"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold text-white bg-[#00aeef] hover:bg-[#008cc0] transition-colors rounded-xl shadow-lg shadow-[#00aeef]/25 text-center"
+              className="learning-journey-btn group"
             >
-              <FontAwesomeIcon icon={faRoute} />
-              <span>Explore Learning Journey</span>
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-85" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white shadow-sm" />
+              </span>
+              <FontAwesomeIcon
+                icon={faRoute}
+                className="text-base text-white group-hover:rotate-6 transition-transform duration-300"
+              />
+              <span className="tracking-wide">Explore Learning Journey</span>
+              <span className="hidden sm:inline-flex items-center px-2 py-0.5 text-[10px] uppercase tracking-wider font-extrabold bg-white/25 text-white rounded-full border border-white/40 shadow-inner">
+                Start Here
+              </span>
+              <FontAwesomeIcon
+                icon={faArrowRight}
+                className="text-xs text-white/90 group-hover:translate-x-1 transition-transform duration-300"
+              />
             </Link>
             <Link
               to="/courses/11485"
-              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-colors rounded-xl backdrop-blur-sm text-center"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 transition-all rounded-xl backdrop-blur-sm text-center"
             >
               <FontAwesomeIcon icon={faGraduationCap} />
               <span>Start Investment 101</span>
