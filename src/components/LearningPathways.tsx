@@ -142,13 +142,13 @@ export const LearningPathways: React.FC = () => {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Auto-cycle through pathways every 4.5 seconds to make the section feel alive
+  // Auto-cycle through pathways every 8 seconds to give users ample reading time
   useEffect(() => {
     if (isPaused) return;
 
     timerRef.current = setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % PATHWAYS.length);
-    }, 4500);
+    }, 8000);
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);

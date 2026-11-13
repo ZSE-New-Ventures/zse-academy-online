@@ -91,13 +91,13 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   line-height: 1.2;
-  animation: rotateWord 4s cubic-bezier(0.23,1,0.32,1) forwards;
+  animation: rotateWord 7.5s cubic-bezier(0.23,1,0.32,1) forwards;
 }
 
 @keyframes rotateWord {
   0% { transform: translateY(16px); opacity: 0; filter: blur(2px); }
-  10% { transform: translateY(0); opacity: 1; filter: blur(0); }
-  90% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  6% { transform: translateY(0); opacity: 1; filter: blur(0); }
+  94% { transform: translateY(0); opacity: 1; filter: blur(0); }
   100% { transform: translateY(-16px); opacity: 0; filter: blur(2px); }
 }
 

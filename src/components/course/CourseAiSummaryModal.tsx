@@ -305,16 +305,12 @@ ${data.prerequisites || ""}
                         <FontAwesomeIcon icon={faBullseye} />
                         Executive Summary
                       </h4>
-                      <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#00aeef]/10 text-[#00aeef]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00aeef] animate-ping" />
-                        AI Stream
-                      </span>
                     </div>
                     {data.executive_summary && (
                       <TypewriterText
                         text={data.executive_summary}
-                        speed={12}
-                        chunkSize={3}
+                        speed={32}
+                        chunkSize={1}
                         className="text-xs sm:text-sm text-slate-800 leading-relaxed whitespace-pre-line font-medium"
                       />
                     )}
@@ -358,8 +354,8 @@ ${data.prerequisites || ""}
                         </h5>
                         <TypewriterText
                           text={data.investment_relevance}
-                          speed={14}
-                          chunkSize={3}
+                          speed={32}
+                          chunkSize={1}
                           className="text-xs text-emerald-800 leading-relaxed font-medium"
                         />
                       </div>
@@ -512,7 +508,7 @@ ${data.prerequisites || ""}
                               <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs mt-0.5 shrink-0" />
                               <div className="flex-1">
                                 {isLatest ? (
-                                  <TypewriterText text={msg.a} speed={12} chunkSize={3} />
+                                  <TypewriterText text={msg.a} speed={32} chunkSize={1} />
                                 ) : (
                                   <span>{msg.a}</span>
                                 )}

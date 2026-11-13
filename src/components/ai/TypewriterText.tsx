@@ -11,8 +11,8 @@ interface TypewriterTextProps {
 
 export const TypewriterText: React.FC<TypewriterTextProps> = ({
   text,
-  speed = 12,
-  chunkSize = 3,
+  speed = 32,
+  chunkSize = 1,
   onComplete,
   className = "",
   allowSkip = true,

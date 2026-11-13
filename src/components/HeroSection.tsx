@@ -61,14 +61,14 @@ export const HeroSection = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentBg((prev) => (prev + 1) % backgroundImages.length);
-    }, 6000);
+    }, 7500);
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setSlideIdx((prev) => (prev + 1) % beginnerSlides.length);
-    }, 4000);
+    }, 7500);
     return () => clearInterval(interval);
   }, []);
 
