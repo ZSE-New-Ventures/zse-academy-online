@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ManageCourses from "./ManageCourses";
+import { ManageGroups } from "./ManageGroups";
 import ManageUsers from "./ManageUsers";
 import ViewQuizzes from "./ViewQuizzes";
 import ManageBlog from "./ManageBlog";
@@ -1444,6 +1445,9 @@ const AdminDashboard = () => {
 
           {/* Users */}
           {activeSection === "users" && <ManageUsers />}
+
+          {/* Cohorts & Groups */}
+          {activeSection === "groups" && <ManageGroups />}
 
           {/* Blog */}
           {activeSection === "Blog" && <ManageBlog />}

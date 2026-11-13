@@ -42,6 +42,8 @@ import {
 
   faWandMagicSparkles,
 
+  faShieldHalved,
+
 } from "@fortawesome/free-solid-svg-icons";
 
 import {
@@ -656,27 +658,43 @@ const CourseDetail = () => {
 
     return (
 
-      <div className="min-h-screen bg-white font-montserrat">
+      <div className="min-h-screen bg-slate-50 font-montserrat">
 
         <Navbar />
 
-        <div className="flex items-center justify-center min-h-[50vh]">
+        <div className="flex items-center justify-center min-h-[60vh] px-4">
 
-          <div className="text-center">
+          <div className="text-center max-w-md bg-white p-8 rounded-3xl border border-slate-200/80 shadow-lg space-y-4">
 
-            <h2 className="text-2xl font-bold text-red-600">Error</h2>
+            <div className="w-16 h-16 bg-amber-50 text-amber-600 rounded-2xl mx-auto flex items-center justify-center border border-amber-200/60 shadow-xs">
 
-            <p className="mt-2 text-gray-600">
+              <FontAwesomeIcon icon={faShieldHalved} className="h-8 w-8" />
 
-              {fetchError ? "Failed to load course details" : "Course not found"}
+            </div>
+
+            <h2 className="text-2xl font-bold text-slate-900">Program Unavailable or Restricted</h2>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+
+              This course is either not available or is a private Sponsor Exam restricted to authorized cohorts and pre-registered candidates.
 
             </p>
 
-            <Button asChild className="mt-4 bg-[#00aeef] hover:bg-[#009ad1]">
+            <div className="pt-2 flex flex-col sm:flex-row gap-3 justify-center">
 
-              <Link to="/courses">Back to Courses</Link>
+              <Button asChild className="bg-[#00aeef] hover:bg-[#009ad1] text-white rounded-xl font-bold text-xs h-10 px-5 shadow-sm">
 
-            </Button>
+                <Link to="/courses">Explore Public Catalog</Link>
+
+              </Button>
+
+              <Button asChild variant="outline" className="rounded-xl font-bold text-xs h-10 px-5">
+
+                <Link to="/dashboard/my-courses">My Enrolled Courses</Link>
+
+              </Button>
+
+            </div>
 
           </div>
 
@@ -755,6 +773,18 @@ const CourseDetail = () => {
                   {course.category?.name || "Topic"}
 
                 </span>
+
+                {(course.visibility === "restricted" || (course.category as unknown as { access_level?: string })?.access_level === "restricted") && (
+
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-sm">
+
+                    <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3 text-slate-950" />
+
+                    Sponsor Exam
+
+                  </span>
+
+                )}
 
               </nav>
 

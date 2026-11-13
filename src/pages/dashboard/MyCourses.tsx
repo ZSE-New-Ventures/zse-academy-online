@@ -18,7 +18,8 @@ import {
   faRotateRight,
   faGraduationCap,
   faLayerGroup,
-  faWandMagicSparkles
+  faWandMagicSparkles,
+  faShieldHalved
 } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/hooks/use-toast";
 import { getFallbackImage } from "@/utils/blogHelpers";
@@ -36,6 +37,8 @@ interface CourseItem {
   level: string;
   status: "completed" | "in-progress" | "not-started";
   certificateReceived: boolean;
+  visibility?: string;
+  category_access_level?: string;
 }
 
 const CourseSkeleton = () => {
@@ -64,7 +67,7 @@ const MyCourses = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<CourseItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState<"all" | "in-progress" | "completed">("all");
+  const [activeFilter, setActiveFilter] = useState<"all" | "in-progress" | "completed" | "restricted">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedAiCourse, setSelectedAiCourse] = useState<{ id: number; title: string; isEnrolled?: boolean } | null>(null);
 
@@ -75,7 +78,7 @@ const MyCourses = () => {
       try {
         const data = await courseService.getMyCourses();
 
-        const formatted: CourseItem[] = data.map((course: { id: number; title: string; description?: string; progress?: number; level?: string; category?: string | { name?: string }; duration?: string; thumbnail_url?: string; thumbnail?: string; instructor?: string | { name?: string }; updated_at?: string; pivot?: { updated_at?: string } }) => {
+        const formatted: CourseItem[] = data.map((course: { id: number; title: string; description?: string; progress?: number; level?: string; category?: string | { name?: string }; category_name?: string; duration?: string; thumbnail_url?: string; thumbnail?: string; instructor?: string | { name?: string }; updated_at?: string; pivot?: { updated_at?: string }; visibility?: string; category_access_level?: string; completed_modules?: number; total_modules?: number }) => {
           const rawProgress = Number(course.progress ?? 0);
           const progress = Math.min(100, Math.max(0, Math.round(rawProgress)));
 
@@ -101,6 +104,8 @@ const MyCourses = () => {
             level: course.level || "Beginner",
             status,
             certificateReceived,
+            visibility: course.visibility,
+            category_access_level: course.category_access_level,
           };
         });
 
@@ -124,6 +129,7 @@ const MyCourses = () => {
       all: courses.length,
       inProgress: courses.filter((c) => c.status === "in-progress" || c.status === "not-started").length,
       completed: courses.filter((c) => c.status === "completed").length,
+      restricted: courses.filter((c) => c.visibility === "restricted" || c.category_access_level === "restricted").length,
     };
   }, [courses]);
 
@@ -132,6 +138,7 @@ const MyCourses = () => {
       // Filter status
       if (activeFilter === "in-progress" && course.status === "completed") return false;
       if (activeFilter === "completed" && course.status !== "completed") return false;
+      if (activeFilter === "restricted" && course.visibility !== "restricted" && course.category_access_level !== "restricted") return false;
 
       // Filter search
       if (searchQuery.trim()) {
@@ -203,6 +210,19 @@ const MyCourses = () => {
             >
               Completed ({counts.completed})
             </button>
+            {counts.restricted > 0 && (
+              <button
+                onClick={() => setActiveFilter("restricted")}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                  activeFilter === "restricted"
+                    ? "bg-amber-500 text-white shadow-sm"
+                    : "text-amber-700 hover:text-amber-800 hover:bg-amber-50"
+                }`}
+              >
+                <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3" />
+                Sponsor Exams ({counts.restricted})
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -298,6 +318,12 @@ const MyCourses = () => {
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-700 bg-amber-50 border border-amber-100 px-2 py-0.5 rounded-full">
                         <FontAwesomeIcon icon={faClock} className="text-amber-500" />
                         In Progress
+                      </span>
+                    )}
+                    {(course.visibility === "restricted" || course.category_access_level === "restricted") && (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100/90 border border-amber-300 px-2.5 py-0.5 rounded-full shadow-xs">
+                        <FontAwesomeIcon icon={faShieldHalved} className="text-amber-700 text-[10px]" />
+                        🏛️ Sponsor / Restricted Program
                       </span>
                     )}
                   </div>

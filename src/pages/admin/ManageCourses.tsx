@@ -595,6 +595,30 @@ const ManageCourses = () => {
                     </Select>
                   </InputWrapper>
 
+                  <InputWrapper label="Access Visibility" icon={faShieldHalved}>
+                    <Select
+                      value={formData.visibility}
+                      onValueChange={(val: "public" | "restricted" | "private") =>
+                        setFormData({ ...formData, visibility: val })
+                      }
+                    >
+                      <SelectTrigger className="bg-transparent border-0">
+                        <SelectValue placeholder="Select Visibility" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="public">
+                          🌐 Public (Open Catalog)
+                        </SelectItem>
+                        <SelectItem value="restricted">
+                          🔒 Restricted (Sponsor Exam / Cohort Gated)
+                        </SelectItem>
+                        <SelectItem value="private">
+                          👁️ Private (Draft / Internal Only)
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </InputWrapper>
+
                   <div className="flex items-center space-x-2">
                     <Switch
                       checked={formData.is_published}
@@ -648,7 +672,7 @@ const ManageCourses = () => {
                 <CardContent className="p-4">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
+                      <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <h3 className="font-semibold text-lg">
                           {course.title}
                         </h3>
@@ -659,6 +683,22 @@ const ManageCourses = () => {
                         ) : (
                           <Badge className="border-gray-300 text-gray-500">
                             Draft
+                          </Badge>
+                        )}
+                        {course.visibility === "restricted" && (
+                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 font-semibold flex items-center gap-1">
+                            <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3 text-amber-700" />
+                            Sponsor Exam / Restricted
+                          </Badge>
+                        )}
+                        {course.visibility === "private" && (
+                          <Badge className="bg-purple-100 text-purple-900 border-purple-300 font-semibold">
+                            Private
+                          </Badge>
+                        )}
+                        {typeof course.category === "object" && course.category?.access_level === "restricted" && (
+                          <Badge variant="outline" className="border-amber-400 text-amber-700 text-xs">
+                            Restricted Category
                           </Badge>
                         )}
                       </div>
@@ -692,7 +732,20 @@ const ManageCourses = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap items-center">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-primary/40 hover:bg-primary/5 text-primary text-xs font-semibold"
+                        onClick={() => {
+                          setAssignmentCourse(course);
+                          setIsAssignmentModalOpen(true);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faUsers} className="mr-1.5 h-3.5 w-3.5" />
+                        Access & Cohorts
+                      </Button>
+
                       <Button
                         size="sm"
                         variant="outline"
@@ -761,6 +814,17 @@ const ManageCourses = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Course Assignment Modal for Cohorts and Specific Learners */}
+      <CourseAssignmentModal
+        course={assignmentCourse}
+        isOpen={isAssignmentModalOpen}
+        onClose={() => {
+          setIsAssignmentModalOpen(false);
+          setAssignmentCourse(null);
+        }}
+        onAssignmentsUpdated={fetchCourses}
+      />
     </div>
   );
 };

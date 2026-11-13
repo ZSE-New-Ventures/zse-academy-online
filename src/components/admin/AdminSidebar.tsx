@@ -41,6 +41,7 @@ const sidebarItems = [
   { icon: faHome, label: "Dashboard", key: "dashboard" },
   { icon: faBook, label: "Courses", key: "courses" },
   { icon: faUsers, label: "Students", key: "users" },
+  { icon: faUsers, label: "Cohorts & Groups", key: "groups" },
   { icon: faBookAtlas, label: "Blog", key: "Blog" },
   { icon: faQuestionCircle, label: "Quizzes", key: "quizzes" },
   { icon: faChartLine, label: "Analytics", key: "analytics" },

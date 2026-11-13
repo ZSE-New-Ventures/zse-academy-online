@@ -10,6 +10,7 @@ export interface Course {
   category?: string | {
     id: number;
     name: string;
+    access_level?: 'public' | 'restricted';
   };
   category_id?: number;
   instructor?: string | {
@@ -34,6 +35,49 @@ export interface Course {
   progress?: number;
   thumbnail_url?: string;
   is_published?: boolean;
+  visibility?: 'public' | 'restricted' | 'private';
+}
+
+export interface UserGroup {
+  id: number;
+  name: string;
+  code: string;
+  organization?: string;
+  description?: string;
+  created_by?: number;
+  is_active: boolean;
+  members_count?: number;
+  categories_count?: number;
+  course_assignments_count?: number;
+  creator?: { id: number; name: string; email: string };
+  members?: Array<{ id: number; name: string; email: string }>;
+  created_at?: string;
+}
+
+export interface CourseAssignment {
+  id: number;
+  course_id: number;
+  user_id?: number | null;
+  group_id?: number | null;
+  status: 'active' | 'revoked' | 'expired';
+  expires_at?: string | null;
+  assigned_by: number;
+  course?: Course;
+  user?: { id: number; name: string; email: string };
+  group?: UserGroup;
+  assigner?: { id: number; name: string };
+  created_at: string;
+}
+
+export interface CategoryItem {
+  id: number;
+  name: string;
+  slug?: string;
+  description?: string;
+  access_level?: 'public' | 'restricted';
+  is_active?: boolean;
+  groups?: UserGroup[];
+  courses_count?: number;
 }
 
 export const courseService = {
@@ -122,6 +166,76 @@ export const courseService = {
   // Finish module/content
   finishModule: async (courseId: string | number, moduleId: string | number) => {
     const response = await apiClient.post(`/courses/${courseId}/contents/${moduleId}/finish`);
+    return response.data;
+  },
+
+  // Cohort Groups Management
+  getGroups: async (params?: { search?: string }) => {
+    const response = await apiClient.get('/groups', { params });
+    return response.data?.data || response.data;
+  },
+
+  getGroupById: async (id: number) => {
+    const response = await apiClient.get(`/groups/${id}`);
+    return response.data?.data || response.data;
+  },
+
+  createGroup: async (data: Partial<UserGroup>) => {
+    const response = await apiClient.post('/groups', data);
+    return response.data?.data || response.data;
+  },
+
+  updateGroup: async (id: number, data: Partial<UserGroup>) => {
+    const response = await apiClient.put(`/groups/${id}`, data);
+    return response.data?.data || response.data;
+  },
+
+  deleteGroup: async (id: number) => {
+    const response = await apiClient.delete(`/groups/${id}`);
+    return response.data;
+  },
+
+  getGroupMembers: async (groupId: number, params?: { search?: string }) => {
+    const response = await apiClient.get(`/groups/${groupId}/members`, { params });
+    return response.data?.data || response.data;
+  },
+
+  addGroupMembers: async (groupId: number, userIds: number[]) => {
+    const response = await apiClient.post(`/groups/${groupId}/members`, { user_ids: userIds });
+    return response.data;
+  },
+
+  removeGroupMember: async (groupId: number, userId: number) => {
+    const response = await apiClient.delete(`/groups/${groupId}/members/${userId}`);
+    return response.data;
+  },
+
+  // Course Assignments
+  getCourseAssignments: async (courseId: number) => {
+    const response = await apiClient.get(`/courses/${courseId}/assignments`);
+    return response.data?.data || response.data;
+  },
+
+  assignCourse: async (
+    courseId: number,
+    data: {
+      assignment_type: 'individual' | 'group';
+      user_ids?: number[];
+      group_id?: number;
+      expires_at?: string | null;
+    }
+  ) => {
+    const response = await apiClient.post(`/courses/${courseId}/assignments`, data);
+    return response.data;
+  },
+
+  revokeAssignment: async (assignmentId: number) => {
+    const response = await apiClient.delete(`/assignments/${assignmentId}`);
+    return response.data;
+  },
+
+  syncCategoryGroups: async (categoryId: number, groupIds: number[]) => {
+    const response = await apiClient.post(`/categories/${categoryId}/groups`, { group_ids: groupIds });
     return response.data;
   },
 };
