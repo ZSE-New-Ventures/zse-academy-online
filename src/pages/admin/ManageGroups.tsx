@@ -228,8 +228,8 @@ export const ManageGroups = () => {
   const existingMemberIds = new Set(groupMembers.map(m => m.id));
   const candidateUsers = allUsers.filter(u =>
     !existingMemberIds.has(u.id) &&
-    (u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-     u.email.toLowerCase().includes(userSearchQuery.toLowerCase()))
+    ((u.name || "").toLowerCase().includes((userSearchQuery || "").toLowerCase()) ||
+     (u.email || "").toLowerCase().includes((userSearchQuery || "").toLowerCase()))
   );
 
   return (
@@ -560,3 +560,4 @@ export const ManageGroups = () => {
     </div>
   );
 };
+

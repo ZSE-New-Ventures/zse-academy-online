@@ -194,8 +194,8 @@ export const CourseAssignmentModal = ({
 
   const candidateStudents = allUsers.filter(
     (u) =>
-      u.name.toLowerCase().includes(userSearchQuery.toLowerCase()) ||
-      u.email.toLowerCase().includes(userSearchQuery.toLowerCase())
+      (u.name || "").toLowerCase().includes((userSearchQuery || "").toLowerCase()) ||
+      (u.email || "").toLowerCase().includes((userSearchQuery || "").toLowerCase())
   );
 
   return (
@@ -412,3 +412,4 @@ export const CourseAssignmentModal = ({
     </Dialog>
   );
 };
+

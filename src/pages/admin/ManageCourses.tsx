@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
+import { CourseAssignmentModal } from "@/components/admin/CourseAssignmentModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -20,6 +21,8 @@ import {
   faMoneyBill,
   faClock,
   faLayerGroup,
+  faUsers,
+  faShieldHalved,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
@@ -139,6 +142,8 @@ const ManageCourses = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
   const [isDeletingCourse, setIsDeletingCourse] = useState(false);
+  const [assignmentCourse, setAssignmentCourse] = useState<Course | null>(null);
+  const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -150,6 +155,7 @@ const ManageCourses = () => {
     thumbnail_url: "",
     duration: "",
     is_published: false,
+    visibility: "public" as "public" | "restricted" | "private",
     instructor_id: "unassigned",
   });
 
@@ -292,6 +298,7 @@ const ManageCourses = () => {
         thumbnail_url: formData.thumbnail_url || null,
         duration: formData.duration,
         is_published: formData.is_published,
+        visibility: formData.visibility,
       };
 
       // Include numeric instructor_id if set and not "unassigned"
@@ -362,6 +369,7 @@ const ManageCourses = () => {
       thumbnail_url: "",
       duration: "",
       is_published: false,
+      visibility: "public",
       instructor_id: "unassigned",
     });
     setEditingCourse(null);
@@ -384,6 +392,7 @@ const ManageCourses = () => {
       thumbnail_url: course.thumbnail_url || "",
       duration: course.duration || "",
       is_published: course.is_published || false,
+      visibility: course.visibility || "public",
       // If no instructor ID, use "unassigned"
       instructor_id: instructorId ? String(instructorId) : "unassigned",
     });
@@ -399,8 +408,8 @@ const ManageCourses = () => {
     setFormData({ ...formData, instructor_id: value });
   };
 
-  const filteredCourses = courses.filter((course) =>
-    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCourses = (Array.isArray(courses) ? courses : []).filter((course) =>
+    (course?.title || "").toLowerCase().includes((searchTerm || "").toLowerCase())
   );
 
   if (loading) {
@@ -696,7 +705,7 @@ const ManageCourses = () => {
                             Private
                           </Badge>
                         )}
-                        {typeof course.category === "object" && course.category?.access_level === "restricted" && (
+                        {course.category && typeof course.category === "object" && course.category?.access_level === "restricted" && (
                           <Badge variant="outline" className="border-amber-400 text-amber-700 text-xs">
                             Restricted Category
                           </Badge>
@@ -714,7 +723,7 @@ const ManageCourses = () => {
                         <span>Level: {course.level || "Not set"}</span>
                         <span>
                           Category:{" "}
-                          {typeof course.category === "object"
+                          {course.category && typeof course.category === "object"
                             ? course.category.name
                             : course.category || "Uncategorized"}
                         </span>
