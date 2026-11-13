@@ -27,6 +27,7 @@ import courseDirect from "@/assets/course-direct.jpg";
 import courseEtf from "@/assets/course-etf.jpg";
 import courseReits from "@/assets/course-reits.png";
 import courseStatements from "@/assets/course-statements.jpg";
+import investmentImg from "@/assets/investment.jpg";
 
 interface JourneyMilestone {
   id: string;
@@ -142,20 +143,24 @@ const MILESTONES: JourneyMilestone[] = [
     stepNumber: "05",
     phase: "execution",
     timeEstimate: "25 Mins",
-    badge: "Advanced Building Blocks",
-    title: "Diversifying with Real Estate (REITs) & Fixed Income",
+    badge: "Post-Investment Money Strategy",
+    title: "Managing Your Returns: How to Use Your Money & Grow Wealth",
     summary:
-      "Expand beyond everyday company stocks into income-generating property funds and debt instruments designed to yield regular cash distributions.",
-    image: courseReits,
+      "Now that your money is invested, what should you do next? Learn how investment returns work in real life, when to reinvest for compound growth versus when to cash out profits to your mobile wallet or bank.",
+    image: investmentImg,
     takeaways: [
-      "What a Real Estate Investment Trust (REIT) is and how it lets you invest in high-value commercial property with minimal capital",
-      "How REITs legally pass on 80%+ of rental income directly to unitholders as quarterly or semi-annual dividends",
-      "Evaluating fixed-income instruments and bonds for capital preservation",
+      "Dividends vs Capital Appreciation: Dividends are cash payouts deposited into your wallet/bank; capital appreciation is the growth in the market value of the shares you hold.",
+      "The Compounding Strategy (Reinvesting): Using your dividend earnings and regular monthly savings to purchase more shares, allowing your portfolio to grow exponentially over time.",
+      "Withdrawing Your Profits (Cashing Out): How to sell shares on ZSE Direct, understand the T+2 settlement cycle, and withdraw liquid cash straight into your EcoCash, InnBucks, or bank account.",
+      "The Golden Emergency Rule: Never invest money needed for everyday necessities like rent or food. Keep an emergency fund in cash so you never have to panic-sell during temporary market dips.",
+      "Diversifying into Income Assets: Allocating portions of your earnings into high-yielding Real Estate Investment Trusts (REITs) and fixed-income assets to establish consistent, passive cash flow.",
     ],
     beginnerTip:
-      "REITs trade exactly like shares on the ZSE. You can buy or sell property units on your mobile phone without ever dealing with tenants, property taxes, or brick maintenance.",
-    primaryCtaText: "Deep Dive into REITs",
+      "Financial rule of thumb: Reinvesting your early dividends to buy even a few extra shares every quarter creates a snowball effect that turns small initial savings into life-changing long-term wealth.",
+    primaryCtaText: "Explore Wealth Building Courses",
     primaryCtaLink: "/courses",
+    secondaryCtaText: "Watch Cashing Out & Dividends Guide",
+    secondaryCtaLink: "/tutorials",
   },
   {
     id: "milestone-6",
