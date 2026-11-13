@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheckCircle,
-  faGraduationCap,
   faArrowRight,
   faCompass,
   faRoute,
@@ -166,15 +165,11 @@ export const HeroSection = () => {
             </span>
           </div>
 
-          <div className="hero-buttons flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 mt-7">
+          <div className="hero-buttons flex items-center mt-7">
             <Link
               to="/learning-journey"
               className="learning-journey-btn group"
             >
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-85" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-white shadow-sm" />
-              </span>
               <FontAwesomeIcon
                 icon={faRoute}
                 className="text-base text-white group-hover:rotate-6 transition-transform duration-300"
@@ -187,14 +182,6 @@ export const HeroSection = () => {
                 icon={faArrowRight}
                 className="text-xs text-white/90 group-hover:translate-x-1 transition-transform duration-300"
               />
-            </Link>
-            <Link
-              to="/courses/11485"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-semibold text-slate-200 hover:text-white bg-white/10 hover:bg-white/15 border border-white/20 hover:border-white/30 transition-all rounded-xl backdrop-blur-sm text-center"
-            >
-              <FontAwesomeIcon icon={faGraduationCap} />
-              <span>Start Investment 101</span>
-              <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
             </Link>
           </div>
         </div>
