@@ -28,21 +28,144 @@ interface FAQCategory {
   items: FAQItem[];
 }
 
+const RETAIL_MARKET_FAQS: FAQCategory[] = [
+  {
+    category: "Getting Started & Onboarding",
+    items: [
+      {
+        id: 1,
+        question: "How do I get a ZSE Direct or VFEX Direct account activated?",
+        answer:
+          "To get your ZSE Direct or VFEX Direct trading account activated, submit the required KYC documentation and a completed broker mandate form. Once verified by your stockbroker and linked to the Central Securities Depository (CSD) or Electronic Depository Securities (EDS), your trading account will be fully activated for order placement.",
+      },
+      {
+        id: 2,
+        question: "What are the documents required for KYC?",
+        answer:
+          "KYC verification requires a certified copy of your National ID or valid Passport, proof of residence (such as a utility bill or bank statement issued within the last 3 months), a passport-sized photograph, and verified bank account details.",
+      },
+      {
+        id: 3,
+        question: "What is the age needed to trade?",
+        answer:
+          "Investors must be at least 18 years old to open an independent trading account. Minors may hold investments through custodial or joint accounts managed by a legal guardian in accordance with regulatory requirements.",
+      },
+      {
+        id: 4,
+        question: "What is a stockbroker?",
+        answer:
+          "A stockbroker is a licensed financial intermediary authorized to execute buy and sell orders on securities exchanges on behalf of clients. They facilitate trade clearing, settlement, market compliance, and research support.",
+      },
+      {
+        id: 5,
+        question:
+          "What is the difference between trading for myself versus the broker trading on my behalf?",
+        answer:
+          "When trading independently, you maintain direct control by submitting orders yourself via the digital platform. When a broker trades on your behalf under a discretionary mandate, the broker selects and executes trades based on an agreed investment strategy, though non-discretionary execution still requires your explicit instruction for each trade.",
+      },
+    ],
+  },
+  {
+    category: "Order Placement & Execution",
+    items: [
+      {
+        id: 6,
+        question: "How do I place a buy or sell order on ZSE Direct or VFEX Direct?",
+        answer:
+          "To place an order, log in to the web portal or mobile application, search for your desired counter under the Market Snapshot or Watchlist, select Buy or Sell, specify the quantity and order price (limit or market price), and submit the order. The transaction is then automatically routed through your designated stockbroker to the Automated Trading System (ATS).",
+      },
+      {
+        id: 7,
+        question:
+          "Can I place buy and sell orders independently, or do I need to contact my stockbroker for every trade?",
+        answer:
+          "Once your account is fully activated and linked to a broker, you can place buy and sell orders independently directly through the digital platform without needing to contact your stockbroker for individual transactions.",
+      },
+      {
+        id: 8,
+        question: "Is daily active trading mandatory?",
+        answer:
+          "No, daily active trading is optional. Equities can be purchased and held long-term for capital appreciation and dividend yield.",
+      },
+    ],
+  },
+  {
+    category: "Stockbroker Roles & Discretionary Control",
+    items: [
+      {
+        id: 9,
+        question:
+          "What is the exact role of my selected stockbroker when I trade on VFEX or ZSE Direct?",
+        answer:
+          "Your stockbroker acts as a clearing agent to execute, clear, and settle transactions placed through the platform, ensuring compliance with market regulations and investor protection standards.",
+      },
+      {
+        id: 10,
+        question:
+          "Does selecting a stockbroker give them discretionary authority over my investment decisions?",
+        answer:
+          "No, the stockbroker does not have discretionary authority over your portfolio. You retain full control over your order placement and trading decisions, though brokers are available to provide market research or advisory support if requested.",
+      },
+    ],
+  },
+  {
+    category: "Trading Troubleshooting & Order Status Issues",
+    items: [
+      {
+        id: 11,
+        question:
+          'What should I do if my broker confirmed a trade, but the platform lists the order as "expired" or refunds my wallet?',
+        answer:
+          "If a trade matches and receives a valid trading ticket number but reflects as expired on the digital portal, it indicates a technical synchronization discrepancy. Contact support with your trading ticket number, counter name, and trading account number to request a manual trade reconciliation and portfolio update.",
+      },
+      {
+        id: 12,
+        question:
+          "What causes a negative wallet balance on a trading account, and how can it be cleared?",
+        answer:
+          "A negative balance can occur if a system error temporarily refunds capital for a matched order while the shares remain allocated to your portfolio. You can resolve the balance by depositing funds equal to the deficit or selling the affected shares to offset the negative amount.",
+      },
+      {
+        id: 13,
+        question:
+          'What does the error "Your trading account is active but not fully set up with the exchange" mean?',
+        answer:
+          "This notification indicates that your registration is approved, but the final activation link to the Automated Trading System (ATS) is still pending. Support must complete the exchange linking before you can place live orders.",
+      },
+      {
+        id: 14,
+        question:
+          'What does the error "Trading account is missing client third-party identifier" mean, and how is it resolved?',
+        answer:
+          "This error occurs when the broker profile code linkage is omitted or broker migration is incomplete. It is resolved by escalating to depository operations to assign the client party ID in ATS and synchronize the custodian/broker trader code.",
+      },
+      {
+        id: 15,
+        question:
+          'What causes the error "Your trading account is inactive. Please contact your broker"?',
+        answer:
+          "This status appears when a broker mandate form is pending or an annual KYC refresh is required. You can resolve this by submitting an updated broker mandate form and verified KYC documents to your broker.",
+      },
+    ],
+  },
+];
+
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<string | null>("0-0");
-  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [faqCategories, setFaqCategories] = useState<FAQCategory[]>(RETAIL_MARKET_FAQS);
+  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
   useEffect(() => {
     const fetchFaqs = async () => {
       try {
-        setLoading(true);
         const response = await fetch(`${API_BASE_URL}/public/faqs`);
         if (response.ok) {
           const data = await response.json();
-          setFaqCategories(data);
+          if (Array.isArray(data) && data.length > 0) {
+            setFaqCategories(data);
+          }
         }
       } catch (error) {
         console.error("Error fetching FAQs:", error);
@@ -86,13 +209,13 @@ const FAQ = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Badge className="bg-[#00aeef] hover:bg-[#00aeef] text-white border-0 mb-4 px-4 py-1 uppercase tracking-widest text-xs font-semibold drop-shadow-md">
-            Help & Knowledge Center
+            Retail Trading Knowledge Base
           </Badge>
           <h1 className="text-3xl md:text-5xl lg:text-6xl font-extrabold mb-4 tracking-tight drop-shadow-md">
-            Frequently Asked Questions
+            ZSE & VFEX Trading FAQs
           </h1>
           <p className="text-base md:text-lg text-gray-200 max-w-2xl mx-auto leading-relaxed drop-shadow-md mb-8">
-            Find answers to commonly asked questions about ZSE Training Institute courses, trading on ZSE Direct, VFEX USD equities, examinations, and certificates.
+            Authoritative guidance for retail investors on trading account activation, KYC verification, placing buy & sell orders on ZSE Direct & VFEX Direct, broker mandates, and troubleshooting.
           </p>
 
           {/* Search Bar */}
@@ -104,7 +227,7 @@ const FAQ = () => {
               />
               <Input
                 type="text"
-                placeholder="Search questions by keyword (e.g. withdraw, VFEX, certificate, deposit)..."
+                placeholder="Search trading questions (e.g. KYC, stockbroker, expired, ATS, mandate)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-11 pr-4 h-12 rounded-xl bg-white/95 text-gray-900 placeholder:text-gray-500 border-0 shadow-lg text-sm focus-visible:ring-2 focus-visible:ring-[#00aeef]"
