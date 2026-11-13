@@ -9,6 +9,7 @@ const footerSections = [
     span: "lg:col-span-3",
     links: [
       { name: "All Courses", href: "/courses" },
+      { name: "Beginner's Learning Journey", href: "/learning-journey" },
       { name: "Video Tutorials", href: "/tutorials" },
       { name: "Live Events & Webinars", href: "/events" },
       { name: "Market Insights & Blog", href: "/blog" },

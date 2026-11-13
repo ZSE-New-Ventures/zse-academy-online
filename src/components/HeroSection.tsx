@@ -6,6 +6,7 @@ import {
   faGraduationCap,
   faArrowRight,
   faCompass,
+  faRoute,
 } from "@fortawesome/free-solid-svg-icons";
 import "./HeroSection.css";
 
@@ -167,17 +168,18 @@ export const HeroSection = () => {
 
           <div className="hero-buttons flex flex-col sm:flex-row gap-3 mt-6">
             <Link
-              to="/courses"
+              to="/learning-journey"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold text-white bg-[#00aeef] hover:bg-[#008cc0] transition-colors rounded-xl shadow-lg shadow-[#00aeef]/25 text-center"
             >
-              <FontAwesomeIcon icon={faGraduationCap} />
-              <span>Start with Investment 101</span>
+              <FontAwesomeIcon icon={faRoute} />
+              <span>Explore Learning Journey</span>
             </Link>
             <Link
-              to="/tutorials"
+              to="/courses/11485"
               className="inline-flex items-center justify-center gap-2 px-7 py-3.5 text-sm font-bold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-colors rounded-xl backdrop-blur-sm text-center"
             >
-              <span>Explore Beginner Guides</span>
+              <FontAwesomeIcon icon={faGraduationCap} />
+              <span>Start Investment 101</span>
               <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
             </Link>
           </div>

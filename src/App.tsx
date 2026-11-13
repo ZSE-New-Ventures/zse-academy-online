@@ -27,6 +27,7 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import FAQ from "./pages/FAQ";
 import VerifyCertificate from "./pages/VerifyCertificate";
+import LearningJourney from "./pages/LearningJourney";
 
 const queryClient = new QueryClient();
 
@@ -57,6 +58,10 @@ const App = () => (
             <Route path="/exam/:id" element={<CourseDetail />} />
             <Route path="/exams/:id" element={<CourseDetail />} />
             <Route path="/take-quiz/:id" element={<CourseDetail />} />
+
+            <Route path="/learning-journey" element={<LearningJourney />} />
+            <Route path="/journey" element={<LearningJourney />} />
+            <Route path="/getting-started" element={<LearningJourney />} />
 
             <Route path="/about" element={<Navigate to="/" replace />} />
             <Route path="/contact" element={<Contact />} />

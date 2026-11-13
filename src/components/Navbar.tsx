@@ -30,6 +30,7 @@ import {
   faCircleQuestion,
   faExternalLinkAlt,
   faFire,
+  faRoute,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "../assets/logo.png";
@@ -216,6 +217,22 @@ export const Navbar = () => {
                 </div>
               )}
             </div>
+
+            {/* Beginner's Learning Journey */}
+            <Link
+              to="/learning-journey"
+              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                isLinkActive("/learning-journey")
+                  ? "text-[#00aeef] bg-[#00aeef]/10"
+                  : "text-slate-700 hover:text-[#00aeef] hover:bg-slate-50"
+              }`}
+            >
+              <FontAwesomeIcon icon={faRoute} className="text-xs text-[#00aeef]" />
+              <span>Learning Journey</span>
+              <span className="bg-emerald-100 text-emerald-700 text-[9px] font-extrabold px-1.5 py-0.5 rounded-full">
+                Roadmap
+              </span>
+            </Link>
 
             {/* Tutorials with Live Badge */}
             <Link
@@ -547,6 +564,19 @@ export const Navbar = () => {
                   >
                     <FontAwesomeIcon icon={faGraduationCap} className="text-[#00aeef]" />
                     <span>Courses</span>
+                  </Link>
+                  <Link
+                    to="/learning-journey"
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <FontAwesomeIcon icon={faRoute} className="text-[#00aeef]" />
+                      <span>Learning Journey</span>
+                    </div>
+                    <span className="bg-emerald-100 text-emerald-700 text-xs font-bold px-2 py-0.5 rounded-full">
+                      Roadmap
+                    </span>
                   </Link>
                   <Link
                     to="/tutorials"
