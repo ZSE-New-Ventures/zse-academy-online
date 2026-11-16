@@ -1098,3 +1098,4 @@ export const AdminSecurity: React.FC = () => {
 };
 
 export default AdminSecurity;
+

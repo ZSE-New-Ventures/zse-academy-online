@@ -86,3 +86,4 @@ export const useSessionTimeout = () => {
     };
   }, [user, timeoutMinutes, logout, toast]);
 };
+

@@ -5,3 +5,4 @@ export const SessionTimeoutWatcher: React.FC = () => {
   useSessionTimeout();
   return null;
 };
+

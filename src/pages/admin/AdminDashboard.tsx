@@ -987,20 +987,32 @@ const AdminDashboard = () => {
                       )}
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56 ml-2 shadow-xl border border-gray-200">
+                  <DropdownMenuContent
+                    side="right"
+                    align="start"
+                    sideOffset={12}
+                    collisionPadding={12}
+                    className="w-56 bg-white shadow-2xl border border-gray-200 rounded-xl p-1.5 z-50"
+                  >
                     {quizSubItems.map((sub) => (
                       <DropdownMenuItem
                         key={sub.key}
                         onClick={() => handleQuizSubSectionChange(sub.key)}
-                        className={`flex items-center space-x-3 cursor-pointer ${
-                          activeQuizSubSection === sub.key ? "bg-gray-100" : ""
+                        className={`flex items-center space-x-3 cursor-pointer rounded-lg px-3 py-2.5 transition-colors ${
+                          activeQuizSubSection === sub.key
+                            ? "bg-blue-50 text-blue-700 font-semibold"
+                            : "text-gray-700 hover:bg-gray-100"
                         }`}
                       >
                         <FontAwesomeIcon
                           icon={sub.icon}
-                          className="h-4 w-4 text-gray-500"
+                          className={`h-4 w-4 ${
+                            activeQuizSubSection === sub.key
+                              ? "text-blue-600"
+                              : "text-gray-500"
+                          }`}
                         />
-                        <span className="text-gray-700">{sub.label}</span>
+                        <span className="text-sm">{sub.label}</span>
                       </DropdownMenuItem>
                     ))}
                   </DropdownMenuContent>
@@ -1037,20 +1049,32 @@ const AdminDashboard = () => {
                   )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 ml-2 shadow-xl border border-gray-200">
+              <DropdownMenuContent
+                side="right"
+                align="end"
+                sideOffset={12}
+                collisionPadding={12}
+                className="w-56 bg-white shadow-2xl border border-gray-200 rounded-xl p-1.5 z-50"
+              >
                 {configSubItems.map((item) => (
                   <DropdownMenuItem
                     key={item.key}
                     onClick={() => handleConfigSubSectionChange(item.key)}
-                    className={`flex items-center space-x-3 cursor-pointer ${
-                      activeConfigSubSection === item.key ? "bg-gray-100" : ""
+                    className={`flex items-center space-x-3 cursor-pointer rounded-lg px-3 py-2.5 transition-colors ${
+                      activeConfigSubSection === item.key
+                        ? "bg-blue-50 text-blue-700 font-semibold"
+                        : "text-gray-700 hover:bg-gray-100"
                     }`}
                   >
                     <FontAwesomeIcon
                       icon={item.icon}
-                      className="h-4 w-4 text-gray-500"
+                      className={`h-4 w-4 ${
+                        activeConfigSubSection === item.key
+                          ? "text-blue-600"
+                          : "text-gray-500"
+                      }`}
                     />
-                    <span className="text-gray-700">{item.label}</span>
+                    <span className="text-sm">{item.label}</span>
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
