@@ -10,6 +10,7 @@ import AdminConfigurations from "./AdminConfigurations";
 import ManageLevels from "./ManageLevels";
 import InstructorManagement from "./InstructoManagement";
 import ManageCertificateSettings from "./ManageCertificateSettings";
+import { ManageDefaultThumbnail } from "./ManageDefaultThumbnail";
 import QuizForm from "./QuizManagement";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,7 @@ import {
   faLayerGroup,
   faCertificate,
   faUserTie,
+  faImage,
   faArrowUp,
   faArrowDown,
   faEye,
@@ -190,6 +192,7 @@ const configSubItems = [
   { icon: faLayerGroup, label: "Difficulty Levels", key: "levels" },
   { icon: faCertificate, label: "Certifications", key: "certifications" },
   { icon: faUserTie, label: "Instructors", key: "instructors" },
+  { icon: faImage, label: "Course Thumbnails", key: "thumbnails" },
 ];
 
 const quizSubItems = [
@@ -795,6 +798,8 @@ const AdminDashboard = () => {
             <InstructorManagement />
           </Card>
         );
+      case "thumbnails":
+        return <ManageDefaultThumbnail />;
       default:
         return <AdminConfigurations />;
     }

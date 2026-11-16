@@ -39,3 +39,4 @@ export const getCourseThumbnail = (course?: {
   if (course.thumbnail) return course.thumbnail;
   return getCachedDefaultThumbnail();
 };
+
