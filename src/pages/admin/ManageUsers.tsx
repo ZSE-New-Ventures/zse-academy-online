@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { ManageGroups } from "./ManageGroups";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faSearch,
@@ -60,7 +61,7 @@ interface Enrollment {
 }
 
 const ManageUsers = () => {
-  const [activeTab, setActiveTab] = useState<"users" | "enrollments">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "enrollments" | "groups">("users");
   
   // Users tab state
   const [users, setUsers] = useState<UserItem[]>([]);
@@ -147,7 +148,7 @@ const ManageUsers = () => {
     }
   };
 
-  const handleTabChange = (tab: "users" | "enrollments") => {
+  const handleTabChange = (tab: "users" | "enrollments" | "groups") => {
     setActiveTab(tab);
     if (tab === "enrollments" && enrollments.length === 0) {
       fetchEnrollments();
@@ -256,6 +257,17 @@ const ManageUsers = () => {
           >
             <FontAwesomeIcon icon={faGraduationCap} className="mr-2" />
             Course Enrollments
+          </button>
+          <button
+            onClick={() => handleTabChange("groups")}
+            className={`px-4 py-1.5 rounded-md text-xs font-bold transition-all ${
+              activeTab === "groups"
+                ? "bg-[#00aeef] text-white shadow-sm"
+                : "text-gray-600 hover:text-gray-900"
+            }`}
+          >
+            <FontAwesomeIcon icon={faUsers} className="mr-2" />
+            Cohorts & Groups
           </button>
         </div>
       </div>
@@ -604,6 +616,9 @@ const ManageUsers = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* TAB 3: COHORTS & GROUPS */}
+      {activeTab === "groups" && <ManageGroups />}
     </div>
   );
 };
