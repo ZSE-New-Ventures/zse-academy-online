@@ -909,7 +909,7 @@ const CourseDetail = () => {
                   className="bg-gradient-to-r from-sky-400 via-[#00aeef] to-indigo-600 hover:from-sky-500 hover:to-indigo-700 text-white font-bold text-xs h-10 px-5 rounded-xl shadow-lg shadow-[#00aeef]/25 border border-white/20 flex items-center gap-2 group/ai transition-all"
                 >
                   <FontAwesomeIcon icon={faWandMagicSparkles} className="text-white text-xs group-hover/ai:rotate-12 transition-transform" />
-                  <span>Summarise with AI Copilot</span>
+                  <span>Summarise</span>
                 </Button>
               </div>
 
@@ -969,7 +969,7 @@ const CourseDetail = () => {
                   className="w-full rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-200 text-[#00aeef] font-bold text-xs h-10 flex items-center justify-center gap-2"
                 >
                   <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs" />
-                  <span>Summarise with AI</span>
+                  <span>Summarise</span>
                 </Button>
 
               </div>

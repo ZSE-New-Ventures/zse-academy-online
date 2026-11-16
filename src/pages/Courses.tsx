@@ -408,7 +408,7 @@ const Courses = () => {
                       className="w-full mb-3 py-1.5 px-3 rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-100/80 text-[#00aeef] hover:text-[#008cc0] font-bold text-[11px] flex items-center justify-center gap-1.5 transition-all shadow-xs group/ai"
                     >
                       <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs transition-transform group-hover/ai:rotate-12" />
-                      <span>Summarise with AI</span>
+                      <span>Summarise</span>
                     </button>
 
                     <div className="pt-2.5 border-t border-slate-100 flex items-center justify-between gap-3">

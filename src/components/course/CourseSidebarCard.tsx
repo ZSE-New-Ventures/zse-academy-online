@@ -103,7 +103,7 @@ export const CourseSidebarCard = ({
               className="w-full rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-200 text-[#00aeef] hover:text-[#008cc0] font-bold text-xs h-10 flex items-center justify-center gap-2 shadow-xs group/ai transition-all"
             >
               <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs transition-transform group-hover/ai:rotate-12" />
-              <span>Summarise with AI</span>
+              <span>Summarise</span>
             </Button>
           </div>
         </div>
