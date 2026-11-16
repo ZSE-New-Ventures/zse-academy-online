@@ -80,6 +80,17 @@ export interface CategoryItem {
   courses_count?: number;
 }
 
+export interface CourseLevelItem {
+  id: number;
+  name: string;
+  slug: string;
+  description?: string;
+  color?: string;
+  position?: number;
+  is_active?: boolean;
+  courses_count?: number;
+}
+
 export const courseService = {
   getAllCourses: async (): Promise<Course[]> => {
     const response = await apiClient.get(API_ENDPOINTS.COURSES);
@@ -236,6 +247,27 @@ export const courseService = {
 
   syncCategoryGroups: async (categoryId: number, groupIds: number[]) => {
     const response = await apiClient.post(`/categories/${categoryId}/groups`, { group_ids: groupIds });
+    return response.data;
+  },
+
+  // Course Difficulty Levels
+  getLevels: async (): Promise<CourseLevelItem[]> => {
+    const response = await apiClient.get('/levels');
+    return response.data?.data || response.data;
+  },
+
+  createLevel: async (data: Partial<CourseLevelItem>) => {
+    const response = await apiClient.post('/levels', data);
+    return response.data;
+  },
+
+  updateLevel: async (id: number | string, data: Partial<CourseLevelItem>) => {
+    const response = await apiClient.put(`/levels/${id}`, data);
+    return response.data;
+  },
+
+  deleteLevel: async (id: number | string) => {
+    const response = await apiClient.delete(`/levels/${id}`);
     return response.data;
   },
 };

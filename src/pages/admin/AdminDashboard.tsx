@@ -7,6 +7,7 @@ import ManageUsers from "./ManageUsers";
 import ViewQuizzes from "./ViewQuizzes";
 import ManageBlog from "./ManageBlog";
 import AdminConfigurations from "./AdminConfigurations";
+import ManageLevels from "./ManageLevels";
 import InstructorManagement from "./InstructoManagement";
 import ManageCertificateSettings from "./ManageCertificateSettings";
 import QuizForm from "./QuizManagement";
@@ -35,6 +36,7 @@ import {
   faBookAtlas,
   faChevronDown,
   faTags,
+  faLayerGroup,
   faCertificate,
   faUserTie,
   faArrowUp,
@@ -185,6 +187,7 @@ const sidebarItems = [
 
 const configSubItems = [
   { icon: faTags, label: "Categories", key: "categories" },
+  { icon: faLayerGroup, label: "Difficulty Levels", key: "levels" },
   { icon: faCertificate, label: "Certifications", key: "certifications" },
   { icon: faUserTie, label: "Instructors", key: "instructors" },
 ];
@@ -782,6 +785,8 @@ const AdminDashboard = () => {
     switch (activeConfigSubSection) {
       case "categories":
         return <AdminConfigurations />;
+      case "levels":
+        return <ManageLevels />;
       case "certifications":
         return <ManageCertificateSettings />;
       case "instructors":

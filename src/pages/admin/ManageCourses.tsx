@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { courseService, Course } from "@/services/course.service";
+import { courseService, Course, CourseLevelItem } from "@/services/course.service";
 import { API_BASE_URL } from "@/constants/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -136,6 +136,7 @@ const ManageCourses = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<Instructor[]>([]);
+  const [levels, setLevels] = useState<CourseLevelItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
@@ -166,11 +167,20 @@ const ManageCourses = () => {
   const fetchAll = async () => {
     setLoading(true);
     try {
-      await Promise.all([fetchCourses(), fetchCategories(), fetchInstructors()]);
+      await Promise.all([fetchCourses(), fetchCategories(), fetchInstructors(), fetchLevels()]);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
     setLoading(false);
+  };
+
+  const fetchLevels = async () => {
+    try {
+      const data = await courseService.getLevels();
+      setLevels(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error("Error fetching levels:", error);
+    }
   };
 
   const fetchCourses = async () => {
@@ -523,15 +533,27 @@ const ManageCourses = () => {
                         <SelectTrigger className="bg-transparent border-0">
                           <SelectValue placeholder="Select level" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Beginner">Beginner</SelectItem>
-                          <SelectItem value="Intermediate">
-                            Intermediate
-                          </SelectItem>
-                          <SelectItem value="Advanced">Advanced</SelectItem>
-                          <SelectItem value="Professional">
-                            Professional
-                          </SelectItem>
+                        <SelectContent className="bg-white dark:bg-slate-900 border border-gray-200 shadow-2xl rounded-xl z-[9999]">
+                          {Array.isArray(levels) && levels.length > 0 ? (
+                            levels.map((lvl) => (
+                              <SelectItem key={lvl.id} value={lvl.name}>
+                                <div className="flex items-center gap-2">
+                                  <span
+                                    className="w-2.5 h-2.5 rounded-full shrink-0 shadow-xs"
+                                    style={{ backgroundColor: lvl.color || "#00aeef" }}
+                                  />
+                                  <span>{lvl.name}</span>
+                                </div>
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <>
+                              <SelectItem value="Beginner">Beginner</SelectItem>
+                              <SelectItem value="Intermediate">Intermediate</SelectItem>
+                              <SelectItem value="Advanced">Advanced</SelectItem>
+                              <SelectItem value="Professional">Professional</SelectItem>
+                            </>
+                          )}
                         </SelectContent>
                       </Select>
                     </InputWrapper>
