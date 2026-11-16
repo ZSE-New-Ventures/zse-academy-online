@@ -1375,8 +1375,16 @@ const AdminDashboard = () => {
                                 </div>
                                 <div className="flex items-center space-x-3">
                                   <div className="text-right">
-                                    <p className="text-lg font-bold text-gray-900">${course.price}</p>
-                                    <p className="text-xs text-gray-500">{course.category}</p>
+                                    {course.price && parseFloat(course.price.toString()) > 0 ? (
+                                      <p className="text-sm font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full inline-block">
+                                        ${course.price}
+                                      </p>
+                                    ) : (
+                                      <p className="text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full inline-block">
+                                        Free
+                                      </p>
+                                    )}
+                                    <p className="text-xs text-gray-500 mt-1">{course.category}</p>
                                   </div>
                                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                                 </div>

@@ -121,8 +121,8 @@ const WishlistTab = () => {
                           ({course.reviews_count || 12})
                         </span>
                       </div>
-                      <div className="font-extrabold text-base text-[#00aeef]">
-                        {course.price && course.price > 0 ? `$${course.price}` : "Free"}
+                      <div className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                        Free Access
                       </div>
                     </div>
 

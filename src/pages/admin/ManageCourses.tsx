@@ -25,6 +25,8 @@ import {
   faShieldHalved,
   faGlobe,
   faLock,
+  faCheckCircle,
+  faTag,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
@@ -141,6 +143,7 @@ const ManageCourses = () => {
   const [levels, setLevels] = useState<CourseLevelItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pricingFilter, setPricingFilter] = useState<"all" | "free" | "payable">("all");
   const [editingCourse, setEditingCourse] = useState<Course | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState<number | null>(null);
@@ -152,6 +155,7 @@ const ManageCourses = () => {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
+    pricing_type: "free" as "free" | "payable",
     price: "",
     category_id: "uncategorized",
     level: "Beginner",
@@ -306,7 +310,7 @@ const ManageCourses = () => {
         title: formData.title,
         description: formData.description,
         level: formData.level,
-        price: formData.price ? parseFloat(formData.price) : 0,
+        price: formData.pricing_type === "payable" && formData.price ? parseFloat(formData.price) : 0,
         thumbnail_url: formData.thumbnail_url || null,
         duration: formData.duration,
         is_published: formData.is_published,
@@ -428,6 +432,7 @@ const ManageCourses = () => {
     setFormData({
       title: "",
       description: "",
+      pricing_type: "free",
       price: "",
       category_id: "uncategorized",
       level: "Beginner",
@@ -446,11 +451,13 @@ const ManageCourses = () => {
     // Extract instructor_id and category_id safely
     const instructorId = course.instructor?.id || course.instructor_id || "";
     const categoryId = course.category?.id || course.category_id || "";
+    const isPayable = course.price !== undefined && course.price !== null && parseFloat(course.price.toString()) > 0;
 
     setFormData({
       title: course.title || "",
       description: course.description || "",
-      price: course.price?.toString() || "",
+      pricing_type: isPayable ? "payable" : "free",
+      price: isPayable ? course.price!.toString() : "",
       // If no category ID, use "uncategorized"
       category_id: categoryId ? String(categoryId) : "uncategorized",
       level: course.level || "Beginner",
@@ -473,9 +480,27 @@ const ManageCourses = () => {
     setFormData({ ...formData, instructor_id: value });
   };
 
-  const filteredCourses = (Array.isArray(courses) ? courses : []).filter((course) =>
-    (course?.title || "").toLowerCase().includes((searchTerm || "").toLowerCase())
-  );
+  const freeCoursesCount = (Array.isArray(courses) ? courses : []).filter(
+    (c) => !c.price || parseFloat(c.price.toString()) === 0
+  ).length;
+
+  const payableCoursesCount = (Array.isArray(courses) ? courses : []).filter(
+    (c) => c.price && parseFloat(c.price.toString()) > 0
+  ).length;
+
+  const filteredCourses = (Array.isArray(courses) ? courses : []).filter((course) => {
+    const matchesSearch =
+      (course?.title || "").toLowerCase().includes((searchTerm || "").toLowerCase()) ||
+      (course?.description || "").toLowerCase().includes((searchTerm || "").toLowerCase());
+
+    const priceVal = parseFloat(course.price?.toString() || "0");
+    const matchesPricing =
+      pricingFilter === "all" ||
+      (pricingFilter === "free" && priceVal === 0) ||
+      (pricingFilter === "payable" && priceVal > 0);
+
+    return matchesSearch && matchesPricing;
+  });
 
   if (loading) {
     return (
@@ -615,18 +640,29 @@ const ManageCourses = () => {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <InputWrapper label="Price ($)" icon={faMoneyBill}>
-                      <Input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={formData.price}
-                        onChange={(e) =>
-                          setFormData({ ...formData, price: e.target.value })
+                    <InputWrapper label="Pricing Model" icon={faTag}>
+                      <Select
+                        value={formData.pricing_type}
+                        onValueChange={(val: "free" | "payable") =>
+                          setFormData({
+                            ...formData,
+                            pricing_type: val,
+                            price: val === "free" ? "" : formData.price,
+                          })
                         }
-                        className="bg-transparent border-0 outline-none"
-                        placeholder="0.00"
-                      />
+                      >
+                        <SelectTrigger className="bg-transparent border-0 outline-none">
+                          <SelectValue placeholder="Select Pricing" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white dark:bg-slate-900 border border-gray-200 z-[9999]">
+                          <SelectItem value="free">
+                            🟢 Free Course (No Tuition)
+                          </SelectItem>
+                          <SelectItem value="payable">
+                            💳 Payable (Paid Certification)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
                     </InputWrapper>
 
                     <InputWrapper label="Duration" icon={faClock}>
@@ -640,6 +676,27 @@ const ManageCourses = () => {
                       />
                     </InputWrapper>
                   </div>
+
+                  {formData.pricing_type === "payable" ? (
+                    <InputWrapper label="Price ($ USD)" icon={faMoneyBill}>
+                      <Input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={formData.price}
+                        onChange={(e) =>
+                          setFormData({ ...formData, price: e.target.value })
+                        }
+                        className="bg-transparent border-0 outline-none"
+                        placeholder="e.g., 49.99"
+                      />
+                    </InputWrapper>
+                  ) : (
+                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 font-medium">
+                      <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-600 h-4 w-4 shrink-0" />
+                      <span>This is a <strong>Free Course</strong>. Students enroll at no cost and no price amount or range is shown.</span>
+                    </div>
+                  )}
 
                   <InputWrapper label="Thumbnail URL" icon={faImage}>
                     <Input
@@ -734,7 +791,7 @@ const ManageCourses = () => {
         </CardHeader>
 
         <CardContent>
-          <div className="mb-4">
+          <div className="mb-4 space-y-3">
             <div className="relative">
               <FontAwesomeIcon
                 icon={faSearch}
@@ -746,6 +803,43 @@ const ManageCourses = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-muted/40 rounded-lg"
               />
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-muted-foreground mr-1">Pricing Model:</span>
+              <button
+                type="button"
+                onClick={() => setPricingFilter("all")}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                  pricingFilter === "all"
+                    ? "bg-slate-900 text-white border-slate-900 shadow-sm"
+                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-100"
+                }`}
+              >
+                All Courses ({(Array.isArray(courses) ? courses : []).length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setPricingFilter("free")}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                  pricingFilter === "free"
+                    ? "bg-emerald-600 text-white border-emerald-600 shadow-sm"
+                    : "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50"
+                }`}
+              >
+                🟢 Free Courses ({freeCoursesCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setPricingFilter("payable")}
+                className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                  pricingFilter === "payable"
+                    ? "bg-blue-600 text-white border-blue-600 shadow-sm"
+                    : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
+                }`}
+              >
+                💳 Payable Courses ({payableCoursesCount})
+              </button>
             </div>
           </div>
 
@@ -847,10 +941,16 @@ const ManageCourses = () => {
                         {course.description}
                       </p>
 
-                      <div className="flex flex-wrap gap-4 text-sm">
-                        <span className="text-primary font-medium">
-                          ${course.price || 0}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-4 text-sm">
+                        {course.price && parseFloat(course.price.toString()) > 0 ? (
+                          <Badge className="bg-blue-50 text-blue-700 border-blue-200 font-semibold text-xs">
+                            Payable: ${course.price}
+                          </Badge>
+                        ) : (
+                          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 font-semibold text-xs">
+                            Free Course
+                          </Badge>
+                        )}
                         <span>Level: {course.level || "Not set"}</span>
                         <span>
                           Category:{" "}
