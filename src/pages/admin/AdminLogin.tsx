@@ -15,11 +15,14 @@ import {
   faArrowLeft,
   faSpinner,
   faExclamationTriangle,
-  faBuildingColumns
+  faBuildingColumns,
+  faKey,
+  faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/hooks/use-toast";
 import logo from "@/assets/logo.png";
 import { sanitizeInput, validateEmail } from "@/utils/sanitization";
+import { securityService } from "@/services/security.service";
 
 const AdminLogin = () => {
   const [formData, setFormData] = useState({
@@ -30,14 +33,20 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // MFA State
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaOtp, setMfaOtp] = useState("");
+  const [mfaEmail, setMfaEmail] = useState("");
+  const [mfaLoading, setMfaLoading] = useState(false);
+
   const { toast } = useToast();
-  const { login, user, isLoading: authLoading } = useAuth();
+  const { login, setUser, user, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
 
   // If already logged in as admin, redirect to /admin
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.role === "admin") {
+      if (user.role === "admin" || user.role === "super_admin" || user.role === "instructor") {
         navigate("/admin", { replace: true });
       }
     }
@@ -69,9 +78,27 @@ const AdminLogin = () => {
     setIsLoading(true);
 
     try {
-      const loggedUser = await login(sanitizedEmail, formData.password);
-      
-      if (loggedUser && loggedUser.role !== "admin") {
+      const res = await login(sanitizedEmail, formData.password);
+
+      // Check if MFA challenge was issued
+      if (res && res.mfa_required) {
+        setMfaRequired(true);
+        setMfaEmail(sanitizedEmail);
+        toast({
+          title: "MFA Verification Required",
+          description: "Enter the 6-digit administrative verification code sent to your email.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const loggedUser = res;
+      if (
+        loggedUser &&
+        loggedUser.role !== "admin" &&
+        loggedUser.role !== "super_admin" &&
+        loggedUser.role !== "instructor"
+      ) {
         setErrorMessage("Access Restricted: This account does not have administrative privileges.");
         toast({
           title: "Access Restricted",
@@ -82,24 +109,82 @@ const AdminLogin = () => {
       }
 
       toast({
-        title: "Authenticated",
-        description: "Welcome to the ZSE Academy Management Portal.",
+        title: "Administrative Access Granted",
+        description: "Welcome to the ZSE Academy Control Center.",
       });
       navigate("/admin");
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { error?: string; message?: string } } };
-      const errorData = err.response?.data;
-      let msg = "Invalid administrative credentials. Please verify your email and password.";
-      if (errorData?.error) msg = errorData.error;
-      else if (errorData?.message) msg = errorData.message;
-      setErrorMessage(msg);
+    } catch (error: any) {
+      const errorData = error.response?.data;
+      let err = "Administrative sign-in failed. Please verify credentials.";
+
+      if (errorData?.error) {
+        err = errorData.error;
+      } else if (errorData?.message) {
+        err = errorData.message;
+      }
+
+      setErrorMessage(err);
       toast({
         title: "Authentication Failed",
-        description: msg,
+        description: err,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaOtp || mfaOtp.trim().length !== 6) {
+      return toast({
+        title: "Invalid Code",
+        description: "Please enter the 6-digit code received in your email.",
+        variant: "destructive",
+      });
+    }
+
+    try {
+      setMfaLoading(true);
+      const res = await securityService.verifyMfa(mfaEmail, mfaOtp.trim());
+
+      if (res.token) {
+        localStorage.setItem("zse_training_token", res.token);
+      }
+      if (res.user) {
+        setUser(res.user);
+      }
+
+      toast({
+        title: "Access Granted",
+        description: "Multi-Factor Authentication verified successfully.",
+      });
+      navigate("/admin");
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || "Invalid or expired verification code.";
+      toast({
+        title: "MFA Verification Failed",
+        description: msg,
+        variant: "destructive",
+      });
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const handleResendMfa = async () => {
+    try {
+      await securityService.resendMfa(mfaEmail);
+      toast({
+        title: "New Code Sent",
+        description: `A fresh 6-digit verification code has been dispatched to ${mfaEmail}.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Resend Failed",
+        description: "Could not resend verification code. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -139,11 +224,13 @@ const AdminLogin = () => {
           <div className="h-1.5 bg-gradient-to-r from-[#00aeef] via-blue-500 to-indigo-600 w-full" />
           <CardHeader className="pt-6 pb-4 px-6 sm:px-8">
             <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
-              <FontAwesomeIcon icon={faLock} className="text-[#00aeef] text-sm" />
-              <span>Administrative Sign In</span>
+              <FontAwesomeIcon icon={mfaRequired ? faKey : faLock} className="text-[#00aeef] text-sm" />
+              <span>{mfaRequired ? "Two-Factor Verification (MFA)" : "Administrative Sign In"}</span>
             </CardTitle>
             <CardDescription className="text-slate-400 text-xs">
-              Enter your authorized staff credentials to continue to the control panel.
+              {mfaRequired
+                ? `Enter the 6-digit administrative code sent to ${mfaEmail}.`
+                : "Enter your authorized staff credentials to continue to the control panel."}
             </CardDescription>
           </CardHeader>
 
@@ -157,76 +244,136 @@ const AdminLogin = () => {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="space-y-2">
-                <Label htmlFor="admin-email" className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                  Admin Email Address
-                </Label>
-                <div className="relative">
-                  <FontAwesomeIcon
-                    icon={faEnvelope}
-                    className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xs"
-                  />
-                  <Input
-                    id="admin-email"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    placeholder="admin@zse.co.zw"
-                    required
-                    disabled={isLoading}
-                    className="pl-10 h-11 bg-slate-950/70 border-slate-700 text-white placeholder:text-slate-500 focus:border-[#00aeef] focus:ring-[#00aeef]/20 rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="admin-password" className="text-xs font-bold uppercase tracking-wider text-slate-300">
-                    Password
+            {mfaRequired ? (
+              <form onSubmit={handleVerifyMfa} className="space-y-5">
+                <div className="space-y-2 text-center">
+                  <Label htmlFor="mfa-otp" className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                    6-Digit Verification Code
                   </Label>
-                </div>
-                <div className="relative">
-                  <FontAwesomeIcon
-                    icon={faLock}
-                    className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xs"
-                  />
                   <Input
-                    id="admin-password"
-                    type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="••••••••••••"
+                    id="mfa-otp"
+                    type="text"
+                    maxLength={6}
+                    value={mfaOtp}
+                    onChange={(e) => setMfaOtp(e.target.value.replace(/\D/g, ""))}
+                    placeholder="123456"
                     required
-                    disabled={isLoading}
-                    className="pl-10 pr-10 h-11 bg-slate-950/70 border-slate-700 text-white placeholder:text-slate-500 focus:border-[#00aeef] focus:ring-[#00aeef]/20 rounded-xl"
+                    disabled={mfaLoading}
+                    className="text-center font-mono tracking-[0.5em] text-xl font-bold h-12 bg-slate-950/70 border-slate-700 text-white placeholder:text-slate-600 focus:border-[#00aeef] focus:ring-[#00aeef]/20 rounded-xl"
                   />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Code is valid for 5 minutes. Check your inbox or spam folder.
+                  </p>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={mfaLoading || mfaOtp.length !== 6}
+                  className="w-full h-11 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-sm tracking-wide rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 mt-2"
+                >
+                  {mfaLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
+                      <span>Verifying Code...</span>
+                    </span>
+                  ) : (
+                    <span>Verify Code & Login</span>
+                  )}
+                </Button>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-2">
                   <button
                     type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    tabIndex={-1}
-                    className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    onClick={() => {
+                      setMfaRequired(false);
+                      setMfaOtp("");
+                    }}
+                    className="hover:text-white transition-colors"
                   >
-                    <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="text-xs" />
+                    ← Back to Sign In
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleResendMfa}
+                    className="text-[#00aeef] hover:underline font-semibold"
+                  >
+                    Resend Code
                   </button>
                 </div>
-              </div>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="admin-email" className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                    Admin Email Address
+                  </Label>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faEnvelope}
+                      className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xs"
+                    />
+                    <Input
+                      id="admin-email"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="admin@zse.co.zw"
+                      required
+                      disabled={isLoading}
+                      className="pl-10 h-11 bg-slate-950/70 border-slate-700 text-white placeholder:text-slate-500 focus:border-[#00aeef] focus:ring-[#00aeef]/20 rounded-xl"
+                    />
+                  </div>
+                </div>
 
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full h-11 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-sm tracking-wide rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 mt-2"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
-                    <span>Verifying Credentials...</span>
-                  </span>
-                ) : (
-                  <span>Access Control Panel</span>
-                )}
-              </Button>
-            </form>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="admin-password" className="text-xs font-bold uppercase tracking-wider text-slate-300">
+                      Password
+                    </Label>
+                  </div>
+                  <div className="relative">
+                    <FontAwesomeIcon
+                      icon={faLock}
+                      className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 text-xs"
+                    />
+                    <Input
+                      id="admin-password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      placeholder="••••••••••••"
+                      required
+                      disabled={isLoading}
+                      className="pl-10 pr-10 h-11 bg-slate-950/70 border-slate-700 text-white placeholder:text-slate-500 focus:border-[#00aeef] focus:ring-[#00aeef]/20 rounded-xl"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      tabIndex={-1}
+                      className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                    >
+                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="text-xs" />
+                    </button>
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-11 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-sm tracking-wide rounded-xl shadow-lg shadow-cyan-500/20 transition-all duration-200 mt-2"
+                >
+                  {isLoading ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <FontAwesomeIcon icon={faSpinner} className="animate-spin text-sm" />
+                      <span>Verifying Credentials...</span>
+                    </span>
+                  ) : (
+                    <span>Access Control Panel</span>
+                  )}
+                </Button>
+              </form>
+            )}
 
             <div className="mt-6 pt-5 border-t border-slate-800 text-center">
               <p className="text-slate-400 text-xs">

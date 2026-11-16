@@ -2,19 +2,27 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { authService } from "@/services/auth.service";
 import { apiClient } from "@/services/api";
 
-interface User {
+export interface User {
   id: string;
   name: string;
   email: string;
   role?: string;
-  createdAt: string;
+  must_change_password?: boolean;
+  department_id?: number | null;
+  department?: {
+    id: number;
+    name: string;
+    code: string;
+  } | null;
+  createdAt?: string;
 }
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<User | null>;
+  login: (email: string, password: string) => Promise<any>;
   signup: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<Record<string, unknown>>;
   verifyOtp: (email: string, otp: string) => Promise<void>;
   resendOtp: (email: string) => Promise<void>;
@@ -65,8 +73,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       const response = await authService.login({ email, password });
+      
+      // If MFA is enabled and challenged
+      if (response.mfa_required) {
+        return response;
+      }
+
       const token = response.token;
-      localStorage.setItem("zse_training_token", token);
+      if (token) {
+        localStorage.setItem("zse_training_token", token);
+      }
 
       // Fetch user profile
       const userData = await authService.getCurrentUser();
@@ -138,6 +154,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     <AuthContext.Provider
       value={{
         user,
+        setUser,
         isLoading,
         isAuthenticated: !!user,
         login,

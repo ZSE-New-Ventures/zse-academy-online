@@ -18,9 +18,13 @@ import {
   faBuildingColumns,
   faShieldHalved,
   faGraduationCap,
+  faKey,
+  faSpinner,
+  faRotateRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { useToast } from "@/hooks/use-toast";
 import { sanitizeInput, validateEmail } from "@/utils/sanitization";
+import { securityService } from "@/services/security.service";
 
 const Login = () => {
   const queryEmail = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get("email") || "" : "";
@@ -39,8 +43,14 @@ const Login = () => {
     email?: string;
   } | null>(null);
 
+  // MFA State
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaOtp, setMfaOtp] = useState("");
+  const [mfaEmail, setMfaEmail] = useState("");
+  const [mfaLoading, setMfaLoading] = useState(false);
+
   const { toast } = useToast();
-  const { user, login, isLoading: authLoading } = useAuth();
+  const { user, setUser, login, isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -81,12 +91,26 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const loggedUser = await login(sanitizedEmail, formData.password);
+      const res = await login(sanitizedEmail, formData.password);
+
+      // Check if MFA OTP was requested
+      if (res && res.mfa_required) {
+        setMfaRequired(true);
+        setMfaEmail(sanitizedEmail);
+        toast({
+          title: "MFA Verification Required",
+          description: "Enter the 6-digit code sent to your email to complete login.",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      const loggedUser = res;
       toast({
         title: "Welcome back!",
         description: "Successfully logged in.",
       });
-      if (loggedUser && loggedUser.role === "admin") {
+      if (loggedUser && (loggedUser.role === "admin" || loggedUser.role === "super_admin")) {
         navigate("/admin");
       } else {
         navigate(redirectPath || "/dashboard");
@@ -151,6 +175,65 @@ const Login = () => {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleVerifyMfa = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!mfaOtp || mfaOtp.trim().length !== 6) {
+      return toast({
+        title: "Invalid Code",
+        description: "Please enter the 6-digit code received in your email.",
+        variant: "destructive",
+      });
+    }
+
+    try {
+      setMfaLoading(true);
+      const res = await securityService.verifyMfa(mfaEmail, mfaOtp.trim());
+
+      if (res.token) {
+        localStorage.setItem("zse_training_token", res.token);
+      }
+      if (res.user) {
+        setUser(res.user);
+      }
+
+      toast({
+        title: "Welcome back!",
+        description: "Multi-Factor Authentication verified successfully.",
+      });
+
+      if (res.user && (res.user.role === "admin" || res.user.role === "super_admin")) {
+        navigate("/admin");
+      } else {
+        navigate(redirectPath || "/dashboard");
+      }
+    } catch (err: any) {
+      const msg = err?.response?.data?.error || "Invalid or expired verification code.";
+      toast({
+        title: "MFA Verification Failed",
+        description: msg,
+        variant: "destructive",
+      });
+    } finally {
+      setMfaLoading(false);
+    }
+  };
+
+  const handleResendMfa = async () => {
+    try {
+      await securityService.resendMfa(mfaEmail);
+      toast({
+        title: "New Code Sent",
+        description: `A fresh 6-digit code has been dispatched to ${mfaEmail}.`,
+      });
+    } catch (err: any) {
+      toast({
+        title: "Resend Failed",
+        description: "Could not resend verification code. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -252,78 +335,136 @@ const Login = () => {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div>
-                  <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                    Email Address
-                  </Label>
-                  <div className="relative mt-1.5">
-                    <FontAwesomeIcon icon={faEnvelope} className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                    <Input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange("email", e.target.value)}
-                      placeholder="your.email@example.com"
-                      className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
-                      required
-                    />
+              {mfaRequired ? (
+                <form onSubmit={handleVerifyMfa} className="space-y-5">
+                  <div className="text-center p-3 bg-blue-50/70 border border-blue-200 rounded-2xl text-xs text-blue-900 leading-relaxed">
+                    <FontAwesomeIcon icon={faShieldHalved} className="text-blue-500 text-lg mb-1 block mx-auto" />
+                    <strong>Two-Factor Authentication Required:</strong> A 6-digit verification code has been dispatched to <strong>{mfaEmail}</strong>.
                   </div>
-                </div>
 
-                <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-slate-700">
-                      Password
+                  <div className="space-y-2 text-center">
+                    <Label htmlFor="mfa-otp-input" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Enter 6-Digit Verification Code
                     </Label>
-                    <Link
-                      to="/forgot-password"
-                      className="text-xs font-semibold text-[#00aeef] hover:underline"
-                    >
-                      Forgot password?
-                    </Link>
-                  </div>
-                  <div className="relative">
-                    <FontAwesomeIcon icon={faLock} className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
                     <Input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={formData.password}
-                      onChange={(e) => handleInputChange("password", e.target.value)}
-                      placeholder="••••••••"
-                      className="pl-10 pr-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                      id="mfa-otp-input"
+                      type="text"
+                      maxLength={6}
+                      value={mfaOtp}
+                      onChange={(e) => setMfaOtp(e.target.value.replace(/\D/g, ""))}
+                      placeholder="123456"
                       required
+                      disabled={mfaLoading}
+                      className="text-center font-mono tracking-[0.4em] text-xl font-bold h-12 bg-slate-50 border-slate-200 rounded-xl"
                     />
+                    <p className="text-[11px] text-slate-400">
+                      Code expires in 5 minutes.
+                    </p>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#00aeef]/20"
+                    disabled={mfaLoading || mfaOtp.length !== 6}
+                  >
+                    {mfaLoading ? "Verifying Code..." : "Verify Code & Sign In"}
+                  </Button>
+
+                  <div className="flex items-center justify-between text-xs text-slate-500 pt-2">
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      onClick={() => {
+                        setMfaRequired(false);
+                        setMfaOtp("");
+                      }}
+                      className="hover:text-slate-800 transition-colors"
                     >
-                      <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="h-4 w-4" />
+                      ← Back to Login
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleResendMfa}
+                      className="text-[#00aeef] hover:underline font-bold"
+                    >
+                      Resend Code
                     </button>
                   </div>
-                </div>
+                </form>
+              ) : (
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div>
+                    <Label htmlFor="email" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                      Email Address
+                    </Label>
+                    <div className="relative mt-1.5">
+                      <FontAwesomeIcon icon={faEnvelope} className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                      <Input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        placeholder="your.email@example.com"
+                        className="pl-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                        required
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex items-center space-x-2 pt-1">
-                  <Checkbox
-                    id="remember"
-                    checked={formData.rememberMe}
-                    onCheckedChange={(checked) => handleInputChange("rememberMe", checked as boolean)}
-                    className="border-slate-300 data-[state=checked]:bg-[#00aeef] data-[state=checked]:border-[#00aeef]"
-                  />
-                  <Label htmlFor="remember" className="text-xs font-medium text-slate-600 cursor-pointer">
-                    Remember my session on this device
-                  </Label>
-                </div>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <Label htmlFor="password" className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                        Password
+                      </Label>
+                      <Link
+                        to="/forgot-password"
+                        className="text-xs font-semibold text-[#00aeef] hover:underline"
+                      >
+                        Forgot password?
+                      </Link>
+                    </div>
+                    <div className="relative">
+                      <FontAwesomeIcon icon={faLock} className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={formData.password}
+                        onChange={(e) => handleInputChange("password", e.target.value)}
+                        placeholder="••••••••"
+                        className="pl-10 pr-10 h-11 bg-slate-50 border-slate-200 rounded-xl focus:border-[#00aeef]"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#00aeef]/20"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Authenticating..." : "Sign In to Training Institute"}
-                </Button>
-              </form>
+                  <div className="flex items-center space-x-2 pt-1">
+                    <Checkbox
+                      id="remember"
+                      checked={formData.rememberMe}
+                      onCheckedChange={(checked) => handleInputChange("rememberMe", checked as boolean)}
+                      className="border-slate-300 data-[state=checked]:bg-[#00aeef] data-[state=checked]:border-[#00aeef]"
+                    />
+                    <Label htmlFor="remember" className="text-xs font-medium text-slate-600 cursor-pointer">
+                      Remember my session on this device
+                    </Label>
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full h-12 bg-[#00aeef] hover:bg-[#008cc0] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-[#00aeef]/20"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Authenticating..." : "Sign In to Training Institute"}
+                  </Button>
+                </form>
+              )}
 
               <div className="pt-4 border-t border-slate-100 text-center text-xs text-slate-500">
                 New to the ZSE Training Institute?{" "}

@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { ForcedPasswordResetModal } from "@/components/auth/ForcedPasswordResetModal";
+import { SessionTimeoutWatcher } from "@/components/auth/SessionTimeoutWatcher";
 import Home from "./pages/Home";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
@@ -37,6 +39,8 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <ForcedPasswordResetModal />
+        <SessionTimeoutWatcher />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />

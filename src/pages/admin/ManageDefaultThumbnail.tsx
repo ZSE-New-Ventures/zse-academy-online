@@ -305,3 +305,4 @@ export const ManageDefaultThumbnail = () => {
 };
 
 export default ManageDefaultThumbnail;
+
