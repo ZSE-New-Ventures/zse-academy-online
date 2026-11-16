@@ -90,7 +90,8 @@ interface CourseContent {
 // --------------------
 
 const ManageCourseContent = () => {
-  const { courseId } = useParams<{ courseId: string }>(); // Explicitly type useParams result
+  const params = useParams<{ courseId?: string; id?: string }>();
+  const courseId = params.courseId || params.id;
   const navigate = useNavigate();
   const [contents, setContents] = useState<CourseContent[]>([]);
   const [loading, setLoading] = useState(true);
