@@ -656,10 +656,10 @@ const ManageCourses = () => {
                         </SelectTrigger>
                         <SelectContent className="bg-white dark:bg-slate-900 border border-gray-200 z-[9999]">
                           <SelectItem value="free">
-                            🟢 Free Course (No Tuition)
+                            Free Course
                           </SelectItem>
                           <SelectItem value="payable">
-                            💳 Payable (Paid Certification)
+                            Payable
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -677,7 +677,7 @@ const ManageCourses = () => {
                     </InputWrapper>
                   </div>
 
-                  {formData.pricing_type === "payable" ? (
+                  {formData.pricing_type === "payable" && (
                     <InputWrapper label="Price ($ USD)" icon={faMoneyBill}>
                       <Input
                         type="number"
@@ -691,11 +691,6 @@ const ManageCourses = () => {
                         placeholder="e.g., 49.99"
                       />
                     </InputWrapper>
-                  ) : (
-                    <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center gap-2.5 text-xs text-emerald-800 font-medium">
-                      <FontAwesomeIcon icon={faCheckCircle} className="text-emerald-600 h-4 w-4 shrink-0" />
-                      <span>This is a <strong>Free Course</strong>. Students enroll at no cost and no price amount or range is shown.</span>
-                    </div>
                   )}
 
                   <InputWrapper label="Thumbnail URL" icon={faImage}>
@@ -827,7 +822,7 @@ const ManageCourses = () => {
                     : "bg-white text-emerald-700 border-emerald-200 hover:bg-emerald-50"
                 }`}
               >
-                🟢 Free Courses ({freeCoursesCount})
+                Free Courses ({freeCoursesCount})
               </button>
               <button
                 type="button"
@@ -838,7 +833,7 @@ const ManageCourses = () => {
                     : "bg-white text-blue-700 border-blue-200 hover:bg-blue-50"
                 }`}
               >
-                💳 Payable Courses ({payableCoursesCount})
+                Payable Courses ({payableCoursesCount})
               </button>
             </div>
           </div>
