@@ -270,4 +270,18 @@ export const courseService = {
     const response = await apiClient.delete(`/levels/${id}`);
     return response.data;
   },
+
+  // Direct Course Visibility & Publication Toggles
+  updateCourseVisibility: async (courseId: number, visibility: 'public' | 'restricted' | 'private') => {
+    const response = await apiClient.patch(`/courses/${courseId}/visibility`, { visibility });
+    return response.data;
+  },
+
+  toggleCoursePublish: async (courseId: number, isPublished?: boolean) => {
+    const response = await apiClient.patch(
+      `/courses/${courseId}/publish`,
+      isPublished !== undefined ? { is_published: isPublished } : {}
+    );
+    return response.data;
+  },
 };

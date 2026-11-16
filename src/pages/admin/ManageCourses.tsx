@@ -23,6 +23,8 @@ import {
   faLayerGroup,
   faUsers,
   faShieldHalved,
+  faGlobe,
+  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
@@ -369,6 +371,59 @@ const ManageCourses = () => {
     setCourseToDelete(id);
   };
 
+  const handleQuickChangeVisibility = async (courseId: number, newVisibility: "public" | "restricted" | "private") => {
+    // Optimistic update
+    setCourses((prev) =>
+      prev.map((c) => (c.id === courseId ? { ...c, visibility: newVisibility } : c))
+    );
+
+    try {
+      await courseService.updateCourseVisibility(courseId, newVisibility);
+      toast({
+        title: "Visibility Updated",
+        description: `Course visibility set to ${
+          newVisibility === "public"
+            ? "Public (Catalog)"
+            : newVisibility === "restricted"
+            ? "Restricted (Sponsor Exam)"
+            : "Private (Internal Only)"
+        }`,
+      });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast({
+        title: "Error Updating Visibility",
+        description: err.response?.data?.message || "Failed to update course visibility.",
+        variant: "destructive",
+      });
+      fetchCourses();
+    }
+  };
+
+  const handleTogglePublish = async (course: Course) => {
+    const updatedStatus = !course.is_published;
+    // Optimistic update
+    setCourses((prev) =>
+      prev.map((c) => (c.id === course.id ? { ...c, is_published: updatedStatus } : c))
+    );
+
+    try {
+      await courseService.toggleCoursePublish(course.id, updatedStatus);
+      toast({
+        title: updatedStatus ? "Course Published" : "Course Moved to Draft",
+        description: `"${course.title}" is now ${updatedStatus ? "published in catalog" : "hidden as draft"}.`,
+      });
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast({
+        title: "Error Updating Status",
+        description: err.response?.data?.message || "Failed to update publication status.",
+        variant: "destructive",
+      });
+      fetchCourses();
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -707,28 +762,82 @@ const ManageCourses = () => {
                         <h3 className="font-semibold text-lg">
                           {course.title}
                         </h3>
-                        {course.is_published ? (
-                          <Badge className="bg-green-100 text-green-800">
-                            Published
-                          </Badge>
-                        ) : (
-                          <Badge className="border-gray-300 text-gray-500">
-                            Draft
-                          </Badge>
-                        )}
-                        {course.visibility === "restricted" && (
-                          <Badge className="bg-amber-100 text-amber-900 border-amber-300 font-semibold flex items-center gap-1">
-                            <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3 text-amber-700" />
-                            Sponsor Exam / Restricted
-                          </Badge>
-                        )}
-                        {course.visibility === "private" && (
-                          <Badge className="bg-purple-100 text-purple-900 border-purple-300 font-semibold">
-                            Private
-                          </Badge>
-                        )}
+
+                        {/* Quick 1-click Publish / Draft Switch */}
+                        <button
+                          type="button"
+                          onClick={() => handleTogglePublish(course)}
+                          title="Click to toggle between Published and Draft"
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
+                            course.is_published
+                              ? "bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100"
+                              : "bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200"
+                          }`}
+                        >
+                          <span
+                            className={`w-2 h-2 rounded-full ${
+                              course.is_published ? "bg-emerald-600 animate-pulse" : "bg-slate-400"
+                            }`}
+                          />
+                          {course.is_published ? "Published" : "Draft"}
+                        </button>
+
+                        {/* Quick Visibility Selector */}
+                        <div className="inline-flex items-center">
+                          <Select
+                            value={course.visibility || "public"}
+                            onValueChange={(val: "public" | "restricted" | "private") =>
+                              handleQuickChangeVisibility(course.id, val)
+                            }
+                          >
+                            <SelectTrigger
+                              className={`h-7 px-2.5 text-xs font-semibold rounded-full border shadow-none focus:ring-0 ${
+                                course.visibility === "restricted"
+                                  ? "bg-amber-50 text-amber-900 border-amber-300 hover:bg-amber-100"
+                                  : course.visibility === "private"
+                                  ? "bg-purple-50 text-purple-900 border-purple-300 hover:bg-purple-100"
+                                  : "bg-blue-50 text-blue-900 border-blue-300 hover:bg-blue-100"
+                              }`}
+                            >
+                              <div className="flex items-center gap-1.5">
+                                <FontAwesomeIcon
+                                  icon={
+                                    course.visibility === "restricted"
+                                      ? faShieldHalved
+                                      : course.visibility === "private"
+                                      ? faLock
+                                      : faGlobe
+                                  }
+                                  className="h-3 w-3"
+                                />
+                                <SelectValue />
+                              </div>
+                            </SelectTrigger>
+                            <SelectContent className="bg-white dark:bg-slate-900 border border-gray-200 z-[9999]">
+                              <SelectItem value="public">
+                                <div className="flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faGlobe} className="text-blue-600 h-3.5 w-3.5" />
+                                  <span>🌐 Public (Open Catalog)</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="restricted">
+                                <div className="flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faShieldHalved} className="text-amber-600 h-3.5 w-3.5" />
+                                  <span>🔒 Restricted (Sponsor Exam / Cohorts)</span>
+                                </div>
+                              </SelectItem>
+                              <SelectItem value="private">
+                                <div className="flex items-center gap-2">
+                                  <FontAwesomeIcon icon={faLock} className="text-purple-600 h-3.5 w-3.5" />
+                                  <span>👁️ Private (Draft / Internal Only)</span>
+                                </div>
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
                         {course.category && typeof course.category === "object" && course.category?.access_level === "restricted" && (
-                          <Badge variant="outline" className="border-amber-400 text-amber-700 text-xs">
+                          <Badge variant="outline" className="border-amber-400 text-amber-700 text-xs bg-amber-50/80">
                             Restricted Category
                           </Badge>
                         )}

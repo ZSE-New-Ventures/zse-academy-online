@@ -178,6 +178,34 @@ function AdminConfigurations() {
     setIsBindingModalOpen(true);
   };
 
+  const handleToggleCategoryScope = async (category: Category) => {
+    const newScope = category.access_level === "restricted" ? "public" : "restricted";
+    try {
+      const response = await fetch(`${API_URL}/${category.id}`, {
+        method: "PUT",
+        headers: authHeaders,
+        body: JSON.stringify({
+          access_level: newScope,
+        }),
+      });
+      const json = await response.json();
+      if (!response.ok) throw new Error(json.message || "Failed to update category");
+      setCategories((prev) =>
+        prev.map((c) => (c.id === category.id ? { ...c, access_level: newScope } : c))
+      );
+      toast({
+        title: "Category Scope Updated",
+        description: `Category "${category.name}" scope changed to ${newScope}.`,
+      });
+    } catch (error: unknown) {
+      toast({
+        title: "Error",
+        description: "Failed to update category scope",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSaveBindings = async () => {
     if (!bindingCategory) return;
 
@@ -363,15 +391,22 @@ function AdminConfigurations() {
                         <span className="font-bold text-slate-900 text-sm sm:text-base">
                           {category.name}
                         </span>
-                        {isRestricted ? (
-                          <Badge className="bg-amber-50 text-amber-700 border-amber-300 text-[10px] font-semibold">
-                            🔒 Restricted
-                          </Badge>
-                        ) : (
-                          <Badge className="bg-emerald-50 text-emerald-700 border-emerald-300 text-[10px] font-semibold">
-                            🌐 Public
-                          </Badge>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => handleToggleCategoryScope(category)}
+                          title="Click to toggle between Public and Restricted scope"
+                          className="cursor-pointer transition-transform active:scale-95"
+                        >
+                          {isRestricted ? (
+                            <Badge className="bg-amber-50 text-amber-700 border-amber-300 text-[10px] font-semibold hover:bg-amber-100">
+                              🔒 Restricted (Click to make Public)
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-emerald-50 text-emerald-700 border-emerald-300 text-[10px] font-semibold hover:bg-emerald-100">
+                              🌐 Public (Click to make Restricted)
+                            </Badge>
+                          )}
+                        </button>
                       </div>
 
                       {category.description && (
