@@ -27,6 +27,9 @@ import {
   faLock,
   faCheckCircle,
   faTag,
+  faUpload,
+  faTimes,
+  faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
@@ -150,6 +153,9 @@ const ManageCourses = () => {
   const [isDeletingCourse, setIsDeletingCourse] = useState(false);
   const [assignmentCourse, setAssignmentCourse] = useState<Course | null>(null);
   const [isAssignmentModalOpen, setIsAssignmentModalOpen] = useState(false);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string | null>(null);
+  const [isUrlInputOpen, setIsUrlInputOpen] = useState(false);
   const { toast } = useToast();
 
   const [formData, setFormData] = useState({
@@ -329,12 +335,30 @@ const ManageCourses = () => {
 
       console.log("Saving course data:", courseData); // Debug log
 
-      if (editingCourse) {
-        await courseService.updateCourse(editingCourse.id, courseData);
-        toast({ title: "Success", description: "Course updated successfully" });
+      if (thumbnailFile) {
+        const fd = new FormData();
+        Object.entries(courseData).forEach(([k, v]) => {
+          if (v !== null && v !== undefined) {
+            fd.append(k, String(v));
+          }
+        });
+        fd.append("thumbnail", thumbnailFile);
+
+        if (editingCourse) {
+          await courseService.updateCourse(editingCourse.id, fd);
+          toast({ title: "Success", description: "Course updated successfully" });
+        } else {
+          await courseService.createCourse(fd);
+          toast({ title: "Success", description: "Course created successfully" });
+        }
       } else {
-        await courseService.createCourse(courseData);
-        toast({ title: "Success", description: "Course created successfully" });
+        if (editingCourse) {
+          await courseService.updateCourse(editingCourse.id, courseData);
+          toast({ title: "Success", description: "Course updated successfully" });
+        } else {
+          await courseService.createCourse(courseData);
+          toast({ title: "Success", description: "Course created successfully" });
+        }
       }
 
       await fetchCourses();
@@ -428,6 +452,29 @@ const ManageCourses = () => {
     }
   };
 
+  const handleThumbnailFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Thumbnail image must be smaller than 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setThumbnailFile(file);
+      setThumbnailPreview(URL.createObjectURL(file));
+      setFormData((prev) => ({ ...prev, thumbnail_url: "" }));
+    }
+  };
+
+  const handleClearThumbnail = () => {
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    setFormData((prev) => ({ ...prev, thumbnail_url: "" }));
+  };
+
   const resetForm = () => {
     setFormData({
       title: "",
@@ -442,6 +489,9 @@ const ManageCourses = () => {
       visibility: "public",
       instructor_id: "unassigned",
     });
+    setThumbnailFile(null);
+    setThumbnailPreview(null);
+    setIsUrlInputOpen(false);
     setEditingCourse(null);
   };
 
@@ -452,6 +502,11 @@ const ManageCourses = () => {
     const instructorId = course.instructor?.id || course.instructor_id || "";
     const categoryId = course.category?.id || course.category_id || "";
     const isPayable = course.price !== undefined && course.price !== null && parseFloat(course.price.toString()) > 0;
+    const existingThumbnail = course.thumbnail_url || course.thumbnail || "";
+
+    setThumbnailFile(null);
+    setThumbnailPreview(existingThumbnail || null);
+    setIsUrlInputOpen(Boolean(existingThumbnail && !existingThumbnail.includes('/storage/')));
 
     setFormData({
       title: course.title || "",
@@ -461,7 +516,7 @@ const ManageCourses = () => {
       // If no category ID, use "uncategorized"
       category_id: categoryId ? String(categoryId) : "uncategorized",
       level: course.level || "Beginner",
-      thumbnail_url: course.thumbnail_url || "",
+      thumbnail_url: existingThumbnail,
       duration: course.duration || "",
       is_published: course.is_published || false,
       visibility: course.visibility || "public",
@@ -693,20 +748,106 @@ const ManageCourses = () => {
                     </InputWrapper>
                   )}
 
-                  <InputWrapper label="Thumbnail URL" icon={faImage}>
-                    <Input
-                      type="url"
-                      value={formData.thumbnail_url}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          thumbnail_url: e.target.value,
-                        })
-                      }
-                      className="bg-transparent border-0 outline-none"
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </InputWrapper>
+                  {/* Course Thumbnail Upload with Highlighted Specs */}
+                  <div className="space-y-2.5 p-3.5 bg-slate-50/90 rounded-xl border border-slate-200">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                        <FontAwesomeIcon icon={faImage} className="text-[#00aeef]" />
+                        <span>Course Thumbnail (Optional)</span>
+                      </Label>
+                      <span className="text-[11px] text-muted-foreground font-medium">
+                        Default fallback used if empty
+                      </span>
+                    </div>
+
+                    {/* Highlighted Specs */}
+                    <div className="flex items-center gap-2 p-2 bg-blue-50/80 border border-blue-200 rounded-lg text-xs text-blue-900">
+                      <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 shrink-0 text-xs" />
+                      <span>
+                        <strong>Recommended Specs:</strong> 1280 × 720 px (16:9 ratio, max 2MB, JPG or PNG).
+                      </span>
+                    </div>
+
+                    {/* Preview or Upload Zone */}
+                    {thumbnailPreview ? (
+                      <div className="relative aspect-video max-h-44 rounded-lg overflow-hidden border border-slate-300 bg-slate-100 group">
+                        <img
+                          src={thumbnailPreview}
+                          alt="Thumbnail preview"
+                          className="w-full h-full object-cover object-center"
+                        />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                          <label className="cursor-pointer bg-white text-slate-900 text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-slate-100 shadow-sm flex items-center gap-1.5">
+                            <FontAwesomeIcon icon={faUpload} />
+                            Change Image
+                            <input
+                              type="file"
+                              accept="image/png,image/jpeg,image/webp"
+                              className="hidden"
+                              onChange={handleThumbnailFileChange}
+                            />
+                          </label>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="h-8 text-xs font-bold"
+                            onClick={handleClearThumbnail}
+                          >
+                            <FontAwesomeIcon icon={faTimes} className="mr-1" />
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="border-2 border-dashed border-slate-300 hover:border-[#00aeef] rounded-xl p-4 flex flex-col items-center justify-center text-center cursor-pointer transition-colors bg-white hover:bg-slate-50/50">
+                        <div className="w-9 h-9 rounded-full bg-[#00aeef]/10 text-[#00aeef] flex items-center justify-center mb-1.5">
+                          <FontAwesomeIcon icon={faUpload} className="h-4 w-4" />
+                        </div>
+                        <span className="text-xs font-bold text-slate-800">
+                          Click to upload course thumbnail
+                        </span>
+                        <span className="text-[11px] text-muted-foreground mt-0.5">
+                          1280 × 720 px (16:9 ratio) • Max 2MB
+                        </span>
+                        <input
+                          type="file"
+                          accept="image/png,image/jpeg,image/webp"
+                          className="hidden"
+                          onChange={handleThumbnailFileChange}
+                        />
+                      </label>
+                    )}
+
+                    {/* Optional URL Toggle */}
+                    <div className="pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => setIsUrlInputOpen(!isUrlInputOpen)}
+                        className="text-[11px] font-semibold text-[#00aeef] hover:underline flex items-center gap-1"
+                      >
+                        {isUrlInputOpen ? "− Hide Image URL input" : "+ Or specify an external Image URL"}
+                      </button>
+
+                      {isUrlInputOpen && (
+                        <div className="mt-2">
+                          <Input
+                            type="url"
+                            value={formData.thumbnail_url}
+                            onChange={(e) => {
+                              setFormData({ ...formData, thumbnail_url: e.target.value });
+                              if (e.target.value) {
+                                setThumbnailPreview(e.target.value);
+                                setThumbnailFile(null);
+                              }
+                            }}
+                            placeholder="https://example.com/course-thumbnail.jpg"
+                            className="text-xs bg-white"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
                   <InputWrapper label="Instructor" icon={faUser}>
                     <Select

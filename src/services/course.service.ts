@@ -133,12 +133,18 @@ export const courseService = {
   },
 
   // Admin functions
-  createCourse: async (courseData: Partial<Course>) => {
+  createCourse: async (courseData: Partial<Course> | FormData) => {
     const response = await apiClient.post(API_ENDPOINTS.ADMIN_CREATE_COURSE, courseData);
     return response.data;
   },
 
-  updateCourse: async (id: string | number, courseData: Partial<Course>) => {
+  updateCourse: async (id: string | number, courseData: Partial<Course> | FormData) => {
+    if (courseData instanceof FormData) {
+      // In Laravel, multipart/form-data for updates requires POST with _method=PUT
+      courseData.append('_method', 'PUT');
+      const response = await apiClient.post(API_ENDPOINTS.ADMIN_UPDATE_COURSE(id), courseData);
+      return response.data;
+    }
     const response = await apiClient.put(API_ENDPOINTS.ADMIN_UPDATE_COURSE(id), courseData);
     return response.data;
   },
@@ -283,5 +289,20 @@ export const courseService = {
       isPublished !== undefined ? { is_published: isPublished } : {}
     );
     return response.data;
+  },
+
+  // Platform Default Course Thumbnail Configuration
+  getDefaultThumbnail: async (): Promise<string | null> => {
+    try {
+      const response = await apiClient.get('/public/settings/default-thumbnail');
+      return response.data?.data?.default_thumbnail_url || null;
+    } catch {
+      return null;
+    }
+  },
+
+  updateDefaultThumbnail: async (data: FormData | { thumbnail_url?: string }) => {
+    const response = await apiClient.post('/admin/settings/default-thumbnail', data);
+    return response.data?.data || response.data;
   },
 };

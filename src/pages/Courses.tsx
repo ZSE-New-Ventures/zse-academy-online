@@ -30,6 +30,7 @@ import {
   faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { CourseAiSummaryModal } from "@/components/course/CourseAiSummaryModal";
+import { getCourseThumbnail } from "@/utils/courseThumbnail";
 
 import courseDirect from "@/assets/course-direct.jpg";
 import courseMarket from "@/assets/course-market-analysis.jpg";
@@ -141,11 +142,7 @@ const Courses = () => {
   const getThumbnail = (course: Course) => {
     if (course.presigned_url) return course.presigned_url;
     if (course.thumbnail_url) return course.thumbnail_url;
-    const cat = (course.category || "").toLowerCase();
-    if (cat.includes("market") || cat.includes("technical") || cat.includes("analysis")) return courseMarket;
-    if (cat.includes("statement") || cat.includes("portfolio")) return courseStatements;
-    if (cat.includes("direct") || cat.includes("trading") || cat.includes("equity")) return courseDirect;
-    return investmentBg;
+    return getCourseThumbnail(course);
   };
 
   const renderRating = (course: Course) => {
@@ -348,7 +345,7 @@ const Courses = () => {
                         alt={course.title}
                         className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
                         onError={(e) => {
-                          e.currentTarget.src = investmentBg;
+                          e.currentTarget.src = getCourseThumbnail(course);
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent opacity-80" />

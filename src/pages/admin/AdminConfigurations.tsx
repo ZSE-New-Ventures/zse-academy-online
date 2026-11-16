@@ -21,9 +21,14 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch, faPlus, faTrash, faUsers, faCheck, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faPlus, faTrash, faUsers, faCheck, faShieldHalved, faImage, faUpload, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { API_BASE_URL } from "@/constants/api";
 import { courseService, UserGroup } from "@/services/course.service";
+import {
+  getCachedDefaultThumbnail,
+  setCachedDefaultThumbnail,
+  fetchAndCacheDefaultThumbnail,
+} from "@/utils/courseThumbnail";
 
 interface Category {
   id: number;
@@ -55,6 +60,13 @@ function AdminConfigurations() {
 
   const [availableGroups, setAvailableGroups] = useState<UserGroup[]>([]);
 
+  // Platform Default Course Thumbnail State
+  const [defaultThumbnail, setDefaultThumbnail] = useState<string>(getCachedDefaultThumbnail());
+  const [defaultThumbnailFile, setDefaultThumbnailFile] = useState<File | null>(null);
+  const [defaultThumbnailPreview, setDefaultThumbnailPreview] = useState<string | null>(null);
+  const [defaultThumbnailUrlInput, setDefaultThumbnailUrlInput] = useState<string>("");
+  const [savingDefaultThumbnail, setSavingDefaultThumbnail] = useState(false);
+
   const { toast } = useToast();
   const API_URL = `${API_BASE_URL}/categories`;
 
@@ -67,7 +79,72 @@ function AdminConfigurations() {
   useEffect(() => {
     fetchCategories();
     fetchCohortGroups();
+    fetchAndCacheDefaultThumbnail().then((url) => {
+      if (url) setDefaultThumbnail(url);
+    });
   }, []);
+
+  const handleDefaultThumbnailFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Thumbnail image must be smaller than 2MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+      setDefaultThumbnailFile(file);
+      setDefaultThumbnailPreview(URL.createObjectURL(file));
+      setDefaultThumbnailUrlInput("");
+    }
+  };
+
+  const handleSaveDefaultThumbnail = async () => {
+    if (!defaultThumbnailFile && !defaultThumbnailUrlInput.trim()) {
+      return toast({
+        title: "No image provided",
+        description: "Please choose an image file or enter an image URL.",
+        variant: "destructive",
+      });
+    }
+
+    try {
+      setSavingDefaultThumbnail(true);
+      let res;
+      if (defaultThumbnailFile) {
+        const fd = new FormData();
+        fd.append("thumbnail", defaultThumbnailFile);
+        res = await courseService.updateDefaultThumbnail(fd);
+      } else {
+        res = await courseService.updateDefaultThumbnail({ thumbnail_url: defaultThumbnailUrlInput.trim() });
+      }
+
+      const newUrl = res.default_thumbnail_url || res.data?.default_thumbnail_url;
+      if (newUrl) {
+        setDefaultThumbnail(newUrl);
+        setCachedDefaultThumbnail(newUrl);
+      }
+      setDefaultThumbnailFile(null);
+      setDefaultThumbnailPreview(null);
+      setDefaultThumbnailUrlInput("");
+
+      toast({
+        title: "Default Thumbnail Saved",
+        description: "Platform default course thumbnail updated successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to update default thumbnail:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update default thumbnail.",
+        variant: "destructive",
+      });
+    } finally {
+      setSavingDefaultThumbnail(false);
+    }
+  };
 
   const fetchCohortGroups = async () => {
     try {
@@ -260,7 +337,119 @@ function AdminConfigurations() {
   }
 
   return (
-    <Card className="border border-slate-200 shadow-sm">
+    <div className="space-y-6">
+      {/* Platform Default Course Thumbnail Card */}
+      <Card className="border border-slate-200 shadow-sm">
+        <CardHeader>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-[#00aeef]/10 text-[#00aeef] flex items-center justify-center shrink-0">
+              <FontAwesomeIcon icon={faImage} className="text-sm" />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-bold text-slate-900">
+                Default Course Thumbnail
+              </CardTitle>
+              <p className="text-xs text-slate-500">
+                Fallback thumbnail image displayed across the platform whenever a course does not have its own custom image.
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Highlighted Specs */}
+          <div className="flex items-center gap-2 p-2.5 bg-blue-50/80 border border-blue-200 rounded-lg text-xs text-blue-900">
+            <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 shrink-0 text-sm" />
+            <span>
+              <strong>Required Specifications:</strong> 1280 × 720 px (16:9 ratio, max 2MB, JPG or PNG).
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+            {/* Current / Preview Image */}
+            <div className="md:col-span-5">
+              <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-xs">
+                <img
+                  src={defaultThumbnailPreview || defaultThumbnail}
+                  alt="Default thumbnail"
+                  className="w-full h-full object-cover object-center"
+                />
+                <Badge className="absolute top-2 left-2 bg-slate-900/80 text-white text-[10px] backdrop-blur-xs">
+                  {defaultThumbnailPreview ? "New Image Selected" : "Active Default"}
+                </Badge>
+              </div>
+            </div>
+
+            {/* Upload Controls */}
+            <div className="md:col-span-7 space-y-3">
+              <div>
+                <label className="text-xs font-bold text-slate-700">Upload Default Thumbnail Image</label>
+                <div className="mt-1.5 flex items-center gap-3">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-50 shadow-xs transition-colors">
+                    <FontAwesomeIcon icon={faUpload} className="text-[#00aeef]" />
+                    <span>Choose Image File</span>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/webp"
+                      className="hidden"
+                      onChange={handleDefaultThumbnailFileChange}
+                    />
+                  </label>
+                  {defaultThumbnailFile && (
+                    <span className="text-xs text-slate-600 font-medium truncate max-w-[200px]">
+                      {defaultThumbnailFile.name}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-600">Or specify an Image URL</label>
+                <Input
+                  type="url"
+                  placeholder="https://example.com/default-thumbnail.jpg"
+                  value={defaultThumbnailUrlInput}
+                  onChange={(e) => {
+                    setDefaultThumbnailUrlInput(e.target.value);
+                    if (e.target.value) {
+                      setDefaultThumbnailPreview(e.target.value);
+                      setDefaultThumbnailFile(null);
+                    }
+                  }}
+                  className="text-xs bg-white"
+                />
+              </div>
+
+              <div className="pt-1 flex items-center gap-2">
+                <Button
+                  onClick={handleSaveDefaultThumbnail}
+                  disabled={savingDefaultThumbnail || (!defaultThumbnailFile && !defaultThumbnailUrlInput.trim())}
+                  className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold h-9 px-4 rounded-xl shadow-sm"
+                >
+                  {savingDefaultThumbnail ? "Saving..." : "Save Default Thumbnail"}
+                </Button>
+                {(defaultThumbnailFile || defaultThumbnailUrlInput) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setDefaultThumbnailFile(null);
+                      setDefaultThumbnailPreview(null);
+                      setDefaultThumbnailUrlInput("");
+                    }}
+                    className="text-xs text-slate-500 h-9"
+                  >
+                    Cancel
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Course Categories & Access Scopes Card */}
+      <Card className="border border-slate-200 shadow-sm">
       <CardHeader>
         <CardTitle className="text-xl font-bold text-slate-900">
           Course Categories & Access Scopes
@@ -531,6 +720,7 @@ function AdminConfigurations() {
         </DialogContent>
       </Dialog>
     </Card>
+    </div>
   );
 }
 
