@@ -186,6 +186,15 @@ const MILESTONES: JourneyMilestone[] = [
   },
 ];
 
+const MILESTONES_SHORT_TITLES = [
+  "01 Understanding ...",
+  "02 Choosing Your",
+  "03 Getting Your",
+  "04 Funding Your",
+  "05 Managing Your",
+  "06 Tracking Dividen...",
+];
+
 export default function LearningJourney() {
   const [activeStep, setActiveStep] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -219,7 +228,7 @@ export default function LearningJourney() {
     setActiveStep(idx);
     const target = milestoneRefs.current[idx];
     if (target) {
-      const topOffset = 140;
+      const topOffset = 150;
       const elementPosition = target.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.pageYOffset - topOffset;
       window.scrollTo({
@@ -232,6 +241,53 @@ export default function LearningJourney() {
   return (
     <div className="min-h-screen bg-[#0a0f1d] text-slate-100 font-montserrat">
       <Navbar />
+
+      {/* Persistent Sticky Roadmap Quick Jump Ribbon (Stays visible on scroll) */}
+      <div className="sticky top-[76px] z-40 bg-[#0c1427]/98 backdrop-blur-md border-b border-slate-800 shadow-md">
+        {/* Progress Bar Line */}
+        <div className="w-full h-1 bg-slate-800/80">
+          <div
+            className="h-full bg-gradient-to-r from-[#00aeef] via-sky-400 to-emerald-400 transition-all duration-150"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+
+        {/* Milestone Quick Jump Buttons */}
+        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11px] font-extrabold text-[#00aeef] uppercase tracking-wider hidden sm:inline">
+              ROADMAP:
+            </span>
+            <span className="text-[11px] text-slate-300 font-semibold whitespace-nowrap">
+              Step {activeStep + 1} of {MILESTONES.length}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-1.5 shrink-0">
+            {MILESTONES.map((m, idx) => (
+              <button
+                key={m.id}
+                onClick={() => scrollToMilestone(idx)}
+                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
+                  activeStep === idx
+                    ? "bg-[#00aeef] text-white shadow-md shadow-[#00aeef]/30 scale-105"
+                    : "bg-slate-800/90 text-slate-400 hover:text-white hover:bg-slate-700"
+                }`}
+              >
+                <span>{MILESTONES_SHORT_TITLES[idx]}</span>
+              </button>
+            ))}
+          </div>
+
+          <Link
+            to="/courses/11485"
+            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500/30 transition-colors shrink-0"
+          >
+            <span>Start Free</span>
+            <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
+          </Link>
+        </div>
+      </div>
 
       {/* Hero Introduction */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-[#0b1324] via-[#0d1830] to-[#0a0f1d]">
