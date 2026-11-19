@@ -233,56 +233,6 @@ export default function LearningJourney() {
     <div className="min-h-screen bg-[#0a0f1d] text-slate-100 font-montserrat">
       <Navbar />
 
-      {/* Sticky Progress Bar & Quick Jump Ribbon */}
-      <div className="sticky top-0 z-40 bg-[#0c1427]/95 backdrop-blur-md border-b border-slate-800 shadow-lg">
-        {/* Progress Bar Line */}
-        <div className="w-full h-1 bg-slate-800">
-          <div
-            className="h-full bg-gradient-to-r from-[#00aeef] via-sky-400 to-emerald-400 transition-all duration-150"
-            style={{ width: `${scrollProgress}%` }}
-          />
-        </div>
-
-        {/* Milestone Quick Jump Buttons */}
-        <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-bold text-[#00aeef] uppercase tracking-wider hidden sm:inline">
-              Roadmap:
-            </span>
-            <span className="text-xs text-slate-300 font-semibold">
-              Step {activeStep + 1} of {MILESTONES.length}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-1.5 shrink-0">
-            {MILESTONES.map((m, idx) => (
-              <button
-                key={m.id}
-                onClick={() => scrollToMilestone(idx)}
-                className={`px-3 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
-                  activeStep === idx
-                    ? "bg-[#00aeef] text-white shadow-md shadow-[#00aeef]/20 scale-105"
-                    : "bg-slate-800/80 text-slate-400 hover:text-white hover:bg-slate-700"
-                }`}
-              >
-                <span>{m.stepNumber}</span>
-                <span className="hidden md:inline truncate max-w-[120px]">
-                  {m.title.split(":")[0].split(" ")[0]} {m.title.split(":")[0].split(" ")[1] || ""}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <Link
-            to="/courses/11485"
-            className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-xs font-bold hover:bg-emerald-500/30 transition-colors"
-          >
-            <span>Start Free</span>
-            <FontAwesomeIcon icon={faArrowRight} className="text-[10px]" />
-          </Link>
-        </div>
-      </div>
-
       {/* Hero Introduction */}
       <section className="relative py-20 px-4 sm:px-6 lg:px-8 overflow-hidden bg-gradient-to-b from-[#0b1324] via-[#0d1830] to-[#0a0f1d]">
         {/* Glow Effects */}

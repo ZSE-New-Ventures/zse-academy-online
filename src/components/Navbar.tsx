@@ -37,6 +37,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import logo from "../assets/logo.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCourses } from "@/hooks/useCourses";
+import { RoadmapRibbon } from "./RoadmapRibbon";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -81,7 +82,8 @@ export const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-50 h-[76px] flex items-center font-montserrat shadow-sm">
+    <header className="sticky top-0 z-50 w-full font-montserrat">
+      <nav className="bg-white/95 backdrop-blur-md border-b border-slate-200/90 h-[74px] sm:h-[76px] flex items-center shadow-sm">
       <div className="w-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="flex justify-between items-center gap-3 lg:gap-6">
 
@@ -757,6 +759,9 @@ export const Navbar = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </nav>
+      </nav>
+      {/* Global Investor Roadmap Ribbon - Visible Across All Tabs & Persistent On Scroll */}
+      <RoadmapRibbon />
+    </header>
   );
 };
