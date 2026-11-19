@@ -359,12 +359,6 @@ export const LearningPathways: React.FC = () => {
             >
               Browse All Courses
             </Link>
-            <Link
-              to="/verify-certificate"
-              className="px-5 py-3 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs uppercase tracking-wider rounded-xl border border-slate-700 transition-colors whitespace-nowrap"
-            >
-              Verify Certificate
-            </Link>
           </div>
         </div>
       </div>
