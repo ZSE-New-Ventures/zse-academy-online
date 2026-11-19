@@ -12,6 +12,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faShieldHalved,
@@ -27,6 +34,7 @@ import {
   faUserTie,
   faGraduationCap,
   faLock,
+  faPlus,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   securityService,
@@ -37,15 +45,310 @@ import {
   LockedUser,
 } from "@/services/security.service";
 
+interface ComplexityCardProps {
+  title: string;
+  description: string;
+  icon: any;
+  iconColor: string;
+  badgeLabel: string;
+  badgeClass: string;
+  buttonClass: string;
+  settings: ScopeSecuritySetting;
+  onChange: (updated: ScopeSecuritySetting) => void;
+  onSave: () => void;
+  saving: boolean;
+}
+
+const ComplexityPolicyCard: React.FC<ComplexityCardProps> = ({
+  title,
+  description,
+  icon,
+  iconColor,
+  badgeLabel,
+  badgeClass,
+  buttonClass,
+  settings,
+  onChange,
+  onSave,
+  saving,
+}) => (
+  <Card className="border border-slate-200 shadow-sm flex flex-col justify-between">
+    <div>
+      <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <FontAwesomeIcon icon={icon} className={iconColor} />
+            <CardTitle className="text-sm font-bold text-slate-900">{title}</CardTitle>
+          </div>
+          <Badge className={badgeClass}>{badgeLabel}</Badge>
+        </div>
+        <CardDescription className="text-xs text-slate-500">{description}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="pt-4 space-y-4">
+        <div className="space-y-1">
+          <div className="flex justify-between text-xs font-semibold text-slate-700">
+            <span>Minimum Password Length</span>
+            <span className={`font-bold ${iconColor}`}>{settings.min_password_length} chars</span>
+          </div>
+          <Input
+            type="number"
+            min={6}
+            max={32}
+            value={settings.min_password_length}
+            onChange={(e) =>
+              onChange({ ...settings, min_password_length: parseInt(e.target.value) || 8 })
+            }
+            className="text-xs bg-slate-50"
+          />
+        </div>
+
+        <div className="divide-y divide-slate-100">
+          <div className="py-2.5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold text-slate-800">Require Uppercase Letters [A-Z]</div>
+              <div className="text-[11px] text-slate-400">Must include capital letters</div>
+            </div>
+            <Switch
+              checked={settings.require_uppercase}
+              onCheckedChange={(val) => onChange({ ...settings, require_uppercase: val })}
+            />
+          </div>
+
+          <div className="py-2.5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold text-slate-800">Require Lowercase Letters [a-z]</div>
+              <div className="text-[11px] text-slate-400">Must include lowercase letters</div>
+            </div>
+            <Switch
+              checked={settings.require_lowercase}
+              onCheckedChange={(val) => onChange({ ...settings, require_lowercase: val })}
+            />
+          </div>
+
+          <div className="py-2.5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold text-slate-800">Require Numeric Digits [0-9]</div>
+              <div className="text-[11px] text-slate-400">Must include numbers</div>
+            </div>
+            <Switch
+              checked={settings.require_numbers}
+              onCheckedChange={(val) => onChange({ ...settings, require_numbers: val })}
+            />
+          </div>
+
+          <div className="py-2.5 flex items-center justify-between">
+            <div>
+              <div className="text-xs font-semibold text-slate-800">Require Special Characters (!@#$%...)</div>
+              <div className="text-[11px] text-slate-400">Mandatory symbol character inclusion</div>
+            </div>
+            <Switch
+              checked={settings.require_special_characters}
+              onCheckedChange={(val) => onChange({ ...settings, require_special_characters: val })}
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 pt-2">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-700">Password Rotation (Days)</label>
+            <Input
+              type="number"
+              min={0}
+              max={365}
+              value={settings.password_expiry_days}
+              onChange={(e) =>
+                onChange({ ...settings, password_expiry_days: parseInt(e.target.value) || 0 })
+              }
+              className="text-xs bg-slate-50"
+            />
+            <span className="text-[10px] text-slate-400">0 = Never expires</span>
+          </div>
+
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-slate-700">History Reuse Limit</label>
+            <Input
+              type="number"
+              min={0}
+              max={24}
+              value={settings.password_history_limit}
+              onChange={(e) =>
+                onChange({ ...settings, password_history_limit: parseInt(e.target.value) || 0 })
+              }
+              className="text-xs bg-slate-50"
+            />
+            <span className="text-[10px] text-slate-400">Prevents previous passwords</span>
+          </div>
+        </div>
+      </CardContent>
+    </div>
+
+    <div className="p-6 pt-0">
+      <Button
+        onClick={onSave}
+        disabled={saving}
+        className={`w-full text-white text-xs font-bold rounded-xl h-10 ${buttonClass}`}
+      >
+        <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
+        Save {title}
+      </Button>
+    </div>
+  </Card>
+);
+
+interface MfaCardProps {
+  title: string;
+  scopeLabel: string;
+  icon: any;
+  iconColor: string;
+  iconBg: string;
+  buttonClass: string;
+  settings: ScopeSecuritySetting;
+  onChange: (updated: ScopeSecuritySetting) => void;
+  onSave: () => void;
+  saving: boolean;
+}
+
+const MfaPolicyCard: React.FC<MfaCardProps> = ({
+  title,
+  scopeLabel,
+  icon,
+  iconColor,
+  iconBg,
+  buttonClass,
+  settings,
+  onChange,
+  onSave,
+  saving,
+}) => (
+  <Card className="border border-slate-200 shadow-sm flex flex-col justify-between">
+    <div>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className={`w-8 h-8 rounded-lg ${iconBg} ${iconColor} flex items-center justify-center`}>
+              <FontAwesomeIcon icon={icon} className="text-xs" />
+            </div>
+            <CardTitle className="text-sm font-bold text-slate-900">{title}</CardTitle>
+          </div>
+          <Badge className={settings.mfa_enabled ? "bg-emerald-100 text-emerald-800" : "bg-slate-100 text-slate-600"}>
+            {settings.mfa_enabled ? "MFA Enforced" : "MFA Disabled"}
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="p-4 bg-slate-50 rounded-xl flex items-center justify-between">
+          <div>
+            <div className="text-xs font-bold text-slate-800">Require MFA for {scopeLabel}</div>
+            <div className="text-[11px] text-slate-500 mt-0.5">
+              Enforce 6-digit email OTP for {scopeLabel.toLowerCase()} authentication.
+            </div>
+          </div>
+          <Switch
+            checked={settings.mfa_enabled}
+            onCheckedChange={(val) => onChange({ ...settings, mfa_enabled: val })}
+          />
+        </div>
+      </CardContent>
+    </div>
+    <div className="p-6 pt-0">
+      <Button
+        onClick={onSave}
+        disabled={saving}
+        className={`w-full text-white text-xs font-bold rounded-xl h-10 ${buttonClass}`}
+      >
+        <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
+        Save {title}
+      </Button>
+    </div>
+  </Card>
+);
+
+interface SessionCardProps {
+  title: string;
+  description: string;
+  icon: any;
+  iconColor: string;
+  badgeClass: string;
+  buttonClass: string;
+  hint: string;
+  min: number;
+  max: number;
+  settings: ScopeSecuritySetting;
+  onChange: (updated: ScopeSecuritySetting) => void;
+  onSave: () => void;
+  saving: boolean;
+}
+
+const SessionTimeoutCard: React.FC<SessionCardProps> = ({
+  title,
+  description,
+  icon,
+  iconColor,
+  badgeClass,
+  buttonClass,
+  hint,
+  min,
+  max,
+  settings,
+  onChange,
+  onSave,
+  saving,
+}) => (
+  <Card className="border border-slate-200 shadow-sm flex flex-col justify-between">
+    <div>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
+            <FontAwesomeIcon icon={icon} className={iconColor} />
+            {title}
+          </CardTitle>
+          <Badge className={badgeClass}>{settings.session_idle_timeout_minutes} Minutes</Badge>
+        </div>
+        <CardDescription className="text-xs text-slate-500">{description}</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-1.5">
+          <label className="text-xs font-semibold text-slate-700">Inactivity Threshold (Minutes)</label>
+          <Input
+            type="number"
+            min={min}
+            max={max}
+            value={settings.session_idle_timeout_minutes}
+            onChange={(e) =>
+              onChange({
+                ...settings,
+                session_idle_timeout_minutes: parseInt(e.target.value) || min,
+              })
+            }
+            className="text-xs bg-slate-50"
+          />
+          <p className="text-[11px] text-slate-400">{hint}</p>
+        </div>
+      </CardContent>
+    </div>
+    <div className="p-6 pt-0">
+      <Button
+        onClick={onSave}
+        disabled={saving}
+        className={`w-full text-white text-xs font-bold rounded-xl h-10 ${buttonClass}`}
+      >
+        <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
+        Save {title}
+      </Button>
+    </div>
+  </Card>
+);
+
 export const AdminSecurity: React.FC = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // Settings for Staff and Student
-  const [staffSettings, setStaffSettings] = useState<ScopeSecuritySetting>({
-    scope: "staff",
-    min_password_length: 12,
+  // Distinct Three-Tier Security Settings for Admin, Instructor, and Student
+  const [adminSettings, setAdminSettings] = useState<ScopeSecuritySetting>({
+    scope: "admin",
+    min_password_length: 14,
     require_uppercase: true,
     require_lowercase: true,
     require_numbers: true,
@@ -54,6 +357,22 @@ export const AdminSecurity: React.FC = () => {
     password_history_limit: 5,
     mfa_enabled: false,
     session_idle_timeout_minutes: 15,
+    max_login_attempts: 3,
+    lockout_duration_minutes: 30,
+    strict_admin_unlock: true,
+  });
+
+  const [instructorSettings, setInstructorSettings] = useState<ScopeSecuritySetting>({
+    scope: "instructor",
+    min_password_length: 12,
+    require_uppercase: true,
+    require_lowercase: true,
+    require_numbers: true,
+    require_special_characters: true,
+    password_expiry_days: 90,
+    password_history_limit: 5,
+    mfa_enabled: false,
+    session_idle_timeout_minutes: 30,
     max_login_attempts: 3,
     lockout_duration_minutes: 30,
     strict_admin_unlock: false,
@@ -79,6 +398,9 @@ export const AdminSecurity: React.FC = () => {
   const [roles, setRoles] = useState<RoleWithPermissions[]>([]);
   const [permissionsByDomain, setPermissionsByDomain] = useState<Record<string, PermissionItem[]>>({});
   const [rolePermissionsMap, setRolePermissionsMap] = useState<Record<number, Set<string>>>({});
+  const [isAddRoleOpen, setIsAddRoleOpen] = useState(false);
+  const [newRoleName, setNewRoleName] = useState("");
+  const [creatingRole, setCreatingRole] = useState(false);
 
   // Locked users
   const [lockedUsers, setLockedUsers] = useState<LockedUser[]>([]);
@@ -97,8 +419,11 @@ export const AdminSecurity: React.FC = () => {
       ]);
 
       if (settingsRes?.settings) {
-        setStaffSettings(settingsRes.settings.staff);
-        setStudentSettings(settingsRes.settings.student);
+        if (settingsRes.settings.admin) setAdminSettings(settingsRes.settings.admin);
+        else if (settingsRes.settings.staff) setAdminSettings(settingsRes.settings.staff);
+
+        if (settingsRes.settings.instructor) setInstructorSettings(settingsRes.settings.instructor);
+        if (settingsRes.settings.student) setStudentSettings(settingsRes.settings.student);
       }
 
       if (iamRes?.roles) {
@@ -128,14 +453,31 @@ export const AdminSecurity: React.FC = () => {
     }
   };
 
-  const handleSavePolicy = async (scope: "staff" | "student") => {
+  const handleSavePolicy = async (scope: "admin" | "instructor" | "student" | "staff") => {
     try {
       setSaving(true);
-      const target = scope === "staff" ? staffSettings : studentSettings;
+      const target =
+        scope === "admin"
+          ? adminSettings
+          : scope === "instructor"
+          ? instructorSettings
+          : scope === "student"
+          ? studentSettings
+          : adminSettings;
+
       await securityService.updateSettings(target);
+      const label =
+        scope === "admin"
+          ? "Administrator"
+          : scope === "instructor"
+          ? "Instructor & Faculty"
+          : scope === "student"
+          ? "Student"
+          : "Staff";
+
       toast({
         title: "Security Policy Saved",
-        description: `${scope === "staff" ? "Staff & Instructor" : "Student"} configuration updated successfully.`,
+        description: `${label} configuration updated successfully.`,
       });
     } catch (err) {
       console.error("Save failed:", err);
@@ -146,6 +488,37 @@ export const AdminSecurity: React.FC = () => {
       });
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleCreateRole = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newRoleName.trim()) {
+      return toast({
+        title: "Validation Error",
+        description: "Role Name is required.",
+        variant: "destructive",
+      });
+    }
+
+    try {
+      setCreatingRole(true);
+      await securityService.createRole({ name: newRoleName.trim() });
+      toast({
+        title: "Role Created",
+        description: `Role '${newRoleName.trim()}' has been added to the IAM matrix.`,
+      });
+      setNewRoleName("");
+      setIsAddRoleOpen(false);
+      loadAllData();
+    } catch (err: any) {
+      toast({
+        title: "Role Creation Failed",
+        description: err?.response?.data?.message || "Failed to create new role.",
+        variant: "destructive",
+      });
+    } finally {
+      setCreatingRole(false);
     }
   };
 
@@ -275,330 +648,53 @@ export const AdminSecurity: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        {/* TAB 1: PASSWORD COMPLEXITY */}
+        {/* TAB 1: PASSWORD COMPLEXITY (THREE-TIER SCOPES) */}
         <TabsContent value="complexity" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Staff / Instructor Card */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faUserTie} className="text-[#00aeef]" />
-                    <CardTitle className="text-sm font-bold text-slate-900">
-                      Staff & Faculty Password Policy
-                    </CardTitle>
-                  </div>
-                  <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-[10px]">
-                    Privileged Access
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Applies to Administrators, Faculty, and Staff accounts.
-                </CardDescription>
-              </CardHeader>
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+            {/* Tier 1: Administrator Policy */}
+            <ComplexityPolicyCard
+              title="Administrator Policy"
+              description="Applies to Super Admins and Administrative security operators."
+              icon={faShieldHalved}
+              iconColor="text-red-500"
+              badgeLabel="High Privileged"
+              badgeClass="bg-red-50 text-red-700 border-red-200 text-[10px]"
+              buttonClass="bg-slate-900 hover:bg-slate-800"
+              settings={adminSettings}
+              onChange={setAdminSettings}
+              onSave={() => handleSavePolicy("admin")}
+              saving={saving}
+            />
 
-              <CardContent className="pt-4 space-y-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold text-slate-700">
-                    <span>Minimum Password Length</span>
-                    <span className="text-[#00aeef] font-bold">
-                      {staffSettings.min_password_length} chars
-                    </span>
-                  </div>
-                  <Input
-                    type="number"
-                    min={8}
-                    max={32}
-                    value={staffSettings.min_password_length}
-                    onChange={(e) =>
-                      setStaffSettings({
-                        ...staffSettings,
-                        min_password_length: parseInt(e.target.value) || 8,
-                      })
-                    }
-                    className="text-xs bg-slate-50"
-                  />
-                </div>
+            {/* Tier 2: Faculty & Instructor Policy */}
+            <ComplexityPolicyCard
+              title="Instructor & Faculty Policy"
+              description="Applies to Course Instructors and Senior Academic Faculty."
+              icon={faUserTie}
+              iconColor="text-[#00aeef]"
+              badgeLabel="Academic Staff"
+              badgeClass="bg-blue-50 text-blue-700 border-blue-200 text-[10px]"
+              buttonClass="bg-[#00aeef] hover:bg-[#008cc0]"
+              settings={instructorSettings}
+              onChange={setInstructorSettings}
+              onSave={() => handleSavePolicy("instructor")}
+              saving={saving}
+            />
 
-                <div className="divide-y divide-slate-100">
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Uppercase Letters [A-Z]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include capital letters</div>
-                    </div>
-                    <Switch
-                      checked={staffSettings.require_uppercase}
-                      onCheckedChange={(val) =>
-                        setStaffSettings({ ...staffSettings, require_uppercase: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Lowercase Letters [a-z]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include lowercase letters</div>
-                    </div>
-                    <Switch
-                      checked={staffSettings.require_lowercase}
-                      onCheckedChange={(val) =>
-                        setStaffSettings({ ...staffSettings, require_lowercase: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Numeric Digits [0-9]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include numbers</div>
-                    </div>
-                    <Switch
-                      checked={staffSettings.require_numbers}
-                      onCheckedChange={(val) =>
-                        setStaffSettings({ ...staffSettings, require_numbers: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Special Characters (!@#$%...)
-                      </div>
-                      <div className="text-[11px] text-slate-400">
-                        Mandatory symbol character inclusion
-                      </div>
-                    </div>
-                    <Switch
-                      checked={staffSettings.require_special_characters}
-                      onCheckedChange={(val) =>
-                        setStaffSettings({
-                          ...staffSettings,
-                          require_special_characters: val,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">
-                      Password Rotation (Days)
-                    </label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={365}
-                      value={staffSettings.password_expiry_days}
-                      onChange={(e) =>
-                        setStaffSettings({
-                          ...staffSettings,
-                          password_expiry_days: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="text-xs bg-slate-50"
-                    />
-                    <span className="text-[10px] text-slate-400">0 = Never expires</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">
-                      History Reuse Limit
-                    </label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={24}
-                      value={staffSettings.password_history_limit}
-                      onChange={(e) =>
-                        setStaffSettings({
-                          ...staffSettings,
-                          password_history_limit: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="text-xs bg-slate-50"
-                    />
-                    <span className="text-[10px] text-slate-400">Prevents previous passwords</span>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => handleSavePolicy("staff")}
-                  disabled={saving}
-                  className="w-full bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10 mt-2"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Staff Password Policy
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Student / Public Card */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="bg-slate-50/50 border-b border-slate-100 pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <FontAwesomeIcon icon={faGraduationCap} className="text-emerald-600" />
-                    <CardTitle className="text-sm font-bold text-slate-900">
-                      Student & Public Password Policy
-                    </CardTitle>
-                  </div>
-                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]">
-                    Learner Access
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Applies to self-registered student and investor accounts.
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="pt-4 space-y-4">
-                <div className="space-y-1">
-                  <div className="flex justify-between text-xs font-semibold text-slate-700">
-                    <span>Minimum Password Length</span>
-                    <span className="text-emerald-600 font-bold">
-                      {studentSettings.min_password_length} chars
-                    </span>
-                  </div>
-                  <Input
-                    type="number"
-                    min={6}
-                    max={32}
-                    value={studentSettings.min_password_length}
-                    onChange={(e) =>
-                      setStudentSettings({
-                        ...studentSettings,
-                        min_password_length: parseInt(e.target.value) || 6,
-                      })
-                    }
-                    className="text-xs bg-slate-50"
-                  />
-                </div>
-
-                <div className="divide-y divide-slate-100">
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Uppercase Letters [A-Z]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include capital letters</div>
-                    </div>
-                    <Switch
-                      checked={studentSettings.require_uppercase}
-                      onCheckedChange={(val) =>
-                        setStudentSettings({ ...studentSettings, require_uppercase: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Lowercase Letters [a-z]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include lowercase letters</div>
-                    </div>
-                    <Switch
-                      checked={studentSettings.require_lowercase}
-                      onCheckedChange={(val) =>
-                        setStudentSettings({ ...studentSettings, require_lowercase: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Numeric Digits [0-9]
-                      </div>
-                      <div className="text-[11px] text-slate-400">Must include numbers</div>
-                    </div>
-                    <Switch
-                      checked={studentSettings.require_numbers}
-                      onCheckedChange={(val) =>
-                        setStudentSettings({ ...studentSettings, require_numbers: val })
-                      }
-                    />
-                  </div>
-
-                  <div className="py-2.5 flex items-center justify-between">
-                    <div>
-                      <div className="text-xs font-semibold text-slate-800">
-                        Require Special Characters (!@#$%...)
-                      </div>
-                      <div className="text-[11px] text-slate-400">Optional for public users</div>
-                    </div>
-                    <Switch
-                      checked={studentSettings.require_special_characters}
-                      onCheckedChange={(val) =>
-                        setStudentSettings({
-                          ...studentSettings,
-                          require_special_characters: val,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3 pt-2">
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">
-                      Password Rotation (Days)
-                    </label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={365}
-                      value={studentSettings.password_expiry_days}
-                      onChange={(e) =>
-                        setStudentSettings({
-                          ...studentSettings,
-                          password_expiry_days: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="text-xs bg-slate-50"
-                    />
-                    <span className="text-[10px] text-slate-400">0 = Disabled</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="text-xs font-semibold text-slate-700">
-                      History Reuse Limit
-                    </label>
-                    <Input
-                      type="number"
-                      min={0}
-                      max={24}
-                      value={studentSettings.password_history_limit}
-                      onChange={(e) =>
-                        setStudentSettings({
-                          ...studentSettings,
-                          password_history_limit: parseInt(e.target.value) || 0,
-                        })
-                      }
-                      className="text-xs bg-slate-50"
-                    />
-                    <span className="text-[10px] text-slate-400">Previous passwords blocked</span>
-                  </div>
-                </div>
-
-                <Button
-                  onClick={() => handleSavePolicy("student")}
-                  disabled={saving}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl h-10 mt-2"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Student Password Policy
-                </Button>
-              </CardContent>
-            </Card>
+            {/* Tier 3: Student & Public Learner Policy */}
+            <ComplexityPolicyCard
+              title="Student & Learner Policy"
+              description="Applies to self-enrolled students and public capital market learners."
+              icon={faGraduationCap}
+              iconColor="text-emerald-600"
+              badgeLabel="Learner Access"
+              badgeClass="bg-emerald-50 text-emerald-700 border-emerald-200 text-[10px]"
+              buttonClass="bg-emerald-600 hover:bg-emerald-700"
+              settings={studentSettings}
+              onChange={setStudentSettings}
+              onSave={() => handleSavePolicy("student")}
+              saving={saving}
+            />
           </div>
         </TabsContent>
 
@@ -608,221 +704,104 @@ export const AdminSecurity: React.FC = () => {
             <FontAwesomeIcon icon={faInfoCircle} className="text-blue-500 text-base mt-0.5 shrink-0" />
             <div>
               <strong>Multi-Factor Authentication (MFA) Architecture:</strong> When MFA is toggled
-              ON for a user group, logging in with an email and password triggers a 6-digit
-              cryptographic verification code delivered via institutional email. The user must
+              ON for a user scope, logging in with an email and password triggers a 6-digit
+              cryptographic verification code delivered via registered email. The user must
               confirm this code within 5 minutes before full session authorization is granted.
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Staff MFA Card */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                      <FontAwesomeIcon icon={faUserTie} className="text-xs" />
-                    </div>
-                    <CardTitle className="text-sm font-bold text-slate-900">
-                      Faculty & Admin MFA
-                    </CardTitle>
-                  </div>
-                  <Badge
-                    className={
-                      staffSettings.mfa_enabled
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-slate-100 text-slate-600"
-                    }
-                  >
-                    {staffSettings.mfa_enabled ? "MFA Enforced" : "MFA Disabled"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-xl flex items-center justify-between">
-                  <div>
-                    <div className="text-xs font-bold text-slate-800">
-                      Require MFA for Staff & Faculty
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Enforce 6-digit email OTP for all administrator and instructor logins.
-                    </div>
-                  </div>
-                  <Switch
-                    checked={staffSettings.mfa_enabled}
-                    onCheckedChange={(val) =>
-                      setStaffSettings({ ...staffSettings, mfa_enabled: val })
-                    }
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <MfaPolicyCard
+              title="Administrator MFA"
+              scopeLabel="Administrators"
+              icon={faShieldHalved}
+              iconColor="text-red-500"
+              iconBg="bg-red-50"
+              buttonClass="bg-slate-900 hover:bg-slate-800"
+              settings={adminSettings}
+              onChange={setAdminSettings}
+              onSave={() => handleSavePolicy("admin")}
+              saving={saving}
+            />
 
-                <Button
-                  onClick={() => handleSavePolicy("staff")}
-                  disabled={saving}
-                  className="w-full bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Staff MFA Configuration
-                </Button>
-              </CardContent>
-            </Card>
+            <MfaPolicyCard
+              title="Instructor MFA"
+              scopeLabel="Faculty & Instructors"
+              icon={faUserTie}
+              iconColor="text-blue-600"
+              iconBg="bg-blue-50"
+              buttonClass="bg-[#00aeef] hover:bg-[#008cc0]"
+              settings={instructorSettings}
+              onChange={setInstructorSettings}
+              onSave={() => handleSavePolicy("instructor")}
+              saving={saving}
+            />
 
-            {/* Student MFA Card */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                      <FontAwesomeIcon icon={faGraduationCap} className="text-xs" />
-                    </div>
-                    <CardTitle className="text-sm font-bold text-slate-900">
-                      Student & Learner MFA
-                    </CardTitle>
-                  </div>
-                  <Badge
-                    className={
-                      studentSettings.mfa_enabled
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-slate-100 text-slate-600"
-                    }
-                  >
-                    {studentSettings.mfa_enabled ? "MFA Enforced" : "MFA Disabled"}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-xl flex items-center justify-between">
-                  <div>
-                    <div className="text-xs font-bold text-slate-800">
-                      Require MFA for Students
-                    </div>
-                    <div className="text-[11px] text-slate-500 mt-0.5">
-                      Enforce 6-digit email OTP for public student and investor sign-ins.
-                    </div>
-                  </div>
-                  <Switch
-                    checked={studentSettings.mfa_enabled}
-                    onCheckedChange={(val) =>
-                      setStudentSettings({ ...studentSettings, mfa_enabled: val })
-                    }
-                  />
-                </div>
-
-                <Button
-                  onClick={() => handleSavePolicy("student")}
-                  disabled={saving}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl h-10"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Student MFA Configuration
-                </Button>
-              </CardContent>
-            </Card>
+            <MfaPolicyCard
+              title="Student MFA"
+              scopeLabel="Students & Learners"
+              icon={faGraduationCap}
+              iconColor="text-emerald-600"
+              iconBg="bg-emerald-50"
+              buttonClass="bg-emerald-600 hover:bg-emerald-700"
+              settings={studentSettings}
+              onChange={setStudentSettings}
+              onSave={() => handleSavePolicy("student")}
+              saving={saving}
+            />
           </div>
         </TabsContent>
 
         {/* TAB 3: SESSION IDLE TIMEOUTS */}
         <TabsContent value="session" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Staff Session Timeout */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faClock} className="text-[#00aeef]" />
-                    Staff Session Idle Timeout
-                  </CardTitle>
-                  <Badge className="bg-blue-50 text-blue-700 border-blue-200 text-xs">
-                    {staffSettings.session_idle_timeout_minutes} Minutes
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Automatic termination of unattended administrative and instructor sessions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-700">
-                    Inactivity Threshold (Minutes)
-                  </label>
-                  <Input
-                    type="number"
-                    min={5}
-                    max={120}
-                    value={staffSettings.session_idle_timeout_minutes}
-                    onChange={(e) =>
-                      setStaffSettings({
-                        ...staffSettings,
-                        session_idle_timeout_minutes: parseInt(e.target.value) || 15,
-                      })
-                    }
-                    className="text-xs bg-slate-50"
-                  />
-                  <p className="text-[11px] text-slate-400">
-                    Recommended: 15 to 30 minutes for institutional PCI/OWASP compliance.
-                  </p>
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <SessionTimeoutCard
+              title="Administrator Session Timeout"
+              description="Automatic termination of unattended administrative operator sessions."
+              icon={faShieldHalved}
+              iconColor="text-red-500"
+              badgeClass="bg-red-50 text-red-700 border-red-200 text-xs"
+              buttonClass="bg-slate-900 hover:bg-slate-800"
+              hint="Recommended: 15 minutes for privileged infrastructure compliance."
+              min={5}
+              max={60}
+              settings={adminSettings}
+              onChange={setAdminSettings}
+              onSave={() => handleSavePolicy("admin")}
+              saving={saving}
+            />
 
-                <Button
-                  onClick={() => handleSavePolicy("staff")}
-                  disabled={saving}
-                  className="w-full bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Staff Session Timeout
-                </Button>
-              </CardContent>
-            </Card>
+            <SessionTimeoutCard
+              title="Instructor Session Timeout"
+              description="Termination of unattended faculty and course instruction sessions."
+              icon={faUserTie}
+              iconColor="text-[#00aeef]"
+              badgeClass="bg-blue-50 text-blue-700 border-blue-200 text-xs"
+              buttonClass="bg-[#00aeef] hover:bg-[#008cc0]"
+              hint="Recommended: 30 to 45 minutes for active grading and lecture preparation."
+              min={10}
+              max={120}
+              settings={instructorSettings}
+              onChange={setInstructorSettings}
+              onSave={() => handleSavePolicy("instructor")}
+              saving={saving}
+            />
 
-            {/* Student Session Timeout */}
-            <Card className="border border-slate-200 shadow-sm">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                    <FontAwesomeIcon icon={faClock} className="text-emerald-600" />
-                    Student Session Idle Timeout
-                  </CardTitle>
-                  <Badge className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
-                    {studentSettings.session_idle_timeout_minutes} Minutes
-                  </Badge>
-                </div>
-                <CardDescription className="text-xs text-slate-500">
-                  Inactivity threshold before public student sessions are safely logged out.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-slate-700">
-                    Inactivity Threshold (Minutes)
-                  </label>
-                  <Input
-                    type="number"
-                    min={15}
-                    max={480}
-                    value={studentSettings.session_idle_timeout_minutes}
-                    onChange={(e) =>
-                      setStudentSettings({
-                        ...studentSettings,
-                        session_idle_timeout_minutes: parseInt(e.target.value) || 120,
-                      })
-                    }
-                    className="text-xs bg-slate-50"
-                  />
-                  <p className="text-[11px] text-slate-400">
-                    Recommended: 60 to 180 minutes to avoid interrupting course examinations.
-                  </p>
-                </div>
-
-                <Button
-                  onClick={() => handleSavePolicy("student")}
-                  disabled={saving}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl h-10"
-                >
-                  <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Student Session Timeout
-                </Button>
-              </CardContent>
-            </Card>
+            <SessionTimeoutCard
+              title="Student Session Timeout"
+              description="Inactivity threshold before public student sessions are safely logged out."
+              icon={faGraduationCap}
+              iconColor="text-emerald-600"
+              badgeClass="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs"
+              buttonClass="bg-emerald-600 hover:bg-emerald-700"
+              hint="Recommended: 120 minutes to prevent interruption during video lessons & quizzes."
+              min={15}
+              max={480}
+              settings={studentSettings}
+              onChange={setStudentSettings}
+              onSave={() => handleSavePolicy("student")}
+              saving={saving}
+            />
           </div>
         </TabsContent>
 
@@ -837,22 +816,41 @@ export const AdminSecurity: React.FC = () => {
                   Lockout Policy Rules
                 </CardTitle>
                 <CardDescription className="text-xs text-slate-500">
-                  Brute-force protection thresholds.
+                  Brute-force protection thresholds across user tiers.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">
-                    Staff Max Failed Attempts
+                    Admin Max Failed Attempts
                   </label>
                   <Input
                     type="number"
                     min={1}
                     max={10}
-                    value={staffSettings.max_login_attempts}
+                    value={adminSettings.max_login_attempts}
                     onChange={(e) =>
-                      setStaffSettings({
-                        ...staffSettings,
+                      setAdminSettings({
+                        ...adminSettings,
+                        max_login_attempts: parseInt(e.target.value) || 3,
+                      })
+                    }
+                    className="text-xs bg-slate-50"
+                  />
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">
+                    Instructor Max Failed Attempts
+                  </label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={instructorSettings.max_login_attempts}
+                    onChange={(e) =>
+                      setInstructorSettings({
+                        ...instructorSettings,
                         max_login_attempts: parseInt(e.target.value) || 3,
                       })
                     }
@@ -887,10 +885,11 @@ export const AdminSecurity: React.FC = () => {
                     type="number"
                     min={5}
                     max={1440}
-                    value={staffSettings.lockout_duration_minutes}
+                    value={adminSettings.lockout_duration_minutes}
                     onChange={(e) => {
                       const val = parseInt(e.target.value) || 30;
-                      setStaffSettings({ ...staffSettings, lockout_duration_minutes: val });
+                      setAdminSettings({ ...adminSettings, lockout_duration_minutes: val });
+                      setInstructorSettings({ ...instructorSettings, lockout_duration_minutes: val });
                       setStudentSettings({ ...studentSettings, lockout_duration_minutes: val });
                     }}
                     className="text-xs bg-slate-50"
@@ -907,9 +906,10 @@ export const AdminSecurity: React.FC = () => {
                     </div>
                   </div>
                   <Switch
-                    checked={staffSettings.strict_admin_unlock}
+                    checked={adminSettings.strict_admin_unlock}
                     onCheckedChange={(val) => {
-                      setStaffSettings({ ...staffSettings, strict_admin_unlock: val });
+                      setAdminSettings({ ...adminSettings, strict_admin_unlock: val });
+                      setInstructorSettings({ ...instructorSettings, strict_admin_unlock: val });
                       setStudentSettings({ ...studentSettings, strict_admin_unlock: val });
                     }}
                   />
@@ -917,14 +917,15 @@ export const AdminSecurity: React.FC = () => {
 
                 <Button
                   onClick={async () => {
-                    await handleSavePolicy("staff");
+                    await handleSavePolicy("admin");
+                    await handleSavePolicy("instructor");
                     await handleSavePolicy("student");
                   }}
                   disabled={saving}
                   className="w-full bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10 mt-2"
                 >
                   <FontAwesomeIcon icon={faFloppyDisk} className="mr-2" />
-                  Save Lockout Rules
+                  Save All Lockout Rules
                 </Button>
               </CardContent>
             </Card>
@@ -1009,6 +1010,14 @@ export const AdminSecurity: React.FC = () => {
                   automatically retains all capabilities.
                 </CardDescription>
               </div>
+
+              <Button
+                onClick={() => setIsAddRoleOpen(true)}
+                className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-9 px-3.5 shadow-sm"
+              >
+                <FontAwesomeIcon icon={faPlus} className="mr-1.5" />
+                Add Custom Role
+              </Button>
             </CardHeader>
 
             <CardContent className="space-y-6">
@@ -1091,6 +1100,61 @@ export const AdminSecurity: React.FC = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Add Custom Role Dialog */}
+          <Dialog open={isAddRoleOpen} onOpenChange={setIsAddRoleOpen}>
+            <DialogContent className="sm:max-w-[420px] p-0 border border-slate-200 shadow-2xl rounded-2xl overflow-hidden">
+              <div className="bg-gradient-to-r from-slate-900 via-[#0a3161] to-[#00aeef] p-6 text-white">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+                    <FontAwesomeIcon icon={faUsersGear} className="h-5 w-5 text-[#00aeef]" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-lg font-bold text-white">
+                      Create Custom System Role
+                    </DialogTitle>
+                    <DialogDescription className="text-slate-200 text-xs mt-0.5">
+                      Define a new staff role and map functional privileges.
+                    </DialogDescription>
+                  </div>
+                </div>
+              </div>
+
+              <form onSubmit={handleCreateRole} className="p-6 space-y-4">
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Role Identifier / Name *</label>
+                  <Input
+                    placeholder="e.g. Compliance Officer or Faculty Head"
+                    value={newRoleName}
+                    onChange={(e) => setNewRoleName(e.target.value)}
+                    required
+                    className="text-xs bg-slate-50 border-slate-200 rounded-xl"
+                  />
+                  <p className="text-[10px] text-slate-400">
+                    Will be registered in the IAM matrix and available when onboarding instructors.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsAddRoleOpen(false)}
+                    className="text-xs rounded-xl h-10 px-4"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    disabled={creatingRole}
+                    className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10 px-5 shadow-sm"
+                  >
+                    {creatingRole ? "Creating..." : "Create Role"}
+                  </Button>
+                </div>
+              </form>
+            </DialogContent>
+          </Dialog>
         </TabsContent>
       </Tabs>
     </div>

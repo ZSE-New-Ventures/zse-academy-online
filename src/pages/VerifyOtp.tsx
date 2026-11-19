@@ -19,13 +19,21 @@ const VerifyOtp = () => {
   const [timer, setTimer] = useState(60);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { toast } = useToast();
-  const { verifyOtp, resendOtp, isAuthenticated } = useAuth();
+  const { verifyOtp, resendOtp, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/dashboard");
+    if (isAuthenticated) {
+      if (user?.role === "admin" || user?.role === "super_admin") {
+        navigate("/admin");
+      } else if (user?.role === "instructor" || user?.role === "senior_instructor") {
+        navigate("/instructor");
+      } else {
+        navigate("/dashboard");
+      }
+    }
     if (!email) navigate("/signup");
-  }, [isAuthenticated, email, navigate]);
+  }, [isAuthenticated, user, email, navigate]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;

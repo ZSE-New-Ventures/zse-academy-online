@@ -30,6 +30,8 @@ import {
   faUpload,
   faTimes,
   faInfoCircle,
+  faCertificate,
+  faAward,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dialog,
@@ -170,6 +172,10 @@ const ManageCourses = () => {
     is_published: false,
     visibility: "public" as "public" | "restricted" | "private",
     instructor_id: "unassigned",
+    certification_type: "standard" as "standard" | "high_stakes" | "none",
+    passing_grade_percent: 70,
+    requires_manual_approval: false,
+    signatory_type: "instructor" as "instructor" | "executive" | "dual",
   });
 
   useEffect(() => {
@@ -321,6 +327,10 @@ const ManageCourses = () => {
         duration: formData.duration,
         is_published: formData.is_published,
         visibility: formData.visibility,
+        certification_type: formData.certification_type,
+        passing_grade_percent: formData.passing_grade_percent,
+        requires_manual_approval: formData.requires_manual_approval,
+        signatory_type: formData.signatory_type,
       };
 
       // Include numeric instructor_id if set and not "unassigned"
@@ -365,11 +375,38 @@ const ManageCourses = () => {
       setIsDialogOpen(false);
       resetForm();
     } catch (error: unknown) {
-      const err = error as { response?: { data?: { message?: string } } };
+      const err = error as {
+        response?: {
+          data?: {
+            message?: string;
+            error?: string;
+            errors?: Record<string, string[]>;
+            [key: string]: unknown;
+          };
+        };
+      };
       console.error("Error saving course:", error);
+      let errMsg = "Failed to save course";
+      if (err.response?.data) {
+        if (typeof err.response.data.message === "string") {
+          errMsg = err.response.data.message;
+        } else if (typeof err.response.data.error === "string") {
+          errMsg = err.response.data.error;
+        } else if (typeof err.response.data.errors === "object" && err.response.data.errors !== null) {
+          const firstErrList = Object.values(err.response.data.errors)[0];
+          if (Array.isArray(firstErrList) && firstErrList.length > 0) {
+            errMsg = firstErrList[0];
+          }
+        } else {
+          const values = Object.values(err.response.data);
+          if (values.length > 0 && Array.isArray(values[0]) && values[0].length > 0) {
+            errMsg = String(values[0][0]);
+          }
+        }
+      }
       toast({
         title: "Error",
-        description: err.response?.data?.message || "Failed to save course",
+        description: errMsg,
         variant: "destructive",
       });
     }
@@ -488,6 +525,10 @@ const ManageCourses = () => {
       is_published: false,
       visibility: "public",
       instructor_id: "unassigned",
+      certification_type: "standard",
+      passing_grade_percent: 70,
+      requires_manual_approval: false,
+      signatory_type: "instructor",
     });
     setThumbnailFile(null);
     setThumbnailPreview(null);
@@ -522,6 +563,10 @@ const ManageCourses = () => {
       visibility: course.visibility || "public",
       // If no instructor ID, use "unassigned"
       instructor_id: instructorId ? String(instructorId) : "unassigned",
+      certification_type: course.certification_type === "high_stakes_licensure" ? "high_stakes" : (course.certification_type || "standard"),
+      passing_grade_percent: course.passing_grade_percent || 70,
+      requires_manual_approval: Boolean(course.requires_manual_approval),
+      signatory_type: course.signatory_type || "instructor",
     });
 
     setIsDialogOpen(true);
@@ -863,6 +908,7 @@ const ManageCourses = () => {
                           instructors.map((inst) => (
                             <SelectItem key={inst.id} value={String(inst.id)}>
                               {inst.name}
+                              {inst.department?.name ? ` — ${inst.department.name}` : ""}
                             </SelectItem>
                           ))
                         ) : (
@@ -906,6 +952,111 @@ const ManageCourses = () => {
                       }
                     />
                     <Label>Publish course</Label>
+                  </div>
+                </div>
+
+                {/* Certification & Accreditation Parameters */}
+                <div className="p-4 bg-slate-50/80 border border-slate-200 rounded-xl space-y-3.5 mt-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <FontAwesomeIcon icon={faCertificate} className="text-[#00aeef] text-sm" />
+                      <span className="text-xs font-bold text-slate-800">Certification & Assessment Parameters</span>
+                    </div>
+                    <Badge className={
+                      formData.certification_type === "high_stakes"
+                        ? "bg-amber-100 text-amber-800 border-amber-300 text-[10px]"
+                        : "bg-blue-100 text-blue-700 border-blue-200 text-[10px]"
+                    }>
+                      {formData.certification_type === "high_stakes" ? "High-Stakes Licensure" : "Standard Cert"}
+                    </Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-[11px] font-semibold text-slate-700">Certification Type</Label>
+                      <Select
+                        value={formData.certification_type}
+                        onValueChange={(val: "standard" | "high_stakes" | "none") =>
+                          setFormData({
+                            ...formData,
+                            certification_type: val,
+                            requires_manual_approval: val === "high_stakes" ? true : formData.requires_manual_approval,
+                          })
+                        }
+                      >
+                        <SelectTrigger className="bg-white border-slate-200 text-xs h-9 mt-1">
+                          <SelectValue placeholder="Select Cert Type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="standard" className="text-xs">
+                            🎓 Standard Certificate of Completion
+                          </SelectItem>
+                          <SelectItem value="high_stakes" className="text-xs">
+                            🏆 High-Stakes Licensure / Professional Exam
+                          </SelectItem>
+                          <SelectItem value="none" className="text-xs">
+                            🚫 No Certificate
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div>
+                      <Label className="text-[11px] font-semibold text-slate-700">Minimum Passing Score (%)</Label>
+                      <Input
+                        type="number"
+                        min={50}
+                        max={100}
+                        value={formData.passing_grade_percent}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            passing_grade_percent: parseInt(e.target.value, 10) || 70,
+                          })
+                        }
+                        className="bg-white border-slate-200 text-xs h-9 mt-1"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <Label className="text-[11px] font-semibold text-slate-700">Signatory Authority</Label>
+                      <Select
+                        value={formData.signatory_type}
+                        onValueChange={(val: "instructor" | "executive" | "dual") =>
+                          setFormData({ ...formData, signatory_type: val })
+                        }
+                      >
+                        <SelectTrigger className="bg-white border-slate-200 text-xs h-9 mt-1">
+                          <SelectValue placeholder="Select Signatory" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="instructor" className="text-xs">
+                            ✍️ Course Instructor Signature
+                          </SelectItem>
+                          <SelectItem value="executive" className="text-xs">
+                            🏛️ Executive Director / CEO
+                          </SelectItem>
+                          <SelectItem value="dual" className="text-xs">
+                            📜 Dual Signatories (Instructor + Director)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex items-center justify-between p-2.5 bg-white border border-slate-200 rounded-lg self-end h-9">
+                      <Label className="text-[11px] font-medium text-slate-700 cursor-pointer" htmlFor="manual-signoff-toggle">
+                        Require Instructor Sign-Off
+                      </Label>
+                      <Switch
+                        id="manual-signoff-toggle"
+                        checked={formData.requires_manual_approval}
+                        onCheckedChange={(checked) =>
+                          setFormData({ ...formData, requires_manual_approval: checked })
+                        }
+                      />
+                    </div>
                   </div>
                 </div>
 

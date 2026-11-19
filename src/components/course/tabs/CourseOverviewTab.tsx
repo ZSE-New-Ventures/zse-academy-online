@@ -17,7 +17,7 @@ export const CourseOverviewTab = ({
     "Learn from industry experts with years of ZSE experience",
     "Hands-on projects and real-world market applications",
     "Build a strong foundation in Zimbabwean financial markets",
-    "Access to exclusive ZSE Academy community resources"
+    "Access to exclusive ZSE Training Institute community resources"
   ];
 
   return (

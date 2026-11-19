@@ -2,7 +2,7 @@ import { apiClient } from "./api";
 
 export interface ScopeSecuritySetting {
   id?: number;
-  scope: "staff" | "student";
+  scope: "admin" | "instructor" | "student" | "staff";
   min_password_length: number;
   require_uppercase: boolean;
   require_lowercase: boolean;
@@ -20,6 +20,8 @@ export interface ScopeSecuritySetting {
 export interface SecuritySettingsResponse {
   status: string;
   settings: {
+    admin?: ScopeSecuritySetting;
+    instructor?: ScopeSecuritySetting;
     staff: ScopeSecuritySetting;
     student: ScopeSecuritySetting;
   };
@@ -107,6 +109,11 @@ export const securityService = {
     return res.data;
   },
 
+  createRole: async (data: { name: string; permissions?: string[] }) => {
+    const res = await apiClient.post("/admin/security/roles", data);
+    return res.data;
+  },
+
   getLockedUsers: async (): Promise<{ locked_users: LockedUser[] }> => {
     const res = await apiClient.get("/admin/security/locked-users");
     return res.data;
@@ -122,8 +129,8 @@ export const securityService = {
     return res.data;
   },
 
-  getDepartments: async (): Promise<{ departments: Department[] }> => {
-    const res = await apiClient.get("/departments");
+  getDepartments: async (all = false): Promise<{ departments: Department[] }> => {
+    const res = await apiClient.get(`/departments${all ? "?all=1" : ""}`);
     return res.data;
   },
 

@@ -52,7 +52,7 @@ const Signup = () => {
     suggestedEmail?: string;
   } | null>(null);
   const { toast } = useToast();
-  const { signup, isAuthenticated } = useAuth();
+  const { signup, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -73,8 +73,16 @@ const Signup = () => {
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/dashboard");
-  }, [isAuthenticated, navigate]);
+    if (isAuthenticated) {
+      if (user?.role === "admin" || user?.role === "super_admin") {
+        navigate("/admin");
+      } else if (user?.role === "instructor" || user?.role === "senior_instructor") {
+        navigate("/instructor");
+      } else {
+        navigate("/dashboard");
+      }
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const validatePassword = (password: string) => {
     if (!policy) return true;

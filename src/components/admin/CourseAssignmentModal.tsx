@@ -6,6 +6,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,6 +62,7 @@ export const CourseAssignmentModal = ({
   // Data states
   const [assignments, setAssignments] = useState<CourseAssignment[]>([]);
   const [loadingAssignments, setLoadingAssignments] = useState(false);
+  const [revokingAssignmentId, setRevokingAssignmentId] = useState<number | null>(null);
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [allUsers, setAllUsers] = useState<Array<{ id: number; name: string; email: string }>>([]);
 
@@ -170,8 +181,9 @@ export const CourseAssignmentModal = ({
     }
   };
 
-  const handleRevoke = async (assignmentId: number) => {
-    if (!window.confirm("Revoke this assignment? The user/group will lose access.")) return;
+  const confirmRevoke = async () => {
+    if (!revokingAssignmentId) return;
+    const assignmentId = revokingAssignmentId;
 
     try {
       await courseService.revokeAssignment(assignmentId);
@@ -183,6 +195,8 @@ export const CourseAssignmentModal = ({
     } catch (error) {
       console.error("Revoke error:", error);
       toast({ title: "Error", description: "Failed to revoke access.", variant: "destructive" });
+    } finally {
+      setRevokingAssignmentId(null);
     }
   };
 
@@ -396,7 +410,7 @@ export const CourseAssignmentModal = ({
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleRevoke(a.id)}
+                        onClick={() => setRevokingAssignmentId(a.id)}
                         className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 h-8"
                       >
                         Revoke Access
@@ -408,6 +422,34 @@ export const CourseAssignmentModal = ({
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Modern In-App Removal Confirmation Dialog */}
+        <AlertDialog
+          open={!!revokingAssignmentId}
+          onOpenChange={(open) => !open && setRevokingAssignmentId(null)}
+        >
+          <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-lg font-bold text-slate-900">
+                Revoke Course Access?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+                Are you sure you want to revoke this course assignment? The assigned student or group will immediately lose access to this restricted course.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="mt-5 gap-2 sm:gap-0">
+              <AlertDialogCancel className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold h-9 px-4">
+                Cancel
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmRevoke}
+                className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold h-9 px-5 shadow-sm"
+              >
+                Yes, Revoke Access
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </DialogContent>
     </Dialog>
   );

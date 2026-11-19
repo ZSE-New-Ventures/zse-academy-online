@@ -36,6 +36,10 @@ export interface Course {
   thumbnail_url?: string;
   is_published?: boolean;
   visibility?: 'public' | 'restricted' | 'private';
+  certification_type?: 'standard' | 'high_stakes' | 'none';
+  passing_grade_percent?: number;
+  requires_manual_approval?: boolean;
+  signatory_type?: 'instructor' | 'executive' | 'dual';
 }
 
 export interface UserGroup {
@@ -304,5 +308,53 @@ export const courseService = {
   updateDefaultThumbnail: async (data: FormData | { thumbnail_url?: string }) => {
     const response = await apiClient.post('/admin/settings/default-thumbnail', data);
     return response.data?.data || response.data;
+  },
+
+  // Dedicated Instructor Portal Methods
+  getInstructorStats: async () => {
+    const response = await apiClient.get('/instructor/stats');
+    return response.data?.stats;
+  },
+
+  getInstructorCourses: async (params?: { page?: number; search?: string; visibility?: string }) => {
+    const response = await apiClient.get('/instructor/courses', { params });
+    return response.data?.courses;
+  },
+
+  getCourseStudents: async (courseId: number, params?: { page?: number; search?: string; status?: string }) => {
+    const response = await apiClient.get(`/instructor/courses/${courseId}/students`, { params });
+    return response.data;
+  },
+
+  getEligibleCertificates: async (params?: { page?: number; course_id?: string | number }) => {
+    const response = await apiClient.get('/instructor/certificates/eligible', { params });
+    return response.data?.eligible_graduates;
+  },
+
+  issueCertificate: async (data: { course_id: number; user_id: number; remarks?: string }) => {
+    const response = await apiClient.post('/instructor/certificates/issue', data);
+    return response.data;
+  },
+
+  revokeCertificate: async (certificateId: number, reason: string) => {
+    const response = await apiClient.post(`/instructor/certificates/${certificateId}/revoke`, { reason });
+    return response.data;
+  },
+
+  updateCourseSettings: async (courseId: number, settings: {
+    certification_type?: 'standard' | 'high_stakes' | 'none';
+    passing_grade_percent?: number;
+    requires_manual_approval?: boolean;
+    signatory_type?: 'instructor' | 'executive' | 'dual';
+  }) => {
+    const response = await apiClient.put(`/instructor/courses/${courseId}/settings`, settings);
+    return response.data;
+  },
+
+  uploadInstructorSignature: async (formData: FormData) => {
+    const response = await apiClient.post('/instructor/profile/signature', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
   },
 };

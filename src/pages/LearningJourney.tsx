@@ -24,7 +24,7 @@ import {
 import courseInvesting101 from "@/assets/course-investing-101.png";
 import courseVfexDirect from "@/assets/course-vfex-direct.png";
 import courseDirect from "@/assets/course-direct.jpg";
-import courseEtf from "@/assets/course-etf.jpg";
+import fundingOrderImg from "@/assets/funding-account-order.jpg";
 import courseReits from "@/assets/course-reits.png";
 import courseStatements from "@/assets/course-statements.jpg";
 import investmentImg from "@/assets/investment.jpg";
@@ -124,7 +124,7 @@ const MILESTONES: JourneyMilestone[] = [
     title: "Funding Your Account & Placing Your Very First Order",
     summary:
       "Once registered, you can deposit funds using EcoCash, InnBucks, ZimSwitch, or bank transfer and place your order on the live exchange order book.",
-    image: courseEtf,
+    image: fundingOrderImg,
     takeaways: [
       "Understanding the Order Book: Bids (what buyers will pay) vs Asks (what sellers want)",
       "Market Orders (buy at the best available current price) vs Limit Orders (buy only at your specified target price)",

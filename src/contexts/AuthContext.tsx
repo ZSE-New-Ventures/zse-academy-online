@@ -56,10 +56,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         const userData = await authService.getCurrentUser();
         setUser(userData);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to fetch user:", error);
-        setUser(null);
-        localStorage.removeItem("zse_training_token");
+        if (error?.response?.data?.code !== "PASSWORD_CHANGE_REQUIRED") {
+          setUser(null);
+          localStorage.removeItem("zse_training_token");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -82,6 +84,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = response.token;
       if (token) {
         localStorage.setItem("zse_training_token", token);
+      }
+
+      if (response.user) {
+        setUser(response.user);
+        return response.user;
       }
 
       // Fetch user profile

@@ -78,7 +78,22 @@ export const transformBlogPost = <T extends { content?: string; image?: string }
   return {
     ...post,
     content: cleanContent,
-    author: post.user ? { name: post.user.name, email: post.user.email } : { name: "Anonymous Author", email: "" },
+    author: (() => {
+      if (typeof (post as any).author === 'string' && (post as any).author.trim() && (post as any).author !== 'zsetraining') {
+        return { name: (post as any).author.trim(), email: (post as any).user?.email || "" };
+      }
+      if ((post as any).author?.name && (post as any).author.name !== 'zsetraining') {
+        return (post as any).author;
+      }
+      const byMatch = cleanContent.match(/^\s*(?:<[^>]+>)*\s*By\s+([A-Z][a-zA-Z\s\.\-]{2,40})/i);
+      if (byMatch && byMatch[1]) {
+        return { name: byMatch[1].trim(), email: (post as any).user?.email || "" };
+      }
+      if ((post as any).user?.name && (post as any).user.name !== 'zsetraining') {
+        return { name: (post as any).user.name, email: (post as any).user.email || "" };
+      }
+      return { name: "ZSE Training Faculty", email: "" };
+    })(),
     image: cleanImage || getFallbackImage(post.id),
     excerpt: generateExcerpt(cleanContent),
     category: post.category_data?.name || post.category?.name || post.category || getRandomCategory(),

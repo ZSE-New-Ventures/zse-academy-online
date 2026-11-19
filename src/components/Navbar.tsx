@@ -16,6 +16,7 @@ import {
   faGauge,
   faRightFromBracket,
   faUserShield,
+  faChalkboardTeacher,
   faHeart,
   faBell,
   faArrowRight,
@@ -384,26 +385,46 @@ export const Navbar = () => {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <Link
-                  to="/dashboard"
-                  className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#00aeef] hover:bg-slate-50 transition-all"
-                >
-                  <FontAwesomeIcon icon={faGauge} className="text-[#00aeef]" />
-                  <span>My Learning</span>
-                </Link>
+                {user?.role === "instructor" || user?.role === "senior_instructor" ? (
+                  <Link
+                    to="/instructor"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#00aeef] hover:bg-slate-50 transition-all border border-slate-200/80 shadow-sm"
+                  >
+                    <FontAwesomeIcon icon={faChalkboardTeacher} className="text-[#00aeef]" />
+                    <span>Faculty Portal</span>
+                  </Link>
+                ) : user?.role === "admin" || user?.role === "super_admin" ? (
+                  <Link
+                    to="/admin"
+                    className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#00aeef] hover:bg-slate-50 transition-all border border-slate-200/80 shadow-sm"
+                  >
+                    <FontAwesomeIcon icon={faUserShield} className="text-[#00aeef]" />
+                    <span>Admin Panel</span>
+                  </Link>
+                ) : (
+                  <>
+                    <Link
+                      to="/dashboard"
+                      className="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#00aeef] hover:bg-slate-50 transition-all"
+                    >
+                      <FontAwesomeIcon icon={faGauge} className="text-[#00aeef]" />
+                      <span>My Learning</span>
+                    </Link>
 
-                <button
-                  onClick={() => setIsWishlistModalOpen(true)}
-                  className="p-2.5 text-slate-600 hover:text-[#00aeef] hover:bg-slate-50 rounded-xl transition-all relative"
-                  title="Saved Courses"
-                >
-                  <FontAwesomeIcon icon={faHeart} className="h-4 w-4" />
-                  {wishlistCount > 0 && (
-                    <span className="absolute top-1 right-1 bg-[#00aeef] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                      {wishlistCount}
-                    </span>
-                  )}
-                </button>
+                    <button
+                      onClick={() => setIsWishlistModalOpen(true)}
+                      className="p-2.5 text-slate-600 hover:text-[#00aeef] hover:bg-slate-50 rounded-xl transition-all relative"
+                      title="Saved Courses"
+                    >
+                      <FontAwesomeIcon icon={faHeart} className="h-4 w-4" />
+                      {wishlistCount > 0 && (
+                        <span className="absolute top-1 right-1 bg-[#00aeef] text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+                          {wishlistCount}
+                        </span>
+                      )}
+                    </button>
+                  </>
+                )}
 
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -417,7 +438,15 @@ export const Navbar = () => {
                   >
                     <div
                       className="p-4 bg-slate-50 hover:bg-slate-100/80 cursor-pointer border-b border-slate-100 flex items-center gap-3 transition-colors"
-                      onClick={() => navigate("/dashboard")}
+                      onClick={() => {
+                        if (user?.role === "instructor" || user?.role === "senior_instructor") {
+                          navigate("/instructor");
+                        } else if (user?.role === "admin" || user?.role === "super_admin") {
+                          navigate("/admin");
+                        } else {
+                          navigate("/dashboard");
+                        }
+                      }}
                     >
                       <div className="h-12 w-12 rounded-xl bg-slate-900 text-white flex items-center justify-center font-black text-lg uppercase shrink-0">
                         {user?.name?.charAt(0) || "U"}
@@ -427,22 +456,36 @@ export const Navbar = () => {
                           {user?.name}
                         </span>
                         <span className="text-xs text-slate-500 truncate">{user?.email}</span>
+                        <span className="text-[10px] uppercase font-bold text-[#00aeef] mt-0.5 tracking-wider">
+                          {user?.role === "instructor" || user?.role === "senior_instructor"
+                            ? "Faculty Instructor"
+                            : user?.role === "admin" || user?.role === "super_admin"
+                            ? "Administrator"
+                            : "Learner"}
+                        </span>
                       </div>
                     </div>
 
                     <div className="p-2 space-y-1">
-                      <DropdownMenuItem asChild className="rounded-xl px-3 py-2 cursor-pointer text-xs font-semibold text-slate-700 hover:bg-slate-100">
-                        <Link to="/dashboard" className="flex items-center gap-2">
-                          <FontAwesomeIcon icon={faGauge} className="text-slate-400" />
-                          <span>My Learning Dashboard</span>
-                        </Link>
-                      </DropdownMenuItem>
-
-                      {user?.role === "admin" && (
+                      {user?.role === "instructor" || user?.role === "senior_instructor" ? (
+                        <DropdownMenuItem asChild className="rounded-xl px-3 py-2 cursor-pointer text-xs font-bold text-[#00aeef] hover:bg-blue-50">
+                          <Link to="/instructor" className="flex items-center gap-2">
+                            <FontAwesomeIcon icon={faChalkboardTeacher} />
+                            <span>Instructor Command Center</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : user?.role === "admin" || user?.role === "super_admin" ? (
                         <DropdownMenuItem asChild className="rounded-xl px-3 py-2 cursor-pointer text-xs font-bold text-[#00aeef] hover:bg-blue-50">
                           <Link to="/admin" className="flex items-center gap-2">
                             <FontAwesomeIcon icon={faUserShield} />
                             <span>Administrator Panel</span>
+                          </Link>
+                        </DropdownMenuItem>
+                      ) : (
+                        <DropdownMenuItem asChild className="rounded-xl px-3 py-2 cursor-pointer text-xs font-semibold text-slate-700 hover:bg-slate-100">
+                          <Link to="/dashboard" className="flex items-center gap-2">
+                            <FontAwesomeIcon icon={faGauge} className="text-slate-400" />
+                            <span>My Learning Dashboard</span>
                           </Link>
                         </DropdownMenuItem>
                       )}
@@ -516,16 +559,53 @@ export const Navbar = () => {
               <img src={logo} alt="ZSE Training Institute" className="h-8 w-auto mb-4" />
 
               {isAuthenticated ? (
-                <div className="flex items-center gap-3">
-                  <div className="h-11 w-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base uppercase shrink-0">
-                    {user?.name?.charAt(0) || "U"}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-xl bg-slate-900 text-white flex items-center justify-center font-bold text-base uppercase shrink-0">
+                      {user?.name?.charAt(0) || "U"}
+                    </div>
+                    <div className="flex flex-col overflow-hidden">
+                      <span className="font-bold text-slate-900 text-sm leading-tight truncate">
+                        {user?.name}
+                      </span>
+                      <span className="text-xs text-slate-500 truncate">{user?.email}</span>
+                      <span className="text-[10px] uppercase font-bold text-[#00aeef] mt-0.5 tracking-wider">
+                        {user?.role === "instructor" || user?.role === "senior_instructor"
+                          ? "Faculty Instructor"
+                          : user?.role === "admin" || user?.role === "super_admin"
+                          ? "Administrator"
+                          : "Learner"}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex flex-col overflow-hidden">
-                    <span className="font-bold text-slate-900 text-sm leading-tight truncate">
-                      {user?.name}
+                  <Link
+                    to={
+                      user?.role === "instructor" || user?.role === "senior_instructor"
+                        ? "/instructor"
+                        : user?.role === "admin" || user?.role === "super_admin"
+                        ? "/admin"
+                        : "/dashboard"
+                    }
+                    onClick={() => setIsOpen(false)}
+                    className="w-full py-2.5 px-3 rounded-xl bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-colors"
+                  >
+                    <FontAwesomeIcon
+                      icon={
+                        user?.role === "instructor" || user?.role === "senior_instructor"
+                          ? faChalkboardTeacher
+                          : user?.role === "admin" || user?.role === "super_admin"
+                          ? faUserShield
+                          : faGauge
+                      }
+                    />
+                    <span>
+                      {user?.role === "instructor" || user?.role === "senior_instructor"
+                        ? "Faculty Portal"
+                        : user?.role === "admin" || user?.role === "super_admin"
+                        ? "Administrator Panel"
+                        : "My Learning Dashboard"}
                     </span>
-                    <span className="text-xs text-slate-500 truncate">{user?.email}</span>
-                  </div>
+                  </Link>
                 </div>
               ) : (
                 <div className="flex gap-2 pt-2">

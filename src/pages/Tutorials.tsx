@@ -25,6 +25,8 @@ import { Badge } from "@/components/ui/badge";
 import tutorialsBg from "../assets/tutorials.jpg";
 import courseDirect from "@/assets/course-direct.jpg";
 import courseMarket from "@/assets/course-market-analysis.jpg";
+import fundingAccountOrder from "@/assets/funding-account-order.jpg";
+import investmentImg from "@/assets/investment.jpg";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { API_BASE_URL } from "@/constants/api";
 
@@ -48,20 +50,20 @@ interface Tutorial {
 const defaultTutorials: Tutorial[] = [
   {
     id: "1",
-    title: "Introduction to ZSE Direct",
-    description: "Comprehensive walkthrough introducing the ZSE Direct trading platform, retail features, and real-time market interface.",
+    title: "Mastering ZSE Direct: Retail Investor Masterclass (2026)",
+    description: "Comprehensive 2026 video masterclass introducing the ZSE Direct trading platform, retail features, ATS sessions (09:30-13:00 CAT), and market access.",
     category: "zse",
-    duration: "4 min",
+    duration: "6 min",
     completed: true,
     order: 1,
     icon: faDesktop,
     gradient: "from-blue-600 to-cyan-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/D21mo9winrY" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+    iframecode: '<video controls controlsList="nodownload" src="/videos/mastering-zse-direct-retail-investor-masterclass.mp4" class="w-full h-full object-contain" playsinline preload="metadata"></video>',
   },
   {
     id: "2",
     title: "How to Register an Account on ZSE Direct",
-    description: "Interactive step-by-step simulation and guide for creating your ZSE Direct account and submitting KYC documents.",
+    description: "Interactive step-by-step hands-on simulation guiding you through account registration, entering personal details, uploading the 3 KYC items (National ID, Proof of Residence, Profile Photo), and selecting your stockbroker.",
     category: "zse",
     duration: "3 min",
     completed: true,
@@ -72,140 +74,56 @@ const defaultTutorials: Tutorial[] = [
   },
   {
     id: "3",
-    title: "ZSE Direct Wallet Top-Up & Funding",
-    description: "Learn how to deposit funds into your ZSE Direct trading wallet using local banking, Paynow, and mobile money.",
+    title: "Interactive Platform & Trading Walkthrough",
+    description: "Interactive hands-on click-through walkthrough demonstrating platform navigation, searching listed counters, checking live prices, and placing orders.",
     category: "zse",
-    duration: "3 min",
+    duration: "4 min",
     completed: false,
     order: 3,
-    icon: faWallet,
-    gradient: "from-amber-600 to-orange-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/-hLBS4pIFEk" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+    icon: faMobileScreen,
+    gradient: "from-indigo-600 to-cyan-500",
+    iframecode: '<iframe src="https://app.supademo.com/embed/cmir6flhu0pj6l821l4stwbjg" width="100%" height="600" style="border:none;border-radius:8px;" allow="clipboard-read; clipboard-write" allowfullscreen></iframe>',
   },
   {
     id: "4",
-    title: "How to Place a Buy Order on ZSE Direct",
-    description: "Step-by-step instructions on selecting listed counters, specifying volume and price limits, and executing buy orders.",
+    title: "Demystifying the Order Book: Bids, Asks & Trading Mechanics",
+    description: "Visual deep-dive into the ATS order book, bids, asks, market depth queues, price-time priority matching, and executing orders without slippage.",
     category: "zse",
-    duration: "3 min",
+    duration: "8 min",
     completed: false,
     order: 4,
     icon: faCoins,
     gradient: "from-sky-600 to-indigo-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/NO41T3N6Mjk" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+    iframecode: '<video controls controlsList="nodownload" src="/videos/demystifying-the-digital-farmers-market.mp4" class="w-full h-full object-contain" playsinline preload="metadata"></video>',
   },
   {
     id: "5",
-    title: "How to Place a Sell Order on ZSE Direct",
-    description: "Detailed walkthrough on liquidating shares from your active portfolio and placing market or limit sell orders.",
+    title: "The Ultimate ZSE Direct Readiness Test & Market Rules",
+    description: "Interactive walkthrough evaluating investor readiness, covering T+3 settlement, statutory fees, CSD accounts, and SECZim compliance.",
     category: "zse",
-    duration: "3 min",
+    duration: "5 min",
     completed: false,
     order: 5,
-    icon: faMoneyBillTransfer,
-    gradient: "from-violet-600 to-purple-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/Y0LL0rIaTn8" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "6",
-    title: "Market Depth Feature & Time in Force",
-    description: "Master order book depth, bid and ask queues, and how to utilize Day vs Good-Till-Cancelled (GTC) order validity.",
-    category: "zse",
-    duration: "4 min",
-    completed: false,
-    order: 6,
-    icon: faChartLine,
-    gradient: "from-blue-700 to-indigo-600",
-    iframecode: '<iframe src="https://www.youtube.com/embed/71E1Ogck2mQ" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "7",
-    title: "ZSE Direct Withdrawal Process",
-    description: "Official guide detailing the secure withdrawal of dividends and realized capital gains back to your verified bank account.",
-    category: "zse",
-    duration: "2 min",
-    completed: false,
-    order: 7,
-    icon: faWallet,
-    gradient: "from-rose-600 to-pink-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/g2NXNdMSDYw" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "8",
-    title: "Introduction to the Victoria Falls Stock Exchange (VFEX)",
-    description: "Learn the fundamentals of the US Dollar-denominated Victoria Falls Stock Exchange and its offshore incentives.",
-    category: "vfex",
-    duration: "4 min",
-    completed: false,
-    order: 8,
-    icon: faGlobe,
-    gradient: "from-teal-600 to-emerald-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/wCPzrIiZdc4" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "9",
-    title: "How to Get Started on VFEX Direct",
-    description: "Setting up your VFEX Direct web & mobile application, selecting your custodian broker, and configuring your USD FCA wallet.",
-    category: "vfex",
-    duration: "4 min",
-    completed: false,
-    order: 9,
-    icon: faMobileAlt,
-    gradient: "from-indigo-600 to-blue-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/rE5wi7S1Qoo" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "10",
-    title: "How to Buy Securities on the VFEX",
-    description: "Live demonstration showing how to browse USD-listed securities, evaluate prices, and execute equity trades on VFEX.",
-    category: "vfex",
-    duration: "3 min",
-    completed: false,
-    order: 10,
-    icon: faArrowTrendUp,
-    gradient: "from-amber-500 to-red-500",
-    iframecode: '<iframe src="https://www.youtube.com/embed/TNlGIqM_cug" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
-  },
-  {
-    id: "11",
-    title: "VFEX Listing Process & Market Framework",
-    description: "Official webinar session exploring VFEX listing procedures, compliance, foreign exchange exemptions, and capital raising.",
-    category: "vfex",
-    duration: "15 min",
-    completed: false,
-    order: 11,
     icon: faGraduationCap,
-    gradient: "from-slate-700 to-slate-900",
-    iframecode: '<iframe src="https://www.youtube.com/embed/sMjZg3kYiag" width="100%" height="550" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen style="border:none;border-radius:12px;"></iframe>',
+    gradient: "from-rose-600 to-pink-500",
+    iframecode: '<video controls controlsList="nodownload" src="/videos/the-ultimate-zse-direct-readiness-test.mp4" class="w-full h-full object-contain" playsinline preload="metadata"></video>',
   },
 ];
 
 const iconsMap: Record<string, IconDefinition> = {
   "1": faDesktop,
   "2": faUserPlus,
-  "3": faWallet,
+  "3": faMobileScreen,
   "4": faCoins,
-  "5": faMoneyBillTransfer,
-  "6": faChartLine,
-  "7": faWallet,
-  "8": faGlobe,
-  "9": faMobileAlt,
-  "10": faArrowTrendUp,
-  "11": faGraduationCap,
+  "5": faGraduationCap,
 };
 
 const gradientsList = [
   "from-blue-600 to-cyan-500",
   "from-emerald-600 to-teal-500",
-  "from-amber-600 to-orange-500",
+  "from-indigo-600 to-cyan-500",
   "from-sky-600 to-indigo-500",
-  "from-violet-600 to-purple-500",
-  "from-blue-700 to-indigo-600",
   "from-rose-600 to-pink-500",
-  "from-teal-600 to-emerald-500",
-  "from-indigo-600 to-blue-500",
-  "from-amber-500 to-red-500",
-  "from-slate-700 to-slate-900",
 ];
 
 // Helper to extract YouTube video ID from URL or embed code
@@ -215,15 +133,27 @@ const getYouTubeId = (urlOrIframe?: string) => {
   return match ? match[1] : null;
 };
 
+// Helper to extract native mp4 video source from video tag
+const extractVideoSrc = (iframecode?: string) => {
+  if (!iframecode) return null;
+  const match = iframecode.match(/src=["']([^"']+\.mp4[^"']*)["']/i);
+  return match ? match[1] : null;
+};
+
 const getTutorialPreview = (tutorial: Tutorial): string => {
   const ytId = getYouTubeId(tutorial.iframecode || tutorial.embedUrl);
   if (ytId) {
     return `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`;
   }
-  if (tutorial.category === "zse") {
-    return courseDirect;
-  }
-  return tutorialsBg;
+
+  // Dedicated thematic previews
+  if (tutorial.id === "1") return courseDirect;
+  if (tutorial.id === "2") return fundingAccountOrder;
+  if (tutorial.id === "3") return tutorialsBg;
+  if (tutorial.id === "4") return courseMarket;
+  if (tutorial.id === "5") return investmentImg;
+
+  return courseDirect;
 };
 
 // -------------------------
@@ -236,7 +166,8 @@ const TutorialCard = ({
   tutorial: Tutorial;
   onSelect: () => void;
 }) => {
-  const isSimulation = tutorial.iframecode?.includes("guideflow");
+  const isSimulation = tutorial.iframecode?.includes("guideflow") || tutorial.iframecode?.includes("supademo");
+  const videoSrc = extractVideoSrc(tutorial.iframecode);
   const previewImg = getTutorialPreview(tutorial);
 
   return (
@@ -244,18 +175,28 @@ const TutorialCard = ({
       onClick={onSelect}
       className="group relative rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm hover:shadow-2xl hover:border-[#00aeef]/60 hover:-translate-y-1.5 transition-all duration-300 cursor-pointer flex flex-col justify-between"
     >
-      <div className="relative aspect-video w-full overflow-hidden bg-slate-900">
-        <img
-          src={previewImg}
-          alt={tutorial.title}
-          className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-          onError={(e) => {
-            e.currentTarget.src = courseDirect;
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/30 to-black/30 group-hover:opacity-85 transition-opacity" />
+      <div className="relative aspect-video w-full overflow-hidden bg-slate-950">
+        {videoSrc ? (
+          <video
+            src={`${videoSrc}#t=0.5`}
+            preload="metadata"
+            muted
+            playsInline
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 pointer-events-none"
+          />
+        ) : (
+          <img
+            src={previewImg}
+            alt={tutorial.title}
+            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+            onError={(e) => {
+              e.currentTarget.src = courseDirect;
+            }}
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-black/30 group-hover:opacity-85 transition-opacity" />
 
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-13 h-13 rounded-full bg-black/50 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-[#00aeef] group-hover:border-transparent transition-all duration-300 shadow-xl">
             <FontAwesomeIcon
               icon={faPlay}
@@ -264,11 +205,14 @@ const TutorialCard = ({
           </div>
         </div>
 
-        <div className="absolute top-3 left-3">
-          <div className="w-8 h-8 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center">
+        <div className="absolute top-3 left-3 flex items-center gap-1.5">
+          <Badge className="bg-[#00aeef] text-white border-0 text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 shadow-md">
+            Step {tutorial.order}
+          </Badge>
+          <div className="w-7 h-7 rounded-lg bg-black/50 backdrop-blur-md border border-white/20 flex items-center justify-center">
             <FontAwesomeIcon
               icon={tutorial.icon || faDesktop}
-              className="h-3.5 w-3.5 text-white"
+              className="h-3 w-3 text-white"
             />
           </div>
         </div>
@@ -343,23 +287,23 @@ const TutorialViewer = ({ iframecode }: { iframecode?: string }) => {
     });
   }, [iframecode]);
 
-  const isGuideflow = iframecode?.includes("guideflow");
+  const isInteractive = iframecode?.includes("guideflow") || iframecode?.includes("supademo");
 
   if (iframecode) {
     return (
       <div className="rounded-xl border border-border bg-card shadow-lg overflow-hidden w-full">
-        {isGuideflow ? (
+        {isInteractive ? (
           <div
             ref={iframecodeContainerRef}
             dangerouslySetInnerHTML={{ __html: iframecode }}
-            className="w-full min-h-[580px] md:min-h-[640px] flex justify-center bg-black/5"
+            className="w-full min-h-[580px] md:min-h-[640px] flex justify-center bg-black/5 [&>iframe]:w-full [&>iframe]:min-h-[600px] [&>iframe]:border-0"
           />
         ) : (
           <div className="relative aspect-video w-full bg-black">
             <div
               ref={iframecodeContainerRef}
               dangerouslySetInnerHTML={{ __html: iframecode.replace(/height="\d+"/, 'height="100%"').replace(/width="\d+"/, 'width="100%"') }}
-              className="absolute inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0"
+              className="absolute inset-0 [&>iframe]:w-full [&>iframe]:h-full [&>iframe]:border-0 [&>video]:w-full [&>video]:h-full [&>video]:object-contain bg-black"
             />
           </div>
         )}
@@ -399,8 +343,9 @@ export default function TutorialsDashboard() {
         if (response.ok) {
           const data = await response.json();
           if (Array.isArray(data) && data.length > 0) {
-            const mappedData: Tutorial[] = data.map((t: { id?: number | string; name?: string; description?: string; exchange?: string; duration?: string }, index: number) => {
-              const strId = t.id?.toString() || String(index + 1);
+            const mappedData: Tutorial[] = data.map((t: { id?: number | string; name?: string; description?: string; exchange?: string; duration?: string; iframecode?: string }, index: number) => {
+              const numId = Number(t.id) || (index + 1);
+              const strId = String(numId);
               const fallback = defaultTutorials.find((d) => d.id === strId) || defaultTutorials[index % defaultTutorials.length];
 
               return {
@@ -410,13 +355,14 @@ export default function TutorialsDashboard() {
                 category: t.exchange?.toLowerCase() === "vfex" ? "vfex" : "zse",
                 duration: t.duration || fallback.duration,
                 completed: index < 2,
-                order: index + 1,
+                order: numId,
                 icon: iconsMap[strId] || fallback.icon || faDesktop,
-                gradient: gradientsList[index % gradientsList.length],
+                gradient: gradientsList[(numId - 1) % gradientsList.length] || gradientsList[0],
                 iframecode: t.iframecode || fallback.iframecode,
               };
             });
-            setTutorials(mappedData);
+            const sorted = mappedData.sort((a, b) => a.order - b.order);
+            setTutorials(sorted);
           }
         }
       } catch (err) {
@@ -429,9 +375,9 @@ export default function TutorialsDashboard() {
     fetchTutorials();
   }, []);
 
-  const filteredTutorials = tutorials.filter((t) =>
-    activeCategory === "all" ? true : t.category === activeCategory
-  );
+  const filteredTutorials = tutorials
+    .filter((t) => (activeCategory === "all" ? true : t.category === activeCategory))
+    .sort((a, b) => a.order - b.order);
 
   const zseCount = tutorials.filter((t) => t.category === "zse").length;
   const vfexCount = tutorials.filter((t) => t.category === "vfex").length;
@@ -440,10 +386,11 @@ export default function TutorialsDashboard() {
   // Tutorial Details View
   // -------------------------
   if (selectedTutorial) {
-    const currentIndex = tutorials.findIndex((t) => t.id === selectedTutorial);
-    const tutorial = tutorials[currentIndex] || tutorials[0];
-    const prevTutorial = currentIndex > 0 ? tutorials[currentIndex - 1] : null;
-    const nextTutorial = currentIndex < tutorials.length - 1 ? tutorials[currentIndex + 1] : null;
+    const sortedTutorials = [...tutorials].sort((a, b) => a.order - b.order);
+    const currentIndex = sortedTutorials.findIndex((t) => t.id === selectedTutorial);
+    const tutorial = sortedTutorials[currentIndex] || sortedTutorials[0];
+    const prevTutorial = currentIndex > 0 ? sortedTutorials[currentIndex - 1] : null;
+    const nextTutorial = currentIndex < sortedTutorials.length - 1 ? sortedTutorials[currentIndex + 1] : null;
 
     return (
       <div className="min-h-screen bg-background font-montserrat">
@@ -494,7 +441,9 @@ export default function TutorialsDashboard() {
                     {tutorial.category === "zse" ? "ZSE Direct" : "VFEX Direct"}
                   </Badge>
                   <span className="text-xs text-muted-foreground font-medium">
-                    {tutorial.iframecode?.includes("guideflow") ? "Interactive Simulation" : "Official Walkthrough"}
+                    {tutorial.iframecode?.includes("guideflow") || tutorial.iframecode?.includes("supademo")
+                      ? "Interactive Simulation"
+                      : "Official Walkthrough"}
                   </span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
@@ -541,52 +490,54 @@ export default function TutorialsDashboard() {
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
           <Badge className="bg-[#00aeef] text-white border-0 mb-4 px-4 py-1 uppercase tracking-widest text-xs drop-shadow-md font-semibold">
-            Interactive Simulations & Video Guides
+            Official Video Masterclasses (2026)
           </Badge>
           <h1 className="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight drop-shadow-md">
-            Master Trading with Hands-On Tutorials
+            Master Trading on ZSE Direct
           </h1>
           <p className="text-gray-200 max-w-2xl mx-auto text-base sm:text-lg leading-relaxed drop-shadow-md">
-            Authentic, step-by-step walkthroughs guiding you through account setup, wallet deposits, order placement, and market depth on ZSE Direct and VFEX Direct.
+            Authentic, high-definition video walkthroughs guiding you through retail onboarding, order book mechanics, and capital market rules on ZSE Direct.
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {/* Category Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-border pb-4 flex-wrap">
-          <Button
-            variant={activeCategory === "all" ? "default" : "outline"}
-            onClick={() => setActiveCategory("all")}
-            size="sm"
-            className={activeCategory === "all" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
-          >
-            All Tutorials ({tutorials.length})
-          </Button>
+        {/* Category Tabs (only shown when multiple categories exist) */}
+        {vfexCount > 0 && (
+          <div className="flex gap-2 mb-8 border-b border-border pb-4 flex-wrap">
+            <Button
+              variant={activeCategory === "all" ? "default" : "outline"}
+              onClick={() => setActiveCategory("all")}
+              size="sm"
+              className={activeCategory === "all" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
+            >
+              All Tutorials ({tutorials.length})
+            </Button>
 
-          <Button
-            variant={activeCategory === "zse" ? "default" : "outline"}
-            onClick={() => setActiveCategory("zse")}
-            size="sm"
-            className={activeCategory === "zse" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
-          >
-            <FontAwesomeIcon icon={faDesktop} className="mr-2 h-3.5 w-3.5" />
-            ZSE Direct ({zseCount})
-          </Button>
+            <Button
+              variant={activeCategory === "zse" ? "default" : "outline"}
+              onClick={() => setActiveCategory("zse")}
+              size="sm"
+              className={activeCategory === "zse" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
+            >
+              <FontAwesomeIcon icon={faDesktop} className="mr-2 h-3.5 w-3.5" />
+              ZSE Direct ({zseCount})
+            </Button>
 
-          <Button
-            variant={activeCategory === "vfex" ? "default" : "outline"}
-            onClick={() => setActiveCategory("vfex")}
-            size="sm"
-            className={activeCategory === "vfex" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
-          >
-            <FontAwesomeIcon icon={faMobileScreen} className="mr-2 h-3.5 w-3.5" />
-            VFEX Direct ({vfexCount})
-          </Button>
-        </div>
+            <Button
+              variant={activeCategory === "vfex" ? "default" : "outline"}
+              onClick={() => setActiveCategory("vfex")}
+              size="sm"
+              className={activeCategory === "vfex" ? "bg-[#00aeef] text-white hover:bg-[#00aeef]/90" : ""}
+            >
+              <FontAwesomeIcon icon={faMobileScreen} className="mr-2 h-3.5 w-3.5" />
+              VFEX Direct ({vfexCount})
+            </Button>
+          </div>
+        )}
 
         {/* Tutorial Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTutorials.map((tutorial) => (
             <TutorialCard
               key={tutorial.id}

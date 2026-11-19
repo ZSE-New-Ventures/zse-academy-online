@@ -15,6 +15,16 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -37,6 +47,7 @@ import {
   faKey,
 } from "@fortawesome/free-solid-svg-icons";
 import { API_BASE_URL } from "@/constants/api";
+import { apiClient } from "@/services/api";
 import { securityService, Department } from "@/services/security.service";
 
 interface Instructor {
@@ -64,12 +75,18 @@ interface Instructor {
 export default function InstructorManagement() {
   const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
+  const [availableRoles, setAvailableRoles] = useState<string[]>([
+    "instructor",
+    "senior_instructor",
+    "admin",
+  ]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [deletingInstructor, setDeletingInstructor] = useState<Instructor | null>(null);
 
   // Form Fields
   const [name, setName] = useState("");
@@ -85,40 +102,43 @@ export default function InstructorManagement() {
   const [signaturePreview, setSignaturePreview] = useState<string | null>(null);
 
   const { toast } = useToast();
-  const API_URL = `${API_BASE_URL}/instructors`;
-  const token = localStorage.getItem("zse_training_token");
-
-  const authHeaders = {
-    Authorization: `Bearer ${token}`,
-  };
 
   useEffect(() => {
     fetchInstructors();
-    fetchDepartments();
+    fetchDepartmentsAndRoles();
   }, []);
 
-  const fetchDepartments = async () => {
+  const fetchDepartmentsAndRoles = async () => {
     try {
-      const res = await securityService.getDepartments();
-      if (res?.departments) {
-        setDepartments(res.departments);
+      const [deptRes, iamRes] = await Promise.all([
+        securityService.getDepartments(),
+        securityService.getIamMatrix(),
+      ]);
+      if (deptRes?.departments) {
+        setDepartments(deptRes.departments);
+      }
+      if (iamRes?.roles) {
+        const staffRoles = iamRes.roles
+          .map((r: { name: string }) => r.name)
+          .filter((name: string) => name !== "student");
+        if (staffRoles.length > 0) {
+          setAvailableRoles(staffRoles);
+        }
       }
     } catch (err) {
-      console.error("Failed to load departments:", err);
+      console.error("Failed to load departments or roles:", err);
     }
   };
 
   const fetchInstructors = async () => {
     try {
       setLoading(true);
-      const response = await fetch(API_URL, {
-        headers: {
-          "Content-Type": "application/json",
-          ...authHeaders,
-        },
-      });
-      const json = await response.json();
-      const result = Array.isArray(json.instructors) ? json.instructors : [];
+      const response = await apiClient.get("/instructors");
+      const result = Array.isArray(response.data?.instructors)
+        ? response.data.instructors
+        : Array.isArray(response.data)
+        ? response.data
+        : [];
       setInstructors(result);
     } catch (error) {
       console.error("Error fetching instructors:", error);
@@ -161,6 +181,15 @@ export default function InstructorManagement() {
       });
     }
 
+    const domain = email.trim().toLowerCase().split("@")[1];
+    if (!domain || !["zse.co.zw", "vfex.exchange"].includes(domain)) {
+      return toast({
+        title: "Institutional Domain Required",
+        description: "Instructor accounts must use an authorized institutional domain (@zse.co.zw or @vfex.exchange).",
+        variant: "destructive",
+      });
+    }
+
     try {
       setSubmitting(true);
       const formData = new FormData();
@@ -174,33 +203,37 @@ export default function InstructorManagement() {
       if (imageFile) formData.append("image", imageFile);
       if (signatureFile) formData.append("signature", signatureFile);
 
-      const response = await fetch(API_URL, {
-        method: "POST",
+      const response = await apiClient.post("/instructors", formData, {
         headers: {
-          ...authHeaders,
+          "Content-Type": "multipart/form-data",
         },
-        body: formData,
       });
 
-      const json = await response.json();
-
-      if (!response.ok || !json.instructor) {
-        throw new Error(json.error || json.message || "Failed to create instructor.");
+      const instructor = response.data?.instructor;
+      if (!instructor) {
+        throw new Error(response.data?.message || "Failed to create instructor.");
       }
 
-      setInstructors((prev) => [json.instructor, ...prev]);
+      setInstructors((prev) => [instructor, ...prev]);
       setIsModalOpen(false);
       resetForm();
 
       toast({
         title: "Instructor Onboarded Successfully",
-        description: `Account created for ${json.instructor.name}. An activation link with temporary credentials was dispatched to ${json.instructor.email}.`,
+        description: `Account created for ${instructor.name}. An activation link with temporary credentials was dispatched to ${instructor.email}.`,
       });
     } catch (error: any) {
       console.error("Error creating instructor:", error);
+      const errorMsg =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.response?.data?.errors ? Object.values(error.response.data.errors).flat().join(" ") : null) ||
+        error.message ||
+        "Failed to create instructor profile.";
+
       toast({
         title: "Onboarding Failed",
-        description: error.message || "Failed to create instructor profile.",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {
@@ -208,31 +241,25 @@ export default function InstructorManagement() {
     }
   };
 
-  const handleDeleteInstructor = async (id: number) => {
-    if (!window.confirm("Are you sure you want to remove this instructor?")) return;
+  const confirmDeleteInstructor = async () => {
+    if (!deletingInstructor) return;
+    const id = deletingInstructor.id;
 
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-          ...authHeaders,
-        },
-      });
-
-      if (!response.ok) throw new Error("Delete failed");
-
+      await apiClient.delete(`/instructors/${id}`);
       setInstructors((prev) => prev.filter((i) => i.id !== id));
       toast({
         title: "Instructor Removed",
-        description: "Instructor record has been deleted.",
+        description: `${deletingInstructor.name} has been removed successfully.`,
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "Failed to delete instructor.",
+        description: error.response?.data?.message || "Failed to delete instructor.",
         variant: "destructive",
       });
+    } finally {
+      setDeletingInstructor(null);
     }
   };
 
@@ -367,8 +394,9 @@ export default function InstructorManagement() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteInstructor(inst.id)}
+                      onClick={() => setDeletingInstructor(inst)}
                       className="text-slate-400 hover:text-red-600 hover:bg-red-50 text-xs h-8 px-2.5 rounded-lg"
+                      title="Remove Instructor"
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </Button>
@@ -428,7 +456,10 @@ export default function InstructorManagement() {
 
               {/* Email Address */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Work Email Address *</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700">Work Email Address *</label>
+                  <span className="text-[10px] text-[#00aeef] font-medium">@zse.co.zw / @vfex.exchange</span>
+                </div>
                 <Input
                   type="email"
                   placeholder="e.g. tendai.chikore@zse.co.zw"
@@ -437,11 +468,17 @@ export default function InstructorManagement() {
                   required
                   className="text-xs bg-slate-50 border-slate-200 rounded-xl"
                 />
+                <p className="text-[10px] text-slate-400">
+                  Institutional accounts must use @zse.co.zw or @vfex.exchange domains.
+                </p>
               </div>
 
               {/* Department */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Department Affiliation</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700">Department Affiliation</label>
+                  <span className="text-[10px] text-[#00aeef] font-medium">Configured by Admin</span>
+                </div>
                 <Select value={departmentId} onValueChange={setDepartmentId}>
                   <SelectTrigger className="text-xs bg-slate-50 border-slate-200 rounded-xl">
                     <SelectValue placeholder="Select Department" />
@@ -458,21 +495,20 @@ export default function InstructorManagement() {
 
               {/* Staff Role */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-slate-700">Staff System Role</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-semibold text-slate-700">Staff System Role</label>
+                  <span className="text-[10px] text-[#00aeef] font-medium">Configured in IAM</span>
+                </div>
                 <Select value={role} onValueChange={setRole}>
                   <SelectTrigger className="text-xs bg-slate-50 border-slate-200 rounded-xl">
                     <SelectValue placeholder="Select Role" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="instructor" className="text-xs">
-                      Instructor (Course Author)
-                    </SelectItem>
-                    <SelectItem value="senior_instructor" className="text-xs">
-                      Senior Instructor
-                    </SelectItem>
-                    <SelectItem value="admin" className="text-xs">
-                      Academic Administrator
-                    </SelectItem>
+                    {availableRoles.map((r) => (
+                      <SelectItem key={r} value={r} className="text-xs capitalize">
+                        {r.replace(/_/g, " ")}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
@@ -597,6 +633,37 @@ export default function InstructorManagement() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Modern In-App Removal Confirmation Dialog */}
+      <AlertDialog
+        open={!!deletingInstructor}
+        onOpenChange={(open) => !open && setDeletingInstructor(null)}
+      >
+        <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+          <AlertDialogHeader>
+            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3">
+              <FontAwesomeIcon icon={faTrash} className="text-lg" />
+            </div>
+            <AlertDialogTitle className="text-lg font-bold text-slate-900">
+              Remove Instructor?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to remove <strong>{deletingInstructor?.name}</strong>? Their instructor profile and course associations will be unlinked. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-5 gap-2 sm:gap-0">
+            <AlertDialogCancel className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold h-9 px-4">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteInstructor}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold h-9 px-5 shadow-sm"
+            >
+              Yes, Remove
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

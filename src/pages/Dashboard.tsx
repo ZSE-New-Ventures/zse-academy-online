@@ -98,10 +98,14 @@ const Dashboard = () => {
   const [activity, setActivity] = useState<ActivityItem[]>([]);
   const [continueLearningData, setContinueLearningData] = useState<ContinueLearning | null>(null);
 
-  // Redirect admin users to admin dashboard
+  // Redirect staff & instructor users to their dedicated command centers
   useEffect(() => {
-    if (!authLoading && user?.role === "admin") {
-      navigate("/admin", { replace: true });
+    if (!authLoading && user) {
+      if (user.role === "admin" || user.role === "super_admin") {
+        navigate("/admin", { replace: true });
+      } else if (user.role === "instructor" || user.role === "senior_instructor") {
+        navigate("/instructor", { replace: true });
+      }
     }
   }, [user, authLoading, navigate]);
 

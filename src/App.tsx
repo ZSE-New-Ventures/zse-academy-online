@@ -15,8 +15,8 @@ import Signup from "./pages/Signup";
 import VerifyOtp from "./pages/VerifyOtp";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import AdminLogin from "./pages/admin/AdminLogin";
 import ManageCourseContent from "./pages/admin/ManageCourseContent";
+import InstructorDashboard from "./pages/instructor/InstructorDashboard";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
@@ -106,10 +106,15 @@ const App = () => (
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
 
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path="/admin/login" element={<Navigate to="/login" replace />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/*" element={<AdminDashboard />} />
             <Route path="/admin/courses/:courseId/content" element={<ManageCourseContent />} />
+
+            {/* Dedicated Instructor Portal */}
+            <Route path="/instructor" element={<InstructorDashboard />} />
+            <Route path="/instructor/courses/:courseId/content" element={<ManageCourseContent />} />
+            <Route path="/instructor/*" element={<InstructorDashboard />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

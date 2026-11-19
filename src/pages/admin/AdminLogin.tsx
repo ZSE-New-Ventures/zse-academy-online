@@ -95,14 +95,12 @@ const AdminLogin = () => {
       const loggedUser = res;
       if (
         loggedUser &&
-        loggedUser.role !== "admin" &&
-        loggedUser.role !== "super_admin" &&
-        loggedUser.role !== "instructor"
+        !["admin", "super_admin", "instructor", "senior_instructor"].includes(loggedUser.role)
       ) {
         setErrorMessage("Access Restricted: This account does not have administrative privileges.");
         toast({
           title: "Access Restricted",
-          description: "This portal is reserved for ZSE Academy administrators only.",
+          description: "This portal is reserved for ZSE Training Institute administrators only.",
           variant: "destructive",
         });
         return;
@@ -110,9 +108,13 @@ const AdminLogin = () => {
 
       toast({
         title: "Administrative Access Granted",
-        description: "Welcome to the ZSE Academy Control Center.",
+        description: "Welcome to the ZSE Training Institute Control Center.",
       });
-      navigate("/admin");
+      if (loggedUser && (loggedUser.role === "instructor" || loggedUser.role === "senior_instructor")) {
+        navigate("/instructor");
+      } else {
+        navigate("/admin");
+      }
     } catch (error: any) {
       const errorData = error.response?.data;
       let err = "Administrative sign-in failed. Please verify credentials.";
@@ -159,7 +161,11 @@ const AdminLogin = () => {
         title: "Access Granted",
         description: "Multi-Factor Authentication verified successfully.",
       });
-      navigate("/admin");
+      if (loggedUser && (loggedUser.role === "instructor" || loggedUser.role === "senior_instructor")) {
+        navigate("/instructor");
+      } else {
+        navigate("/admin");
+      }
     } catch (err: any) {
       const msg = err?.response?.data?.error || "Invalid or expired verification code.";
       toast({
@@ -189,15 +195,15 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b1324] via-[#0f172a] to-[#1e293b] flex flex-col justify-between py-10 px-4 sm:px-6 lg:px-8 font-sans selection:bg-[#00aeef] selection:text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#0b1324] via-[#0f172a] to-[#1e293b] flex flex-col justify-between p-4 sm:p-6 font-sans selection:bg-[#00aeef] selection:text-white">
       {/* Top Bar */}
-      <div className="max-w-7xl mx-auto w-full flex items-center justify-between">
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between shrink-0">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-400 hover:text-white transition-colors bg-white/5 hover:bg-white/10 px-3.5 py-2 rounded-lg border border-white/10"
         >
           <FontAwesomeIcon icon={faArrowLeft} className="text-xs" />
-          <span>Back to Academy Public Site</span>
+          <span>Back to Public Website</span>
         </Link>
 
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold">
@@ -207,23 +213,25 @@ const AdminLogin = () => {
       </div>
 
       {/* Main Card */}
-      <div className="w-full max-w-md mx-auto my-8">
-        <div className="text-center mb-8">
-          <Link to="/" className="inline-block mb-4">
-            <img src={logo} alt="Zimbabwe Stock Exchange" className="h-14 w-auto mx-auto filter drop-shadow-md" />
+      <div className="w-full max-w-md mx-auto my-auto py-3">
+        <div className="text-center mb-4">
+          <Link to="/" className="inline-block mb-2.5">
+            <div className="bg-white px-5 py-2 rounded-2xl shadow-xl border border-white/20 inline-flex items-center justify-center hover:opacity-95 transition-opacity">
+              <img src={logo} alt="ZSE Training Institute" className="h-8 w-auto" />
+            </div>
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-black text-white tracking-tight">
             Administrator Portal
           </h1>
-          <p className="text-slate-400 text-sm mt-2">
-            Secure management console for ZSE Academy courses, content, quizzes, and learner analytics.
+          <p className="text-slate-400 text-xs mt-1 max-w-xs mx-auto">
+            Authorized management console for institutional curriculum, assessments, and operations.
           </p>
         </div>
 
         <Card className="bg-slate-900/90 border-slate-800 shadow-2xl backdrop-blur-xl rounded-2xl overflow-hidden">
           <div className="h-1.5 bg-gradient-to-r from-[#00aeef] via-blue-500 to-indigo-600 w-full" />
-          <CardHeader className="pt-6 pb-4 px-6 sm:px-8">
-            <CardTitle className="text-lg font-bold text-white flex items-center gap-2">
+          <CardHeader className="pt-5 pb-3 px-6 sm:px-8">
+            <CardTitle className="text-base font-bold text-white flex items-center gap-2">
               <FontAwesomeIcon icon={mfaRequired ? faKey : faLock} className="text-[#00aeef] text-sm" />
               <span>{mfaRequired ? "Two-Factor Verification (MFA)" : "Administrative Sign In"}</span>
             </CardTitle>
@@ -375,7 +383,7 @@ const AdminLogin = () => {
               </form>
             )}
 
-            <div className="mt-6 pt-5 border-t border-slate-800 text-center">
+            <div className="mt-5 pt-4 border-t border-slate-800 text-center">
               <p className="text-slate-400 text-xs">
                 Are you a learner or investor?{" "}
                 <Link to="/login" className="text-[#00aeef] hover:underline font-semibold">
@@ -388,7 +396,7 @@ const AdminLogin = () => {
       </div>
 
       {/* Footer Disclaimer */}
-      <div className="text-center text-xs text-slate-500 max-w-md mx-auto">
+      <div className="text-center text-xs text-slate-500 max-w-md mx-auto shrink-0 pt-2">
         <p>© {new Date().getFullYear()} Zimbabwe Stock Exchange Limited. All administrative actions are audited.</p>
       </div>
     </div>

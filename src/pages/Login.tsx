@@ -59,8 +59,10 @@ const Login = () => {
   // If user is already authenticated, redirect them automatically
   useEffect(() => {
     if (!authLoading && user) {
-      if (user.role === "admin") {
+      if (user.role === "admin" || user.role === "super_admin") {
         navigate("/admin", { replace: true });
+      } else if (user.role === "instructor" || user.role === "senior_instructor") {
+        navigate("/instructor", { replace: true });
       } else {
         navigate(redirectPath || "/dashboard", { replace: true });
       }
@@ -112,6 +114,8 @@ const Login = () => {
       });
       if (loggedUser && (loggedUser.role === "admin" || loggedUser.role === "super_admin")) {
         navigate("/admin");
+      } else if (loggedUser && (loggedUser.role === "instructor" || loggedUser.role === "senior_instructor")) {
+        navigate("/instructor");
       } else {
         navigate(redirectPath || "/dashboard");
       }
@@ -206,6 +210,8 @@ const Login = () => {
 
       if (res.user && (res.user.role === "admin" || res.user.role === "super_admin")) {
         navigate("/admin");
+      } else if (res.user && (res.user.role === "instructor" || res.user.role === "senior_instructor")) {
+        navigate("/instructor");
       } else {
         navigate(redirectPath || "/dashboard");
       }
@@ -278,10 +284,10 @@ const Login = () => {
                   <span>ZSE Training Institute</span>
                 </div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                  Welcome Back
+                  Sign In
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                  Sign in to continue your courses, simulations, and exam modules
+                  Access your learner portal, faculty command center, or administrator console
                 </p>
               </div>
 

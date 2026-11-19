@@ -22,8 +22,8 @@ export const useSessionTimeout = () => {
 
     const fetchPolicy = async () => {
       try {
-        const isStaff = user.role === "admin" || user.role === "super_admin" || user.role === "instructor";
-        if (isStaff) {
+        const isAdmin = (user.role === "admin" || user.role === "super_admin") && !user.must_change_password;
+        if (isAdmin) {
           const res = await securityService.getSettings();
           if (res?.settings?.staff?.session_idle_timeout_minutes) {
             setTimeoutMinutes(res.settings.staff.session_idle_timeout_minutes);

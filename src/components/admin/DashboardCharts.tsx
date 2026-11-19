@@ -76,7 +76,7 @@ export const MaterialBarChart = ({
   };
 
   return (
-    <Box sx={{ height: height }}>
+    <Box sx={{ width: "100%" }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6" fontWeight="600" color="text.primary">
           {title}
@@ -87,48 +87,52 @@ export const MaterialBarChart = ({
           </Typography>
         )}
       </Box>
-      <ResponsiveContainer width="100%" height="100%">
-        <MuiBarChart
-          data={chartData}
-          margin={{
-            top: 20,
-            right: isMobile ? 10 : 30,
-            left: isMobile ? -10 : 0,
-            bottom: 5,
-          }}
-        >
-          {showGrid && (
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          )}
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
-            tickFormatter={(value) => value.toLocaleString()}
-          />
-          <Tooltip content={<CustomTooltip />} />
-          <Bar
-            dataKey="value"
-            name="Active Users"
-            radius={[4, 4, 0, 0]}
-            maxBarSize={isMobile ? 30 : 60}
+      <Box sx={{ height: height, width: "100%" }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <MuiBarChart
+            data={chartData}
+            margin={{
+              top: 15,
+              right: isMobile ? 10 : 25,
+              left: isMobile ? -15 : -10,
+              bottom: 15,
+            }}
           >
-            {chartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={entry.growth && entry.growth > 0 ? theme.palette.success.main : color}
-                opacity={entry.growth && entry.growth > 0 ? 0.9 : 0.7}
-              />
-            ))}
-          </Bar>
-        </MuiBarChart>
-      </ResponsiveContainer>
+            {showGrid && (
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            )}
+            <XAxis
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6b7280", fontSize: isMobile ? 11 : 13 }}
+              dy={6}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              allowDecimals={false}
+              tick={{ fill: "#6b7280", fontSize: isMobile ? 11 : 13 }}
+              tickFormatter={(value) => Math.round(Number(value)).toString()}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Bar
+              dataKey="value"
+              name="Active Users"
+              radius={[4, 4, 0, 0]}
+              maxBarSize={isMobile ? 30 : 54}
+            >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.growth && entry.growth > 0 ? theme.palette.success.main : color}
+                  opacity={entry.growth && entry.growth > 0 ? 0.9 : 0.75}
+                />
+              ))}
+            </Bar>
+          </MuiBarChart>
+        </ResponsiveContainer>
+      </Box>
     </Box>
   );
 };
@@ -148,7 +152,7 @@ export const WeeklyActivityChart = ({ data }: WeeklyActivityChartProps) => {
   }));
 
   return (
-    <Box sx={{ height: 300 }}>
+    <Box sx={{ width: "100%" }}>
       <Box sx={{ mb: 2 }}>
         <Typography variant="h6" fontWeight="600" color="text.primary">
           Weekly User Activity
@@ -157,37 +161,70 @@ export const WeeklyActivityChart = ({ data }: WeeklyActivityChartProps) => {
           Daily active users and new signups
         </Typography>
       </Box>
-      <ResponsiveContainer width="100%" height="100%">
-        <MuiBarChart
-          data={chartData}
-          margin={{
-            top: 20,
-            right: isMobile ? 10 : 30,
-            left: isMobile ? -10 : 0,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
-          <XAxis
-            dataKey="name"
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
-          />
-          <YAxis
-            axisLine={false}
-            tickLine={false}
-            tick={{ fill: "#6b7280", fontSize: isMobile ? 12 : 14 }}
-            tickFormatter={(value) => value.toLocaleString()}
-          />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "rgba(255, 255, 255, 0.95)",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
+      <Box sx={{ height: 260, width: "100%" }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <MuiBarChart
+            data={chartData}
+            margin={{
+              top: 15,
+              right: isMobile ? 10 : 25,
+              left: isMobile ? -15 : -10,
+              bottom: 5,
             }}
-            formatter={(value: number | string, name: string) => {
-              if (name === "activeUsers") return [value, "Active Users"];
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" vertical={false} />
+            <XAxis
+              dataKey="name"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fill: "#6b7280", fontSize: isMobile ? 11 : 13 }}
+              dy={6}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              allowDecimals={false}
+              tick={{ fill: "#6b7280", fontSize: isMobile ? 11 : 13 }}
+              tickFormatter={(value) => Math.round(Number(value)).toString()}
+            />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "rgba(255, 255, 255, 0.95)",
+                border: "1px solid #e5e7eb",
+                borderRadius: "8px",
+              }}
+              formatter={(value: number | string, name: string) => {
+                if (name === "activeUsers") return [value, "Active Users"];
+                if (name === "newSignups") return [value, "New Signups"];
+                return [value, name];
+              }}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              wrapperStyle={{ paddingTop: 8 }}
+            />
+            <Bar
+              dataKey="activeUsers"
+              name="Active Users"
+              fill={theme.palette.primary.main}
+              radius={[4, 4, 0, 0]}
+              maxBarSize={isMobile ? 24 : 44}
+            />
+            <Bar
+              dataKey="newSignups"
+              name="New Signups"
+              fill={theme.palette.success.main}
+              radius={[4, 4, 0, 0]}
+              maxBarSize={isMobile ? 24 : 44}
+            />
+          </MuiBarChart>
+        </ResponsiveContainer>
+      </Box>
+    </Box>
+  );
+};
               if (name === "newSignups") return [value, "New Signups"];
               return [value, name];
             }}

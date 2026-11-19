@@ -96,8 +96,7 @@ const ManageUsers = () => {
   const fetchUsers = async (page = 1, search?: string) => {
     try {
       setUsersLoading(true);
-      const params: Record<string, string | number> = { page, per_page: 25 };
-      if (roleFilter !== "all") params.role = roleFilter;
+      const params: Record<string, string | number> = { page, per_page: 25, type: "student" };
       const term = search !== undefined ? search : userSearchTerm;
       if (term.trim()) {
         params.search = term.trim();
@@ -115,10 +114,10 @@ const ManageUsers = () => {
         setTotalPages(1);
       }
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error("Failed to fetch student users:", error);
       toast({
         title: "Error",
-        description: "Failed to load user accounts. Please check your login session.",
+        description: "Failed to load student accounts.",
         variant: "destructive",
       });
     } finally {
@@ -228,9 +227,9 @@ const ManageUsers = () => {
       {/* Top Header & Tab Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-2 border-b border-gray-200">
         <div>
-          <h2 className="text-2xl font-black text-gray-900 tracking-tight">User & Role Management</h2>
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">Student Users & Learners</h2>
           <p className="text-xs text-gray-500 mt-1">
-            Manage student registrations, grant administrative privileges, and track course enrollments.
+            Manage registered student accounts, course enrollments, cohort participation, and academic progress.
           </p>
         </div>
 
@@ -244,8 +243,8 @@ const ManageUsers = () => {
                 : "text-gray-600 hover:text-gray-900"
             }`}
           >
-            <FontAwesomeIcon icon={faUsers} className="mr-2" />
-            User Accounts & Admins
+            <FontAwesomeIcon icon={faGraduationCap} className="mr-2" />
+            Student Accounts
           </button>
           <button
             onClick={() => handleTabChange("enrollments")}
@@ -255,7 +254,7 @@ const ManageUsers = () => {
                 : "text-gray-600 hover:text-gray-900"
             }`}
           >
-            <FontAwesomeIcon icon={faGraduationCap} className="mr-2" />
+            <FontAwesomeIcon icon={faBook} className="mr-2" />
             Course Enrollments
           </button>
           <button
@@ -272,103 +271,23 @@ const ManageUsers = () => {
         </div>
       </div>
 
-      {/* TAB 1: USER ACCOUNTS & ROLES */}
+      {/* TAB 1: STUDENT ACCOUNTS */}
       {activeTab === "users" && (
         <Card className="border border-gray-200 shadow-sm rounded-xl overflow-hidden bg-white">
           <CardHeader className="bg-gray-50/60 border-b border-gray-100 py-4 px-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
-              <CardTitle className="text-base font-bold text-gray-900">Registered Accounts & Roles</CardTitle>
+              <CardTitle className="text-base font-bold text-gray-900">Registered Student Learners</CardTitle>
               <CardDescription className="text-xs text-gray-500">
-                Search all platform users, grant or revoke administrator rights, and invite new administrators.
+                Directory of active student learners enrolled across training institute programs.
               </CardDescription>
             </div>
-
-            {/* Add Admin / User Button */}
-            <Dialog open={isCreateModalOpen} onOpenChange={setIsCreateModalOpen}>
-              <DialogTrigger asChild>
-                <Button className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold uppercase tracking-wider h-9 px-4 rounded-lg shadow-sm">
-                  <FontAwesomeIcon icon={faUserPlus} className="mr-2 h-3.5 w-3.5" />
-                  Add User / Admin
-                </Button>
-              </DialogTrigger>
-
-              <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                  <DialogTitle className="text-lg font-bold text-gray-900">Add Platform Account</DialogTitle>
-                </DialogHeader>
-                <form onSubmit={handleCreateUser} className="space-y-4 pt-2">
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Full Name</Label>
-                    <Input
-                      placeholder="e.g. Tendai Chikwanha"
-                      value={newUser.name}
-                      onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Email Address</Label>
-                    <Input
-                      type="email"
-                      placeholder="e.g. tendai@zse.co.zw"
-                      value={newUser.email}
-                      onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Initial Password (Optional)</Label>
-                    <Input
-                      type="password"
-                      placeholder="Leave blank for auto-generated password"
-                      value={newUser.password}
-                      onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label className="text-xs font-semibold">Platform Role</Label>
-                    <Select
-                      value={newUser.role}
-                      onValueChange={(val) => setNewUser({ ...newUser, role: val })}
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin">Administrator (Full Admin Access)</SelectItem>
-                        <SelectItem value="student">Student (Standard Learner)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <DialogFooter className="pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsCreateModalOpen(false)}
-                      disabled={isSubmitting}
-                      className="text-xs"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold"
-                    >
-                      {isSubmitting ? "Creating Account..." : "Create Account"}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </DialogContent>
-            </Dialog>
+            <div className="text-xs text-slate-500 font-medium">
+              Total Students: <strong className="text-slate-800">{totalCount}</strong>
+            </div>
           </CardHeader>
 
           <CardContent className="p-6">
-            {/* Search & Filters */}
+            {/* Search */}
             <form onSubmit={handleUserSearch} className="flex flex-col sm:flex-row gap-3 mb-6">
               <div className="relative flex-1">
                 <FontAwesomeIcon
@@ -376,29 +295,16 @@ const ManageUsers = () => {
                   className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 text-xs"
                 />
                 <Input
-                  placeholder="Search by user name or email address..."
+                  placeholder="Search students by name or email address..."
                   value={userSearchTerm}
                   onChange={(e) => setUserSearchTerm(e.target.value)}
                   className="pl-9 h-10 text-xs"
                 />
               </div>
 
-              <div className="flex gap-2">
-                <Select value={roleFilter} onValueChange={(val) => setRoleFilter(val)}>
-                  <SelectTrigger className="w-[140px] h-10 text-xs font-semibold">
-                    <SelectValue placeholder="Filter Role" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Roles</SelectItem>
-                    <SelectItem value="admin">Admins Only</SelectItem>
-                    <SelectItem value="student">Students Only</SelectItem>
-                  </SelectContent>
-                </Select>
-
-                <Button type="submit" variant="secondary" className="h-10 text-xs font-semibold px-4">
-                  Search
-                </Button>
-              </div>
+              <Button type="submit" className="bg-[#00aeef] hover:bg-[#008cc0] text-white h-10 text-xs font-semibold px-5">
+                Search Students
+              </Button>
             </form>
 
             {/* Users List */}
@@ -450,53 +356,16 @@ const ManageUsers = () => {
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="font-bold text-sm text-gray-900">{u.name}</span>
-                            {isAdmin ? (
-                              <Badge className="bg-[#00aeef]/15 text-[#008cc0] hover:bg-[#00aeef]/20 border border-[#00aeef]/30 font-bold text-[10px] uppercase tracking-wider px-2 py-0.5">
-                                Administrator
-                              </Badge>
-                            ) : (
-                              <Badge variant="outline" className="text-gray-500 font-semibold text-[10px] uppercase">
-                                Student
-                              </Badge>
-                            )}
+                            <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-semibold">
+                              Student Learner
+                            </Badge>
                           </div>
                           <p className="text-xs text-gray-500 mt-0.5">{u.email}</p>
                         </div>
                       </div>
 
-                      {/* Action Button: Promote / Demote */}
-                      <div className="flex items-center gap-2 self-end sm:self-center">
-                        {isAdmin ? (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            disabled={isActionLoading}
-                            onClick={() => handleRoleChange(u.id, "student")}
-                            className="text-xs text-rose-600 border-rose-200 hover:bg-rose-50 hover:text-rose-700 h-8"
-                          >
-                            {isActionLoading ? (
-                              <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xs" />
-                            ) : (
-                              "Demote to Student"
-                            )}
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            disabled={isActionLoading}
-                            onClick={() => handleRoleChange(u.id, "admin")}
-                            className="bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold h-8 shadow-sm"
-                          >
-                            {isActionLoading ? (
-                              <FontAwesomeIcon icon={faSpinner} className="animate-spin text-xs" />
-                            ) : (
-                              <>
-                                <FontAwesomeIcon icon={faShieldHalved} className="mr-1.5 h-3 w-3" />
-                                Promote to Admin
-                              </>
-                            )}
-                          </Button>
-                        )}
+                      <div className="text-xs text-slate-400 self-end sm:self-center">
+                        Registered {new Date(u.created_at).toLocaleDateString()}
                       </div>
                     </div>
                   );

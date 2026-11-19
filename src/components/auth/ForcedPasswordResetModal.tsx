@@ -18,9 +18,7 @@ import {
   faEye,
   faEyeSlash,
   faCheck,
-  faXmark,
   faRightFromBracket,
-  faLock,
 } from "@fortawesome/free-solid-svg-icons";
 
 export const ForcedPasswordResetModal: React.FC = () => {
@@ -41,8 +39,13 @@ export const ForcedPasswordResetModal: React.FC = () => {
     return null;
   }
 
-  // Password complexity checks
-  const hasMinLength = newPassword.length >= 8;
+  // Password complexity checks tailored to user role policy (Admin: 14+, Instructor: 12+, Student: 8+)
+  const isInstructor = user?.role === "instructor" || user?.role === "senior_instructor";
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
+  const minRequiredLength = isAdmin ? 14 : isInstructor ? 12 : 8;
+  const requiresSpecial = isAdmin || isInstructor;
+
+  const hasMinLength = newPassword.length >= minRequiredLength;
   const hasUpper = /[A-Z]/.test(newPassword);
   const hasLower = /[a-z]/.test(newPassword);
   const hasNumber = /[0-9]/.test(newPassword);
@@ -50,12 +53,20 @@ export const ForcedPasswordResetModal: React.FC = () => {
   const passwordsMatch = newPassword.length > 0 && newPassword === confirmPassword;
   const isDifferentFromCurrent = newPassword.length > 0 && newPassword !== currentPassword;
 
+  const passedRulesCount = [
+    hasMinLength,
+    hasUpper,
+    hasLower,
+    hasNumber,
+    hasSpecial,
+  ].filter(Boolean).length;
+
   const allRulesSatisfied =
     hasMinLength &&
     hasUpper &&
     hasLower &&
     hasNumber &&
-    hasSpecial &&
+    (!requiresSpecial || hasSpecial) &&
     passwordsMatch &&
     isDifferentFromCurrent &&
     currentPassword.trim().length > 0;
@@ -76,7 +87,7 @@ export const ForcedPasswordResetModal: React.FC = () => {
 
       toast({
         title: "Password Updated Successfully",
-        description: "Your new password has been set. Welcome to the ZSE Academy!",
+        description: "Your new password has been set. Welcome to ZSE Training Institute!",
       });
 
       // Update user state so modal closes seamlessly
@@ -101,73 +112,67 @@ export const ForcedPasswordResetModal: React.FC = () => {
     }
   };
 
-  const RuleIndicator = ({ label, passed }: { label: string; passed: boolean }) => (
-    <div className="flex items-center gap-2 text-xs">
-      <FontAwesomeIcon
-        icon={passed ? faCheck : faXmark}
-        className={`h-3 w-3 ${passed ? "text-emerald-600" : "text-slate-400"}`}
-      />
-      <span className={passed ? "text-emerald-700 font-medium" : "text-slate-500"}>
-        {label}
-      </span>
-    </div>
-  );
+  const getStrengthMeta = () => {
+    if (passedRulesCount <= 1) return { label: "Very Weak", color: "bg-red-500", width: "w-1/4" };
+    if (passedRulesCount <= 3) return { label: "Fair", color: "bg-amber-500", width: "w-2/4" };
+    if (passedRulesCount === 4) return { label: "Good", color: "bg-blue-500", width: "w-3/4" };
+    return { label: "Strong", color: "bg-emerald-500", width: "w-full" };
+  };
+
+  const strength = getStrengthMeta();
 
   return (
     <Dialog open={true} onOpenChange={() => {}}>
       <DialogContent
-        className="sm:max-w-[520px] p-0 overflow-hidden border border-slate-200 shadow-2xl rounded-2xl"
+        className="max-w-[430px] p-0 border border-slate-200/80 shadow-2xl rounded-2xl bg-white overflow-hidden max-h-[92vh] overflow-y-auto"
         onPointerDownOutside={(e) => e.preventDefault()}
         onEscapeKeyDown={(e) => e.preventDefault()}
       >
-        {/* Header Banner */}
-        <div className="bg-gradient-to-r from-slate-900 via-[#0a3161] to-[#00aeef] p-6 text-white text-center relative">
-          <div className="mx-auto w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center mb-3 shadow-inner border border-white/20">
-            <FontAwesomeIcon icon={faShieldHalved} className="h-7 w-7 text-[#00aeef]" />
+        {/* Sleek, Modern Brand Header */}
+        <div className="pt-6 pb-4 px-6 text-center border-b border-slate-100 bg-slate-50/50">
+          <div className="mx-auto w-11 h-11 rounded-2xl bg-[#00aeef]/10 border border-[#00aeef]/20 flex items-center justify-center mb-2.5 text-[#00aeef] shadow-sm">
+            <FontAwesomeIcon icon={faShieldHalved} className="h-5 w-5" />
           </div>
-          <DialogTitle className="text-xl font-bold tracking-tight text-white">
-            Welcome to ZSE Training Academy!
+          <DialogTitle className="text-base font-bold tracking-tight text-slate-900">
+            Set Your Permanent Password
           </DialogTitle>
-          <DialogDescription className="text-slate-200 text-xs mt-1.5 max-w-sm mx-auto">
-            Action Required: Initial Password Change for Institutional Security.
+          <div className="mt-1">
+            <span className="inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+              {isAdmin ? "Admin Policy (14+ chars & symbols)" : isInstructor ? "Faculty Policy (12+ chars & symbols)" : "Learner Policy (8+ chars)"}
+            </span>
+          </div>
+          <DialogDescription className="text-xs text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+            Please replace your temporary auto-generated credentials to secure your account.
           </DialogDescription>
         </div>
 
         {/* Content Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 leading-relaxed flex items-start gap-2.5">
-            <FontAwesomeIcon icon={faLock} className="text-amber-600 shrink-0 mt-0.5 text-sm" />
-            <div>
-              <strong>Security Policy:</strong> You are currently signed in with a temporary
-              auto-generated password. You must set a personalized, permanent password before you
-              can access the academy dashboard.
-            </div>
-          </div>
-
+        <form onSubmit={handleSubmit} className="p-5 space-y-3.5">
           {errorMessage && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium">
+            <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-medium">
               {errorMessage}
             </div>
           )}
 
           {/* Current Temporary Password */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">
-              Temporary / Current Password *
+            <label className="text-[11px] font-semibold text-slate-700 block">
+              Temporary / Current Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Input
                 type={showCurrent ? "text" : "password"}
-                placeholder="Enter password received in your email"
+                placeholder="Password received in email"
                 value={currentPassword}
                 onChange={(e) => setCurrentPassword(e.target.value)}
                 required
-                className="pr-10 text-xs bg-slate-50 border-slate-200"
+                className="pr-9 text-xs h-9 bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
               />
               <button
                 type="button"
                 onClick={() => setShowCurrent(!showCurrent)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                tabIndex={-1}
               >
                 <FontAwesomeIcon icon={showCurrent ? faEyeSlash : faEye} />
               </button>
@@ -176,20 +181,23 @@ export const ForcedPasswordResetModal: React.FC = () => {
 
           {/* New Password */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">New Password *</label>
+            <label className="text-[11px] font-semibold text-slate-700 block">
+              New Password <span className="text-red-500">*</span>
+            </label>
             <div className="relative">
               <Input
                 type={showNew ? "text" : "password"}
-                placeholder="Enter strong new password"
+                placeholder="Create strong new password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                className="pr-10 text-xs bg-slate-50 border-slate-200"
+                className="pr-9 text-xs h-9 bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
               />
               <button
                 type="button"
                 onClick={() => setShowNew(!showNew)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                tabIndex={-1}
               >
                 <FontAwesomeIcon icon={showNew ? faEyeSlash : faEye} />
               </button>
@@ -198,62 +206,89 @@ export const ForcedPasswordResetModal: React.FC = () => {
 
           {/* Confirm New Password */}
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-slate-700">
-              Confirm New Password *
+            <label className="text-[11px] font-semibold text-slate-700 block">
+              Confirm New Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <Input
                 type={showConfirm ? "text" : "password"}
-                placeholder="Re-type new password"
+                placeholder="Re-enter new password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                className="pr-10 text-xs bg-slate-50 border-slate-200"
+                className="pr-9 text-xs h-9 bg-slate-50 border-slate-200 rounded-lg focus:bg-white"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirm(!showConfirm)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs p-1"
+                tabIndex={-1}
               >
                 <FontAwesomeIcon icon={showConfirm ? faEyeSlash : faEye} />
               </button>
             </div>
           </div>
 
-          {/* Live Complexity Checklist */}
-          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
-            <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
-              Password Requirements
-            </p>
-            <div className="grid grid-cols-2 gap-1.5">
-              <RuleIndicator label="Min. 8 characters" passed={hasMinLength} />
-              <RuleIndicator label="Uppercase (A-Z)" passed={hasUpper} />
-              <RuleIndicator label="Lowercase (a-z)" passed={hasLower} />
-              <RuleIndicator label="Number (0-9)" passed={hasNumber} />
-              <RuleIndicator label="Special character" passed={hasSpecial} />
-              <RuleIndicator label="Passwords match" passed={passwordsMatch} />
+          {/* Sleek Password Strength & Checklist Chips */}
+          <div className="p-3 bg-slate-50/80 border border-slate-200/70 rounded-xl space-y-2">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-500 font-medium">Strength:</span>
+              <span className="font-semibold text-slate-700">
+                {newPassword ? strength.label : "Enter password"}
+              </span>
+            </div>
+            <div className="h-1.5 w-full bg-slate-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${newPassword ? strength.color : "bg-transparent"} ${newPassword ? strength.width : "w-0"} transition-all duration-300 rounded-full`}
+              />
+            </div>
+
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {[
+                { label: `${minRequiredLength}+ chars`, passed: hasMinLength },
+                { label: "Uppercase (A-Z)", passed: hasUpper },
+                { label: "Lowercase (a-z)", passed: hasLower },
+                { label: "Number (0-9)", passed: hasNumber },
+                { label: requiresSpecial ? "Symbol (!@#...)" : "Symbol (Optional)", passed: hasSpecial },
+                { label: "Match", passed: passwordsMatch },
+              ].map((item) => (
+                <span
+                  key={item.label}
+                  className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors ${
+                    item.passed
+                      ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                      : "bg-white text-slate-400 border border-slate-200"
+                  }`}
+                >
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className={`text-[8px] ${item.passed ? "text-emerald-600" : "text-transparent"}`}
+                  />
+                  {item.label}
+                </span>
+              ))}
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="pt-2 flex items-center justify-between gap-3">
+          <div className="pt-2 flex items-center justify-between gap-2.5">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               onClick={() => logout()}
-              className="text-xs text-slate-600 hover:text-red-600 border-slate-200 rounded-xl h-10 px-4"
+              className="text-xs text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg h-9 px-3"
             >
-              <FontAwesomeIcon icon={faRightFromBracket} className="mr-2 text-xs" />
+              <FontAwesomeIcon icon={faRightFromBracket} className="mr-1.5 text-xs" />
               Sign Out
             </Button>
 
             <Button
               type="submit"
               disabled={submitting || !allRulesSatisfied}
-              className="flex-1 bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-bold rounded-xl h-10 shadow-sm"
+              className="flex-1 bg-[#00aeef] hover:bg-[#008cc0] text-white text-xs font-semibold rounded-lg h-9 shadow-sm transition-all"
             >
-              <FontAwesomeIcon icon={faKey} className="mr-2 text-xs" />
-              {submitting ? "Updating..." : "Set New Password & Proceed"}
+              <FontAwesomeIcon icon={faKey} className="mr-1.5 text-xs" />
+              {submitting ? "Updating..." : "Update Password & Continue"}
             </Button>
           </div>
         </form>
@@ -261,4 +296,3 @@ export const ForcedPasswordResetModal: React.FC = () => {
     </Dialog>
   );
 };
-

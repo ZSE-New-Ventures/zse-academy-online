@@ -12,6 +12,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -39,6 +49,7 @@ interface MemberItem {
 export const ManageGroups = () => {
   const [groups, setGroups] = useState<UserGroup[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingGroup, setDeletingGroup] = useState<UserGroup | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const { toast } = useToast();
 
@@ -132,18 +143,18 @@ export const ManageGroups = () => {
     }
   };
 
-  const handleDeleteGroup = async (group: UserGroup) => {
-    if (!window.confirm(`Are you sure you want to delete the group "${group.name}"?`)) {
-      return;
-    }
+  const confirmDeleteGroup = async () => {
+    if (!deletingGroup) return;
 
     try {
-      await courseService.deleteGroup(group.id);
-      toast({ title: "Deleted", description: "Cohort group removed successfully." });
+      await courseService.deleteGroup(deletingGroup.id);
+      toast({ title: "Deleted", description: `Cohort group "${deletingGroup.name}" removed successfully.` });
       fetchGroups();
     } catch (error) {
       console.error("Error deleting group:", error);
       toast({ title: "Error", description: "Failed to delete cohort group.", variant: "destructive" });
+    } finally {
+      setDeletingGroup(null);
     }
   };
 
@@ -354,7 +365,7 @@ export const ManageGroups = () => {
                   <Button
                     size="icon"
                     variant="ghost"
-                    onClick={() => handleDeleteGroup(group)}
+                    onClick={() => setDeletingGroup(group)}
                     className="h-8 w-8 text-red-500 hover:text-red-700 hover:bg-red-50"
                   >
                     <FontAwesomeIcon icon={faTrash} className="text-xs" />
@@ -557,6 +568,38 @@ export const ManageGroups = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Modern In-App Removal Confirmation Dialog */}
+      <AlertDialog
+        open={!!deletingGroup}
+        onOpenChange={(open) => !open && setDeletingGroup(null)}
+      >
+        <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+          <AlertDialogHeader>
+            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3">
+              <FontAwesomeIcon icon={faTrash} className="text-lg" />
+            </div>
+            <AlertDialogTitle className="text-lg font-bold text-slate-900">
+              Delete Cohort Group?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to delete the group <strong>"{deletingGroup?.name}"</strong>? 
+              Existing course assignments and member links tied to this group will be unlinked.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-5 gap-2 sm:gap-0">
+            <AlertDialogCancel className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold h-9 px-4">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteGroup}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold h-9 px-5 shadow-sm"
+            >
+              Yes, Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

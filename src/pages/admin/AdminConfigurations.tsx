@@ -20,6 +20,16 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faPlus, faTrash, faUsers, faCheck, faShieldHalved } from "@fortawesome/free-solid-svg-icons";
 import { API_BASE_URL } from "@/constants/api";
@@ -38,6 +48,7 @@ interface Category {
 function AdminConfigurations() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
   const [name, setName] = useState("");
@@ -148,8 +159,9 @@ function AdminConfigurations() {
     }
   };
 
-  const handleDeleteCategory = async (categoryId: number) => {
-    if (!window.confirm("Delete this category?")) return;
+  const confirmDeleteCategory = async () => {
+    if (!deletingCategory) return;
+    const categoryId = deletingCategory.id;
 
     try {
       await fetch(`${API_URL}/${categoryId}`, {
@@ -159,15 +171,17 @@ function AdminConfigurations() {
 
       setCategories((prev) => prev.filter((cat) => cat.id !== categoryId));
       toast({
-        title: "Deleted",
-        description: "Category removed successfully",
+        title: "Category Deleted",
+        description: `"${deletingCategory.name}" removed successfully.`,
       });
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to delete category",
+        description: "Failed to delete category.",
         variant: "destructive",
       });
+    } finally {
+      setDeletingCategory(null);
     }
   };
 
@@ -448,7 +462,7 @@ function AdminConfigurations() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleDeleteCategory(category.id)}
+                      onClick={() => setDeletingCategory(category)}
                       className="text-red-500 hover:text-red-700 hover:bg-red-50 h-8 text-xs"
                     >
                       <FontAwesomeIcon icon={faTrash} className="mr-1" />
@@ -532,6 +546,38 @@ function AdminConfigurations() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Modern In-App Removal Confirmation Dialog */}
+      <AlertDialog
+        open={!!deletingCategory}
+        onOpenChange={(open) => !open && setDeletingCategory(null)}
+      >
+        <AlertDialogContent className="max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100">
+          <AlertDialogHeader>
+            <div className="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3">
+              <FontAwesomeIcon icon={faTrash} className="text-lg" />
+            </div>
+            <AlertDialogTitle className="text-lg font-bold text-slate-900">
+              Delete Course Category?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-sm text-slate-600 leading-relaxed">
+              Are you sure you want to delete category <strong>"{deletingCategory?.name}"</strong>? 
+              Courses assigned to this category will need to be recategorized.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-5 gap-2 sm:gap-0">
+            <AlertDialogCancel className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-semibold h-9 px-4">
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteCategory}
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold h-9 px-5 shadow-sm"
+            >
+              Yes, Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
     </div>
   );
