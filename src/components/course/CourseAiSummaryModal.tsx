@@ -26,12 +26,79 @@ import {
   faUserGraduate,
   faShieldHalved,
   faLightbulb,
-  faArrowUpRightFromSquare
+  faArrowUpRightFromSquare,
+  faChartLine,
+  faBuildingColumns,
+  faCoins,
+  faExternalLinkAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { courseService } from "@/services/course.service";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { TypewriterText } from "@/components/ai/TypewriterText";
+
+const SHOWCASE_COUNTERS = [
+  {
+    ticker: "DLTA",
+    name: "Delta Corporation Limited",
+    exchange: "ZSE",
+    currency: "ZiG",
+    sector: "Beverages & Consumer Staples",
+    marketRole: "Zimbabwe's largest listed corporate by market capitalization and institutional liquidity.",
+    dividendProfile: "Reliable semi-annual dividend distributions in both ZiG and foreign currency components.",
+    syllabusConnection: "Used to demonstrate blue-chip equities valuation, price-to-earnings (P/E) benchmarking, and dividend discount modeling in capital markets.",
+    portalUrl: "https://www.zsedirect.co.zw",
+    highlights: ["Largest market cap on ZSE", "High trading liquidity", "Consumer staple defensive moat"]
+  },
+  {
+    ticker: "ECO",
+    name: "Econet Wireless Zimbabwe",
+    exchange: "ZSE",
+    currency: "ZiG",
+    sector: "Telecommunications & Technology",
+    marketRole: "Pioneer in mobile telecoms, digital broadband infrastructure, and mobile network operations.",
+    dividendProfile: "Periodic capital reinvestment and cash distributions aligned with infrastructure modernization.",
+    syllabusConnection: "Illustrates technology growth stock dynamics, volume-weighted average price (VWAP) trading, and retail investor participation.",
+    portalUrl: "https://www.zsedirect.co.zw",
+    highlights: ["Dominant telecom provider", "Retail investor favorite", "High digital ecosystem integration"]
+  },
+  {
+    ticker: "SIM",
+    name: "Simbisa Brands Limited",
+    exchange: "VFEX",
+    currency: "USD",
+    sector: "Quick Service Restaurants (QSR)",
+    marketRole: "Regional hospitality and food retailer operating across Zimbabwe, Kenya, Ghana, Mauritius, and DRC.",
+    dividendProfile: "Pure US Dollar dividends paid semi-annually directly into foreign currency accounts (FCA).",
+    syllabusConnection: "Exemplifies Victoria Falls Stock Exchange US Dollar counter investing, regional export expansion, and zero percent capital gains tax advantages.",
+    portalUrl: "https://www.vfexdirect.co.zw",
+    highlights: ["100% USD-denominated trading", "0% capital gains tax on VFEX", "Multi-country African revenue"]
+  },
+  {
+    ticker: "PHL",
+    name: "Padenga Holdings Limited",
+    exchange: "VFEX",
+    currency: "USD",
+    sector: "Export Agriculture & Gold Mining",
+    marketRole: "Global producer of premium crocodile skins and export gold mining via Dallaglio Investments.",
+    dividendProfile: "Hard-currency foreign exchange dividend distributions funded by global commodity export proceeds.",
+    syllabusConnection: "Demonstrates commodity export hedging, dual-listing migration from ZSE to VFEX, and hard currency portfolio balancing.",
+    portalUrl: "https://www.vfexdirect.co.zw",
+    highlights: ["Direct foreign currency earner", "Gold mining growth division", "International luxury brand supplier"]
+  },
+  {
+    ticker: "SCIL",
+    name: "Seed Co International Limited",
+    exchange: "VFEX",
+    currency: "USD",
+    sector: "Pan-African Agribusiness & Seed Genetics",
+    marketRole: "Leading agricultural research and seed certified producer with operations across 15+ African nations.",
+    dividendProfile: "USD dividends reflecting regional agricultural harvest cycles and cross-border licensing.",
+    syllabusConnection: "Highlights agricultural risk management, regional expansion on the VFEX offshore exchange, and food security equity investments.",
+    portalUrl: "https://www.vfexdirect.co.zw",
+    highlights: ["Pan-African agricultural footprint", "Proprietary hybrid seed IP", "VFEX dollar trading liquidity"]
+  }
+];
 
 interface CourseAiSummaryModalProps {
   isOpen: boolean;
@@ -72,7 +139,8 @@ export const CourseAiSummaryModal = ({
   const [data, setData] = useState<AiSummaryData | null>(null);
   const [loading, setLoading] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<"overview" | "modules" | "audience" | "ask">("overview");
+  const [activeTab, setActiveTab] = useState<"overview" | "modules" | "market_lab" | "audience" | "ask">("overview");
+  const [selectedCounterIndex, setSelectedCounterIndex] = useState(0);
   const [copied, setCopied] = useState(false);
 
   // Ask AI state
@@ -166,12 +234,12 @@ ${data.prerequisites || ""}
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-3xl w-[95vw] max-h-[90vh] p-0 overflow-hidden bg-white rounded-3xl border border-slate-200 shadow-2xl flex flex-col">
         {/* Header with AI Gradient */}
-        <div className="relative bg-gradient-to-r from-[#0b1324] via-[#0f244a] to-[#00aeef] p-6 text-white shrink-0">
+        <div className="relative bg-gradient-to-r from-[#070e1e] via-[#0b1c3d] to-[#00aeef] p-6 text-white shrink-0">
           <div className="relative z-10">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-md rounded-full text-[11px] font-bold uppercase tracking-wider text-sky-200 border border-white/20">
                 <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef]" />
-                ZSE AI Course Copilot
+                ZSE Training Institute Explorer
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -200,10 +268,10 @@ ${data.prerequisites || ""}
             </div>
 
             <DialogTitle className="text-xl sm:text-2xl font-black text-white leading-tight">
-              {courseTitle || "Course Executive Summary"}
+              Explorer AI • {courseTitle || "Curriculum & Market Intelligence"}
             </DialogTitle>
             <p className="text-xs text-sky-100/90 mt-1">
-              Curriculum analysis, core competencies, and market relevance powered by ZSE AI
+              AI-assisted syllabus analysis, practical trading application, and listed counter intelligence
             </p>
           </div>
 
@@ -236,6 +304,18 @@ ${data.prerequisites || ""}
             Syllabus Breakdown
           </button>
           <button
+            onClick={() => setActiveTab("market_lab")}
+            className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
+              activeTab === "market_lab"
+                ? "border-[#00aeef] text-[#00aeef]"
+                : "border-transparent text-slate-500 hover:text-slate-800"
+            }`}
+          >
+            <FontAwesomeIcon icon={faChartLine} className="text-[11px]" />
+            Market Lab
+            <span className="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.2 rounded-full font-extrabold ml-1">Counters</span>
+          </button>
+          <button
             onClick={() => setActiveTab("audience")}
             className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 flex items-center gap-1.5 whitespace-nowrap ${
               activeTab === "audience"
@@ -255,7 +335,7 @@ ${data.prerequisites || ""}
             }`}
           >
             <FontAwesomeIcon icon={faComments} className="text-[11px]" />
-            Ask AI Copilot
+            Ask Explorer
             <span className="text-[9px] bg-sky-100 text-[#00aeef] px-1.5 py-0.2 rounded-full font-extrabold ml-1">Live</span>
           </button>
         </div>
@@ -406,7 +486,131 @@ ${data.prerequisites || ""}
                 </div>
               )}
 
-              {/* TAB 3: AUDIENCE & FIT */}
+              {/* TAB 3: MARKET LAB - LISTED COUNTERS */}
+              {activeTab === "market_lab" && (
+                <div className="space-y-5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-100">
+                    <div>
+                      <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                        <span>ZSE & VFEX Market Lab</span>
+                        <span className="text-[10px] bg-emerald-100 text-emerald-800 font-extrabold px-2 py-0.5 rounded-full">
+                          Real-World Case Studies
+                        </span>
+                      </h4>
+                      <p className="text-xs text-slate-500">
+                        See how this course's valuation and trading principles apply to live listed counters on ZSE & VFEX Direct.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Counter Pills */}
+                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                    {SHOWCASE_COUNTERS.map((counter, idx) => {
+                      const isSelected = selectedCounterIndex === idx;
+                      return (
+                        <button
+                          key={counter.ticker}
+                          onClick={() => setSelectedCounterIndex(idx)}
+                          className={`px-3 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shrink-0 border ${
+                            isSelected
+                              ? "bg-[#070e1e] text-white border-[#070e1e] shadow-md shadow-slate-900/10"
+                              : "bg-white text-slate-700 border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                          }`}
+                        >
+                          <span>{counter.ticker}</span>
+                          <span
+                            className={`text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase ${
+                              counter.exchange === "VFEX"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-sky-100 text-sky-700"
+                            }`}
+                          >
+                            {counter.exchange} • {counter.currency}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Selected Counter Card */}
+                  {(() => {
+                    const c = SHOWCASE_COUNTERS[selectedCounterIndex];
+                    return (
+                      <div className="bg-slate-50/70 border border-slate-200/90 rounded-2xl p-5 space-y-4">
+                        <div className="flex flex-wrap items-start justify-between gap-3 pb-3 border-b border-slate-200/80">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-lg font-black text-slate-900">{c.name}</span>
+                              <Badge className="bg-[#00aeef] text-white text-[10px] font-bold">
+                                {c.ticker}
+                              </Badge>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-0.5 font-medium">
+                              Sector: <span className="text-slate-800 font-semibold">{c.sector}</span> • Primary Exchange: <span className="text-slate-800 font-semibold">{c.exchange} ({c.currency})</span>
+                            </p>
+                          </div>
+
+                          <a
+                            href={c.portalUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-[#00aeef] text-[#00aeef] text-xs font-bold shadow-xs hover:bg-sky-50/50 transition-all"
+                          >
+                            <span>Open on {c.exchange} Direct</span>
+                            <FontAwesomeIcon icon={faExternalLinkAlt} className="text-[10px]" />
+                          </a>
+                        </div>
+
+                        {/* Syllabus Connection Insight */}
+                        <div className="p-4 rounded-xl bg-sky-50/90 border border-sky-100">
+                          <h5 className="text-xs font-bold text-[#00aeef] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            <FontAwesomeIcon icon={faLightbulb} />
+                            How this Counter Applies to this Course Syllabus
+                          </h5>
+                          <p className="text-xs sm:text-sm text-slate-800 leading-relaxed font-medium">
+                            {c.syllabusConnection}
+                          </p>
+                        </div>
+
+                        {/* Market Role & Highlights */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                              Institutional Role
+                            </span>
+                            <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                              {c.marketRole}
+                            </p>
+                          </div>
+                          <div className="p-3.5 rounded-xl bg-white border border-slate-200/80">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+                              Dividend & Capital Return
+                            </span>
+                            <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                              {c.dividendProfile}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Bullet Highlights */}
+                        <div className="flex flex-wrap gap-2 pt-1">
+                          {c.highlights.map((h, i) => (
+                            <span
+                              key={i}
+                              className="text-[11px] font-semibold text-slate-700 bg-white border border-slate-200 px-2.5 py-1 rounded-lg flex items-center gap-1.5"
+                            >
+                              <FontAwesomeIcon icon={faCircleCheck} className="text-emerald-500 text-[10px]" />
+                              {h}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* TAB 4: AUDIENCE & FIT */}
               {activeTab === "audience" && (
                 <div className="space-y-5">
                   {/* Target Audience */}
@@ -460,26 +664,26 @@ ${data.prerequisites || ""}
                 </div>
               )}
 
-              {/* TAB 4: ASK AI COPILOT */}
+              {/* TAB 5: ASK EXPLORER COPILOT */}
               {activeTab === "ask" && (
                 <div className="space-y-4">
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                       <FontAwesomeIcon icon={faComments} className="text-[#00aeef]" />
-                      Interactive Course Q&A
+                      Ask Explorer (Capital Markets Copilot)
                     </h4>
                     <p className="text-xs text-slate-500">
-                      Ask any question about this course syllabus, difficulty, certificate, or learning outcomes.
+                      Ask any question about this syllabus, SECZim regulations, trading workflows on ZSE/VFEX Direct, or investor readiness.
                     </p>
                   </div>
 
                   {/* Sample Quick Questions */}
                   <div className="flex flex-wrap gap-2 pt-1">
                     {[
-                      "Will I earn a certificate upon completion?",
-                      "Is this course suitable for beginners?",
-                      "How long will it take to finish?",
-                      "How does this apply to trading on ZSE?",
+                      "Will I earn an accredited certificate?",
+                      "How do I buy shares on ZSE Direct?",
+                      "What is the difference between ZSE (ZiG) and VFEX (USD)?",
+                      "How does this course apply to practical trading?",
                     ].map((sampleQ, idx) => (
                       <button
                         key={idx}
