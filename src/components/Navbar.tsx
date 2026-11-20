@@ -32,13 +32,11 @@ import {
   faExternalLinkAlt,
   faFire,
   faRoute,
-  faWandMagicSparkles,
 } from "@fortawesome/free-solid-svg-icons";
 import { useAuth } from "@/contexts/AuthContext";
 import logo from "../assets/logo.png";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useCourses } from "@/hooks/useCourses";
-import { CourseAiSummaryModal } from "@/components/course/CourseAiSummaryModal";
 
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +46,6 @@ export const Navbar = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const [isWishlistModalOpen, setIsWishlistModalOpen] = useState(false);
-  const [isExplorerModalOpen, setIsExplorerModalOpen] = useState(false);
   const [wishlistIds, setWishlistIds] = useState<number[]>([]);
   const { data: courses = [] } = useCourses();
   const [wishlistCount, setWishlistCount] = useState(0);
@@ -382,22 +379,6 @@ export const Navbar = () => {
                 </div>
               )}
             </div>
-
-            {/* Global Explorer AI Trigger */}
-            <button
-              onClick={() => setIsExplorerModalOpen(true)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sky-300/80 bg-gradient-to-r from-sky-50 via-indigo-50/50 to-purple-50/40 text-slate-800 hover:text-[#00aeef] hover:border-[#00aeef] text-[11px] font-bold uppercase tracking-wider transition-all shadow-xs group cursor-pointer ml-1"
-              title="Launch ZSE Training Institute Explorer AI"
-            >
-              <FontAwesomeIcon
-                icon={faWandMagicSparkles}
-                className="text-[#00aeef] text-xs transition-transform group-hover:rotate-12"
-              />
-              <span>Explorer</span>
-              <span className="px-1.5 py-0.2 rounded-full bg-[#00aeef] text-white text-[9px] font-black uppercase">
-                AI
-              </span>
-            </button>
           </div>
 
           {/* Auth & Profile Section */}
@@ -706,23 +687,6 @@ export const Navbar = () => {
                     <FontAwesomeIcon icon={faExternalLinkAlt} className="text-[#00aeef]" />
                     <span>Contact Us</span>
                   </Link>
-
-                  {/* Mobile Explorer AI Trigger */}
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      setIsExplorerModalOpen(true);
-                    }}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-sky-50 to-indigo-50/60 border border-sky-200 text-slate-800 hover:text-[#00aeef] transition-all"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef]" />
-                      <span>Explorer AI</span>
-                    </div>
-                    <span className="bg-[#00aeef] text-white text-[10px] font-black px-2 py-0.5 rounded-full uppercase">
-                      Analysis
-                    </span>
-                  </button>
                 </div>
               </div>
 
@@ -793,14 +757,6 @@ export const Navbar = () => {
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Global Explorer AI Modal */}
-      <CourseAiSummaryModal
-        isOpen={isExplorerModalOpen}
-        onClose={() => setIsExplorerModalOpen(false)}
-        courseId={11485}
-        courseTitle="ZSE Training Institute Explorer"
-      />
     </nav>
   );
 };

@@ -742,168 +742,244 @@ const CourseDetail = () => {
 
 
 
-      {/* ZSE Training Institute Course Hero Banner */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#060b17] via-[#0b172e] to-[#071324] text-white py-10 md:py-14 border-b border-slate-800">
-        {/* Ambient fintech glow effects */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#00aeef]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-10 w-80 h-80 bg-indigo-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      {/* Udemy Header Section */}
+
+      <section className="relative bg-cover bg-center text-white py-8 md:py-12" style={{ backgroundImage: `url(${courseBg})` }}>
+
+        <div className="absolute inset-0 bg-black opacity-50" />
 
         <div className="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8 relative">
-            {/* Left Content Column */}
-            <div className="lg:col-span-2 space-y-4 md:space-y-6">
-              {/* Breadcrumb & Accreditation Badges */}
-              <div className="flex flex-wrap items-center gap-2.5">
-                <nav className="flex items-center space-x-2 text-xs font-semibold text-slate-400">
-                  <Link to="/courses" className="hover:text-white transition-colors">
-                    Courses
-                  </Link>
-                  <FontAwesomeIcon icon={faChevronRight} className="h-2.5 w-2.5 text-slate-600" />
-                  <span className="text-sky-300 font-bold">
-                    {course.category?.name || "Capital Markets"}
-                  </span>
-                </nav>
 
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold bg-[#00aeef]/15 text-[#00aeef] border border-[#00aeef]/30 px-2.5 py-0.5 rounded-full">
-                  Accredited Syllabus
+          <div className="flex flex-col-reverse lg:grid lg:grid-cols-3 gap-8 relative">
+
+            {/* Left Content Column */}
+
+            <div className="lg:col-span-2 space-y-4 md:space-y-6">
+
+              {/* Breadcrumb - White on Dark */}
+
+              <nav className="flex items-center space-x-2 text-sm text-[#cec0fc] font-bold">
+
+                <Link to="/courses" className="hover:underline">
+
+                  Courses
+
+                </Link>
+
+                <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3" />
+
+                <span className="text-[#cec0fc]">
+
+                  {course.category?.name || "Topic"}
+
                 </span>
 
                 {(course.visibility === "restricted" || (course.category as unknown as { access_level?: string })?.access_level === "restricted") && (
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-bold bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-sm">
-                    <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3 text-slate-950" />
-                    Sponsor Exam
-                  </span>
-                )}
-              </div>
 
-              {/* Course Title */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-left leading-tight tracking-tight text-white">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-full shadow-sm">
+
+                    <FontAwesomeIcon icon={faShieldHalved} className="h-3 w-3 text-slate-950" />
+
+                    Sponsor Exam
+
+                  </span>
+
+                )}
+
+              </nav>
+
+
+
+              <h1 className="text-3xl lg:text-4xl font-bold text-left leading-tight">
+
                 {course.title}
+
               </h1>
 
-              {/* Course Description */}
-              <p className="text-sm sm:text-base leading-relaxed text-slate-300 transition-all duration-300">
+
+
+              <p className="text-lg leading-relaxed text-gray-200 transition-all duration-300">
+
                 {course.description && (
+
                   <>
+
                     {showFullDesc
+
                       ? course.description
-                      : `${course.description.substring(0, 225)}${course.description.length > 225 ? "..." : ""}`}
-                    {course.description.length > 225 && (
+
+                      : `${course.description.substring(0, 225)}${course.description.length > 25 ? "..." : ""}`}
+
+                    {course.description.length > 25 && (
+
                       <button
+
                         onClick={() => setShowFullDesc(!showFullDesc)}
-                        className="ml-2 font-bold text-[#00aeef] hover:text-sky-300 underline transition-colors text-xs"
+
+                        className="ml-2 underline font-bold hover:text-white text-[#cec0fc] transition-colors text-sm"
+
                       >
+
                         {showFullDesc ? "Read Less" : "Read More"}
+
                       </button>
+
                     )}
+
                   </>
+
                 )}
+
               </p>
 
-              {/* Ratings & Metadata Bar */}
-              <div className="flex flex-wrap items-center gap-4 text-left pt-1">
-                <div className="flex items-center space-x-2">
-                  {(course.reviews_avg_rating && course.reviews_avg_rating > 0) ? (
-                    <>
-                      <span className="font-black text-[#f3ca8c] text-sm">
-                        {course.reviews_avg_rating.toFixed(1)}
-                      </span>
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <Star
-                            key={i}
-                            className={`h-4 w-4 ${
-                              i < Math.round(course.reviews_avg_rating || 0)
-                                ? "fill-[#f3ca8c] text-[#f3ca8c]"
-                                : "text-slate-600"
+
+
+              <div className="flex flex-wrap items-center gap-4 text-left">
+
+                <div className="flex items-center space-x-1">
+
+                  <span className="font-bold text-[#f3ca8c]">
+
+                    {(course.reviews_avg_rating || course.rating || 0).toFixed(1)}
+
+                  </span>
+
+                  <div className="flex">
+
+                    {[...Array(5)].map((_, i) => {
+
+                      const ratingVal = course.reviews_avg_rating || course.rating || 0;
+
+                      return (
+
+                        <Star
+
+                          key={i}
+
+                          className={`h-4 w-4 ${i < Math.round(ratingVal)
+
+                              ? "fill-[#f3ca8c] text-[#f3ca8c]"
+
+                              : "text-gray-600"
+
                             }`}
-                          />
-                        ))}
-                      </div>
-                      <span
-                        className="text-xs text-slate-400 hover:text-white underline cursor-pointer"
-                        onClick={() => setActiveTab("reviews")}
-                      >
-                        ({course.reviews_count ?? 0} {course.reviews_count === 1 ? "rating" : "ratings"})
-                      </span>
-                    </>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">
-                      ★ Official Certified Syllabus • ZSE Training Institute
-                    </span>
-                  )}
+
+                        />
+
+                      );
+
+                    })}
+
+                  </div>
+
+                  <span className="text-[#cec0fc] hover:underline cursor-pointer" onClick={() => setActiveTab("reviews")}>
+
+                    ({course.reviews_count ?? 0} {course.reviews_count === 1 ? "rating" : "ratings"})
+
+                  </span>
+
                 </div>
+
               </div>
 
-              {/* Instructor & Update Meta */}
-              <div className="flex flex-wrap items-center gap-4 text-xs text-slate-400 border-t border-slate-800/80 pt-3">
+
+
+              <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
+
                 <div>
-                  Created by <span className="text-white font-semibold">{course.instructor?.name || "ZSE Training Institute Faculty"}</span>
+
+                  Created by <span className="text-[#cec0fc] hover:underline cursor-pointer">{course.instructor?.name || "ZSE Training Institute"}</span>
+
                 </div>
+
                 <div className="flex items-center">
-                  <FontAwesomeIcon icon={faFileAlt} className="mr-2 h-3.5 w-3.5 text-slate-500" />
+
+                  <FontAwesomeIcon icon={faFileAlt} className="mr-2 h-3.5 w-3.5" />
+
                   Last updated {new Date(course.updated_at).toLocaleDateString()}
+
                 </div>
-                <div className="flex items-center text-slate-400">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00aeef] mr-2"></span>
-                  ZiG & USD Capital Markets
-                </div>
+
               </div>
 
-              {/* Explorer AI Analysis Button in Hero */}
-              <div className="pt-2 flex flex-wrap items-center gap-3">
+              {/* AI Summarize Button in Hero */}
+              <div className="pt-2">
                 <Button
                   onClick={() => setIsAiSummaryModalOpen(true)}
-                  className="bg-gradient-to-r from-[#00aeef] via-sky-500 to-indigo-600 hover:from-[#0096ce] hover:to-indigo-700 text-white font-extrabold text-xs h-11 px-6 rounded-xl shadow-lg shadow-[#00aeef]/30 border border-white/20 flex items-center gap-2.5 group transition-all transform hover:-translate-y-0.5 cursor-pointer"
+                  className="bg-gradient-to-r from-sky-400 via-[#00aeef] to-indigo-600 hover:from-sky-500 hover:to-indigo-700 text-white font-bold text-xs h-10 px-5 rounded-xl shadow-lg shadow-[#00aeef]/25 border border-white/20 flex items-center gap-2 group/ai transition-all"
                 >
-                  <FontAwesomeIcon icon={faWandMagicSparkles} className="text-white text-xs group-hover:rotate-12 transition-transform" />
-                  <span>Explorer AI Analysis</span>
-                  <span className="bg-white/25 text-white text-[9px] font-black px-1.5 py-0.5 rounded-full uppercase tracking-wider ml-1">
-                    NEW
-                  </span>
+                  <FontAwesomeIcon icon={faWandMagicSparkles} className="text-white text-xs group-hover/ai:rotate-12 transition-transform" />
+                  <span>Summarise</span>
                 </Button>
-                <span className="text-xs text-slate-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  Instant curriculum & listed counter intelligence
-                </span>
               </div>
+
             </div>
 
+
+
+
+
+
+
             {/* Mobile Sidebar Card - Simplified */}
+
             <div className="lg:hidden w-full mt-4">
+
               <img
+
                 src={course.thumbnail_url || course.thumbnail || "/placeholder.svg"}
+
                 alt={course.title}
-                className="w-full aspect-video object-cover object-top rounded-2xl border border-white/20 mb-4 shadow-xl"
+
+                className="w-full aspect-video object-cover object-top border border-white/20 mb-4"
+
               />
+
               <div className="flex flex-col gap-3">
+
                 {course.progress === 100 || course.is_completed ? (
-                  <Button className="w-full rounded-xl h-12 bg-green-700 hover:bg-green-700 text-white font-bold cursor-default">
+
+                  <Button className="w-full rounded-none h-12 bg-green-700 hover:bg-green-700 text-white font-bold cursor-default">
+
                     Completed
+
                   </Button>
+
                 ) : course.is_enrolled ? (
-                  <Button className="w-full rounded-xl h-12 bg-green-600 hover:bg-green-600 text-white font-bold cursor-default">
+
+                  <Button className="w-full rounded-none h-12 bg-green-600 hover:bg-green-600 text-white font-bold cursor-default">
+
                     Enrolled
+
                   </Button>
+
                 ) : (
-                  <Button onClick={handleEnrollNow} className="w-full rounded-xl h-12 bg-[#00aeef] hover:bg-[#009ad1] text-white font-bold shadow-lg shadow-[#00aeef]/30">
+
+                  <Button onClick={handleEnrollNow} className="w-full rounded-none h-12 bg-[#00aeef] hover:bg-[#009ad1] text-white font-bold">
+
                     Enroll Now
+
                   </Button>
+
                 )}
 
                 <Button
                   variant="outline"
                   onClick={() => setIsAiSummaryModalOpen(true)}
-                  className="w-full rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-300 text-[#00aeef] font-bold text-xs h-11 flex items-center justify-center gap-2"
+                  className="w-full rounded-xl bg-gradient-to-r from-sky-50 via-indigo-50/60 to-purple-50/50 hover:from-sky-100 hover:to-indigo-100 border border-sky-200 text-[#00aeef] font-bold text-xs h-10 flex items-center justify-center gap-2"
                 >
                   <FontAwesomeIcon icon={faWandMagicSparkles} className="text-[#00aeef] text-xs" />
-                  <span>Explorer AI Analysis</span>
+                  <span>Summarise</span>
                 </Button>
+
               </div>
+
             </div>
+
           </div>
+
         </div>
+
       </section>
 
 
